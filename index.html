@@ -246,6 +246,14 @@
     #estreno .arrow{display:none}
     #estreno .btn-primary{display:block;text-align:center}
   }
+
+  #tiktok .tkc-frame{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
+  #tiktok .tkc-close{position:absolute;top:8px;right:8px;z-index:5;width:30px;height:30px;border-radius:50%;background:rgba(10,10,11,.72);border:1px solid var(--line-2);color:#fff;cursor:pointer;display:grid;place-items:center;font-size:12px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  #tiktok .tkc-close:hover{background:var(--uv);border-color:var(--uv)}
+  #tiktok .tkc-play{cursor:pointer;padding:0}
+  #tiktok .tkc-handle{text-decoration:none;cursor:pointer}
+  #tiktok .tkc.playing{transform:none}
+  #tiktok .tkc.playing:hover{transform:none}
 </style>
 </head>
 <body oncontextmenu="return true">
@@ -521,18 +529,31 @@
 
   /* ====== TikTok ====== */
   var tkMount = document.getElementById('tk-mount');
+  var openTk=null;
+  function bindPlay(cell){ var pb=cell.querySelector('.tkc-play'); if(pb) pb.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); playTk(cell); }); }
+  function closeTk(cell){ if(!cell) return; var c=cell.querySelector('.tkc-cover'); if(c && cell._poster!=null){ c.innerHTML=cell._poster; bindPlay(cell); } cell.classList.remove('playing'); if(openTk===cell) openTk=null; }
+  function playTk(cell){
+    if(openTk && openTk!==cell) closeTk(openTk);
+    var id=cell.getAttribute('data-id'), t=cell.getAttribute('data-t')||'';
+    var c=cell.querySelector('.tkc-cover');
+    c.innerHTML='<iframe class="tkc-frame" title="'+t+'" src="https://www.tiktok.com/player/v1/'+id+'?loop=1&rel=0&autoplay=1&controls=1&music_info=0&description=0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe>' +
+      '<button class="tkc-close" type="button" aria-label="Volver a la portada">\u2715</button>';
+    c.querySelector('.tkc-close').addEventListener('click',function(e){ e.stopPropagation(); closeTk(cell); });
+    cell.classList.add('playing'); openTk=cell;
+  }
   if(TIKTOKS.length){
     var rail = document.createElement('div'); rail.className='rail';
     TIKTOKS.forEach(function(v){
-      var a = document.createElement('a'); a.className='tkc'; a.href=v.u; a.target='_blank'; a.rel='noopener';
-      a.setAttribute('aria-label','Ver en TikTok: '+v.t);
-      a.innerHTML = '<div class="tkc-cover">' +
-        '<span class="tkc-badge">TikTok</span>' +
-        '<span class="tkc-play"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>' +
+      var id=(v.u.match(/video\/(\d+)/)||[])[1]||'';
+      var cell=document.createElement('div'); cell.className='tkc'; cell.setAttribute('data-id',id); cell.setAttribute('data-t',v.t);
+      var poster='<span class="tkc-badge">TikTok</span>' +
+        '<button class="tkc-play" type="button" aria-label="Reproducir '+v.t+'"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>' +
         '<span class="tkc-title">'+v.t+'</span>' +
-        '<span class="tkc-handle">@zignalez \u2197</span>' +
-      '</div>';
-      rail.appendChild(a);
+        '<a class="tkc-handle" href="'+v.u+'" target="_blank" rel="noopener">@zignalez \u2197</a>';
+      cell._poster=poster;
+      cell.innerHTML='<div class="tkc-cover">'+poster+'</div>';
+      bindPlay(cell);
+      rail.appendChild(cell);
     });
     tkMount.appendChild(rail);
   } else {
