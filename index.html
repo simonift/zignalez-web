@@ -108,6 +108,28 @@
   .members p{max-width:56ch;margin:0 auto 8px;color:var(--chrome)}
   .members .btn-primary{margin-top:22px}
   .members .fineprint{font-family:var(--font-m);font-size:11px;color:var(--smoke);margin-top:18px}
+  .members-login{max-width:400px;margin:22px auto 0;text-align:left}
+  .members-login .field{margin-bottom:14px}
+  .members-login label{display:block;font-family:var(--font-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--smoke);margin-bottom:6px}
+  .members-login input[type="email"]{width:100%;padding:12px 14px;border-radius:6px;border:1px solid var(--line-2);background:var(--ink);color:var(--chrome-hi);font-family:var(--font-b);font-size:15px}
+  .members-login input[type="email"]:focus{outline:none;border-color:var(--uv-soft);box-shadow:0 0 0 3px rgba(139,61,255,.18)}
+  .members-login .submit{width:100%;padding:14px;border:none;border-radius:8px;background:var(--uv);color:var(--white);font-family:var(--font-d);font-weight:700;font-size:15px;cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .members-login .submit:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(139,61,255,.35)}
+  .members-login .submit:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+  .members-login .login-note{font-family:var(--font-m);font-size:12px;line-height:1.5;padding:10px 14px;border-radius:4px;margin-top:12px;display:none}
+  .members-login .login-note.ok{display:block;background:rgba(199,204,209,.10);border:1px solid var(--chrome);color:var(--chrome-hi)}
+  .members-login .login-note.err{display:block;background:rgba(199,204,209,.06);border:1px dashed var(--line-2);color:var(--chrome)}
+  .members-content{display:none}
+  .members-content.visible{display:block}
+  .members-content .track-list{list-style:none;padding:0;margin:24px auto;max-width:480px;text-align:left}
+  .members-content .track-list li{padding:14px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px}
+  .members-content .track-list li:last-child{border-bottom:none}
+  .members-content .track-icon{font-size:20px;flex-shrink:0}
+  .members-content .track-info{flex:1;min-width:0}
+  .members-content .track-title{font-family:var(--font-d);color:var(--white);font-size:15px}
+  .members-content .track-meta{font-family:var(--font-m);font-size:11px;color:var(--smoke)}
+  .members-content .logout-link{font-family:var(--font-m);font-size:11px;color:var(--smoke);text-decoration:underline;cursor:pointer;margin-top:18px;display:inline-block}
+  .members-content .logout-link:hover{color:var(--uv-soft)}
 
   /* CAPTURA */
   .capture{background:radial-gradient(70% 120% at 100% 0%,rgba(139,61,255,.16),transparent 60%),var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:clamp(28px,5vw,52px)}
@@ -395,16 +417,59 @@
     </div>
   </section>
 
-  <!-- ZONA MIEMBROS: maquetas inéditas (gate real pendiente de backend) -->
+  <!-- ZONA MIEMBROS: maquetas inéditas (Supabase Auth) -->
   <section id="miembros">
     <div class="wrap">
       <div class="members">
-        <div class="lock">🔒</div>
-        <h2>Maquetas inéditas · solo miembros</h2>
-        <p>Pre-views y maquetas que no están en ninguna plataforma. HAYABUSA, LUCE BIEN y lo que viene — primero acá, para los que están en la lista.</p>
-        <p class="muted" style="font-size:14px">El acceso es por cuenta. Reproducción protegida: sin descarga.</p>
-        <a class="btn btn-primary" href="#lista">Entrar a la lista para acceder</a>
-        <p class="fineprint">Aquí van las maquetas inéditas con acceso por cuenta (login) y reproducción sin descarga.</p>
+        <!-- Estado: no autenticado -->
+        <div id="members-gate">
+          <div class="lock">🔒</div>
+          <h2>Maquetas inéditas · solo miembros</h2>
+          <p>Pre-views y maquetas que no están en ninguna plataforma. HAYABUSA, LUCE BIEN y lo que viene — primero acá, para los que están en la lista.</p>
+          <p class="muted" style="font-size:14px">El acceso es por cuenta. Reproducción protegida: sin descarga.</p>
+          <div class="members-login">
+            <form id="login-form" novalidate>
+              <div class="field">
+                <label for="login-email">Tu correo de la lista</label>
+                <input type="email" id="login-email" placeholder="tu@correo.com" required autocomplete="email">
+              </div>
+              <button type="submit" class="submit" id="login-submit">Acceder con magic link</button>
+              <div class="login-note" id="login-note" role="status" aria-live="polite"></div>
+            </form>
+          </div>
+          <p class="fineprint">Te enviamos un enlace mágico por correo. Sin contraseñas.</p>
+        </div>
+        <!-- Estado: autenticado -->
+        <div id="members-content" class="members-content">
+          <div class="lock">🎧</div>
+          <h2>Maquetas inéditas</h2>
+          <p id="members-welcome">Bienvenido.</p>
+          <p class="muted" style="font-size:14px">Reproducción protegida: sin descarga. Solo para miembros de la lista.</p>
+          <ul class="track-list">
+            <li>
+              <span class="track-icon">▶</span>
+              <div class="track-info">
+                <div class="track-title">HAYABUSA (maqueta)</div>
+                <div class="track-meta">Preview · próximamente</div>
+              </div>
+            </li>
+            <li>
+              <span class="track-icon">▶</span>
+              <div class="track-info">
+                <div class="track-title">LUCE BIEN (maqueta)</div>
+                <div class="track-meta">Preview · próximamente</div>
+              </div>
+            </li>
+            <li>
+              <span class="track-icon">🔜</span>
+              <div class="track-info">
+                <div class="track-title">Más maquetas en camino</div>
+                <div class="track-meta">Estarán aquí antes que en cualquier plataforma</div>
+              </div>
+            </li>
+          </ul>
+          <span class="logout-link" id="logout-btn">Cerrar sesión</span>
+        </div>
       </div>
     </div>
   </section>
@@ -476,6 +541,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"></script>
 <script>
 (function(){
   "use strict";
@@ -622,32 +688,130 @@
     igMount.innerHTML = '<div class="placeholder-note">Reels de @zignalez.</div>';
   }
 
-  /* ====== Formulario: honesto por diseño ====== */
-  var ENDPOINT_CAPTURA = "";
+  /* ====== Supabase: init ====== */
+  var SUPABASE_URL = 'https://fdahfltjaqzdgmsgedcp.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_TK7Jf1kWDATJ8o9Rmp7-Ew_61rPjCib';
+  var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+  /* ====== Formulario captura: registro con Supabase ====== */
   var form = document.getElementById('capture-form');
   var note = document.getElementById('note');
-  var submit = document.getElementById('submit');
-  if(!ENDPOINT_CAPTURA){
+  var submitBtn = document.getElementById('submit');
+
+  if(!sb){
     note.className = 'form-note dev';
-    note.textContent = 'Aquí se conecta el registro con doble opt-in (Worker + D1 + correo de confirmación).';
+    note.textContent = 'Cargando sistema de registro…';
   }
+
   form.addEventListener('submit', function(e){
     e.preventDefault();
-    if(!ENDPOINT_CAPTURA){
-      note.className='form-note dev';
-      note.textContent='Modo demo · el registro se activa al conectar el endpoint (Worker + doble opt-in).';
+    if(!sb){
+      note.className='form-note err';
+      note.textContent='El sistema de registro no está disponible. Intenta recargar la página.';
       return;
     }
-    if(!form.email.value || !document.getElementById('consent').checked){
+    var emailVal = form.email.value.trim();
+    var wspVal = form.whatsapp ? form.whatsapp.value.trim() : '';
+    if(!emailVal || !document.getElementById('consent').checked){
       note.className='form-note warn'; note.textContent='Completa tu correo y marca el consentimiento.'; return;
     }
-    submit.disabled = true; note.className='form-note warn'; note.textContent='Enviando…';
-    fetch(ENDPOINT_CAPTURA, {method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email:form.email.value, whatsapp:form.whatsapp.value, ts:Date.now()})
-    }).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status);
-      note.className='form-note ok'; note.textContent='Casi listo: revisa tu correo y confirma la suscripción (doble opt-in).'; submit.textContent='Revisa tu correo';
-    }).catch(function(){ submit.disabled=false; note.className='form-note err'; note.textContent='No se pudo enviar. Intenta de nuevo en un momento.'; });
+    submitBtn.disabled = true; note.className='form-note warn'; note.textContent='Registrando…';
+
+    /* 1. signInWithOtp envía magic link y crea cuenta si no existe */
+    sb.auth.signInWithOtp({
+      email: emailVal,
+      options: { emailRedirectTo: window.location.origin + '/#miembros' }
+    }).then(function(res){
+      if(res.error) throw res.error;
+      /* 2. Upsert en tabla subscribers (puede fallar si RLS bloquea anon insert — no es crítico, el auth es lo principal) */
+      sb.from('subscribers').upsert(
+        { email: emailVal, whatsapp: wspVal || null, consent_ts: Date.now(), source: 'web' },
+        { onConflict: 'email' }
+      ).then(function(){}).catch(function(){});
+      note.className='form-note ok';
+      note.textContent='Revisa tu correo — te enviamos un enlace mágico para confirmar y acceder a las maquetas.';
+      submitBtn.textContent='Revisa tu correo';
+    }).catch(function(err){
+      submitBtn.disabled=false;
+      note.className='form-note err';
+      note.textContent= err.message === 'For security purposes, you can only request this after 60 seconds'
+        ? 'Espera un momento antes de solicitar otro enlace.'
+        : 'No se pudo enviar. Intenta de nuevo en un momento.';
+    });
   });
+
+  /* ====== Login zona miembros ====== */
+  var loginForm = document.getElementById('login-form');
+  var loginNote = document.getElementById('login-note');
+  var loginSubmit = document.getElementById('login-submit');
+  var membersGate = document.getElementById('members-gate');
+  var membersContent = document.getElementById('members-content');
+  var membersWelcome = document.getElementById('members-welcome');
+  var logoutBtn = document.getElementById('logout-btn');
+
+  function showMembers(user){
+    membersGate.style.display = 'none';
+    membersContent.classList.add('visible');
+    membersWelcome.textContent = 'Bienvenido, ' + (user.email || '') + '.';
+  }
+  function showGate(){
+    membersGate.style.display = '';
+    membersContent.classList.remove('visible');
+  }
+
+  if(loginForm && sb){
+    loginForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var email = document.getElementById('login-email').value.trim();
+      if(!email){ loginNote.className='login-note err'; loginNote.textContent='Ingresa tu correo.'; return; }
+      loginSubmit.disabled = true;
+      loginNote.className='login-note'; loginNote.style.display='none';
+      sb.auth.signInWithOtp({
+        email: email,
+        options: { emailRedirectTo: window.location.origin + '/#miembros' }
+      }).then(function(res){
+        if(res.error) throw res.error;
+        loginNote.className='login-note ok';
+        loginNote.textContent='Enlace mágico enviado — revisa tu correo.';
+        loginSubmit.textContent='Revisa tu correo';
+      }).catch(function(err){
+        loginSubmit.disabled=false;
+        loginNote.className='login-note err';
+        loginNote.textContent= err.message === 'For security purposes, you can only request this after 60 seconds'
+          ? 'Espera un momento antes de solicitar otro enlace.'
+          : 'Error al enviar. Intenta de nuevo.';
+      });
+    });
+  }
+
+  if(logoutBtn && sb){
+    logoutBtn.addEventListener('click', function(){
+      sb.auth.signOut().then(function(){ showGate(); });
+    });
+  }
+
+  /* ====== Auth state: detectar sesión activa / callback de magic link ====== */
+  if(sb){
+    sb.auth.onAuthStateChange(function(event, session){
+      if(session && session.user){
+        showMembers(session.user);
+        /* Upsert subscriber data on login */
+        sb.from('subscribers').upsert(
+          { email: session.user.email, consent_ts: Date.now(), source: 'web' },
+          { onConflict: 'email' }
+        ).then(function(){}).catch(function(){});
+      } else {
+        showGate();
+      }
+    });
+    /* Check existing session on load */
+    sb.auth.getSession().then(function(res){
+      if(res.data && res.data.session && res.data.session.user){
+        showMembers(res.data.session.user);
+      }
+    });
+  }
+
 })();
 </script>
 <script>
