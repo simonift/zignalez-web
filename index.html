@@ -254,6 +254,28 @@
   #tiktok .tkc-handle{text-decoration:none;cursor:pointer}
   #tiktok .tkc.playing{transform:none}
   #tiktok .tkc.playing:hover{transform:none}
+
+  .follow-cta.ig .fic{background:linear-gradient(135deg,#f58529 0%,#dd2a7b 45%,#8134af 75%,#515bd4 100%)}
+  .follow-cta.ig:hover{border-color:#dd2a7b;box-shadow:0 8px 22px rgba(221,42,123,.20)}
+  #galeria .rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 14px;scrollbar-width:none}
+  #galeria .rail::-webkit-scrollbar{display:none}
+  #galeria .igc{flex:0 0 220px;scroll-snap-align:start;border-radius:12px;overflow:hidden;border:1px solid var(--line);transition:transform .18s ease,border-color .18s ease}
+  #galeria .igc:hover{border-color:var(--uv);transform:translateY(-3px)}
+  #galeria .igc.playing{flex:0 0 320px;transform:none}
+  #galeria .igc.playing:hover{transform:none}
+  #galeria .igc-cover{position:relative;aspect-ratio:9/16;background:radial-gradient(120% 90% at 30% 15%,rgba(139,61,255,.30),#0d0d12 72%);display:flex;flex-direction:column;justify-content:flex-end;gap:2px;padding:14px}
+  #galeria .igc.playing .igc-cover{aspect-ratio:auto;height:560px;background:#000}
+  #galeria .igc-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,11,.6),transparent 55%)}
+  #galeria .igc.playing .igc-cover::after{display:none}
+  #galeria .igc-badge{position:absolute;top:12px;left:12px;z-index:2;font-family:var(--font-m);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:rgba(10,10,11,.7);border:1px solid var(--line-2);color:var(--chrome-hi);padding:5px 9px;border-radius:2px}
+  #galeria .igc-play{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);z-index:2;width:56px;height:56px;border-radius:50%;background:rgba(10,10,11,.6);border:1px solid var(--line-2);display:grid;place-items:center;cursor:pointer;padding:0;transition:.15s}
+  #galeria .igc:hover .igc-play{background:var(--uv);border-color:transparent}
+  #galeria .igc-play svg{fill:#fff;margin-left:3px}
+  #galeria .igc-title{position:relative;z-index:2;font-family:var(--font-d);font-weight:700;color:#fff;font-size:15px;line-height:1.2}
+  #galeria .igc-handle{position:relative;z-index:2;font-family:var(--font-m);font-size:11px;color:var(--uv-soft);text-decoration:none;cursor:pointer}
+  #galeria .igc-frame{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3;background:#000}
+  #galeria .igc-close{position:absolute;top:8px;right:8px;z-index:5;width:30px;height:30px;border-radius:50%;background:rgba(10,10,11,.72);border:1px solid var(--line-2);color:#fff;cursor:pointer;display:grid;place-items:center;font-size:12px}
+  #galeria .igc-close:hover{background:var(--uv);border-color:var(--uv)}
 </style>
 </head>
 <body oncontextmenu="return true">
@@ -391,8 +413,8 @@
   <section id="galeria">
     <div class="wrap">
       <div class="sec-head">
-        <h2>Instagram</h2>
-        <a class="eyebrow" href="https://instagram.com/zignalez" target="_blank" rel="noopener" style="text-decoration:none">@zignalez ↗</a>
+        <h2>En Instagram</h2>
+        <a class="follow-cta ig" href="https://instagram.com/zignalez" target="_blank" rel="noopener"><span class="fic" aria-hidden="true">◎</span> Seguir en Instagram <span class="farr">↗</span></a>
       </div>
       <div id="ig-mount"></div>
     </div>
@@ -445,8 +467,10 @@
       </div>
       <div class="social">
         <a href="https://open.spotify.com/artist/0M4ZFfQbpLYiLksk0QyOph" target="_blank" rel="noopener">Spotify</a>
-        <a href="https://instagram.com/zignalez" target="_blank" rel="noopener">Instagram</a>
         <a href="https://www.youtube.com/@Zignalez" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.tiktok.com/@zignalez" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://instagram.com/zignalez" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.threads.com/@zignalez" target="_blank" rel="noopener">Threads</a>
       </div>
     </div>
   </div>
@@ -560,18 +584,42 @@
     tkMount.innerHTML = '<div class="placeholder-note">Aquí va el <b>carrusel de TikToks</b> de @zignalez.</div>';
   }
 
-  /* ====== Instagram ====== */
+  /* ====== Instagram (reels destacados -> embed inline) ====== */
+  var IG_REELS = [
+    {c:"DcZ2NHBOj7C", t:"LUCE BIEN \u00b7 detrás de cámara"},
+    {c:"DcPum1quVXj", t:"HAYABUSA \u00b7 ¿la soltamos?"},
+    {c:"DcXmOaBuvX9", t:"Del boceto al set"},
+    {c:"DcFkzFxuy6u", t:"Últimamente suena así"}
+  ];
   var igMount = document.getElementById('ig-mount');
-  if(IG_IMAGES.length){
-    var g=document.createElement('div'); g.className='ggrid';
-    IG_IMAGES.forEach(function(src){
-      var c=document.createElement('div'); c.className='gcell';
-      c.innerHTML='<img loading="lazy" alt="Zignalez en Instagram" src="'+src+'">';
-      g.appendChild(c);
+  var openIg=null;
+  function bindIgPlay(cell){ var pb=cell.querySelector('.igc-play'); if(pb) pb.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); playIg(cell); }); }
+  function closeIg(cell){ if(!cell) return; var c=cell.querySelector('.igc-cover'); if(c && cell._poster!=null){ c.innerHTML=cell._poster; bindIgPlay(cell); } cell.classList.remove('playing'); if(openIg===cell) openIg=null; }
+  function playIg(cell){
+    if(openIg && openIg!==cell) closeIg(openIg);
+    var code=cell.getAttribute('data-code'), t=cell.getAttribute('data-t')||'';
+    var c=cell.querySelector('.igc-cover');
+    c.innerHTML='<iframe class="igc-frame" title="'+t+'" src="https://www.instagram.com/reel/'+code+'/embed/" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" scrolling="no"></iframe>' +
+      '<button class="igc-close" type="button" aria-label="Volver a la portada">\u2715</button>';
+    c.querySelector('.igc-close').addEventListener('click',function(e){ e.stopPropagation(); closeIg(cell); });
+    cell.classList.add('playing'); openIg=cell;
+  }
+  if(IG_REELS.length){
+    var igrail=document.createElement('div'); igrail.className='rail';
+    IG_REELS.forEach(function(v){
+      var cell=document.createElement('div'); cell.className='igc'; cell.setAttribute('data-code',v.c); cell.setAttribute('data-t',v.t);
+      var poster='<span class="igc-badge">Instagram</span>' +
+        '<button class="igc-play" type="button" aria-label="Reproducir '+v.t+'"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>' +
+        '<span class="igc-title">'+v.t+'</span>' +
+        '<a class="igc-handle" href="https://www.instagram.com/reel/'+v.c+'/" target="_blank" rel="noopener">@zignalez \u2197</a>';
+      cell._poster=poster;
+      cell.innerHTML='<div class="igc-cover">'+poster+'</div>';
+      bindIgPlay(cell);
+      igrail.appendChild(cell);
     });
-    igMount.appendChild(g);
+    igMount.appendChild(igrail);
   } else {
-    igMount.innerHTML = '<div class="placeholder-note">Aquí va la <b>galería de Instagram</b> — imágenes de @zignalez en grilla. Se integran como URLs alojadas por ti.</div>';
+    igMount.innerHTML = '<div class="placeholder-note">Reels de @zignalez.</div>';
   }
 
   /* ====== Formulario: honesto por diseño ====== */
