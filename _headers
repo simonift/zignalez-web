@@ -1,21 +1,31 @@
 # Cabeceras de seguridad · Cloudflare Pages
-# Zignalez · 16-09-2026
+# Zignalez · 17-09-2026
 #
 # Hosts derivados del inventario REAL de index.html / admin.html / privacidad.html.
 # Si agregas un tercero nuevo y no lo sumas aqui, el navegador lo bloquea en silencio:
 # revisa la consola ante cualquier recurso que no cargue.
 #
-# 16-09-2026: la primera version rompio el reproductor de Spotify. index.html:1180
-# carga https://open.spotify.com/embed/iframe-api/v1 y ese host no estaba en
-# script-src. Corregido. Leccion: un host que aparece como href PUEDE ademas ser
-# un <script>; hay que mirar la etiqueta, no solo el dominio.
+# 16-09-2026: la primera version rompio el reproductor de Spotify. index.html
+# cargaba https://open.spotify.com/embed/iframe-api/v1 y ese host no estaba en
+# script-src. Se agrego el host -- y SEGUIA ROTO, porque ese script carga a su
+# vez otro desde embed-cdn.spotifycdn.com que llama a eval() sobre cadenas.
+#
+# 17-09-2026 · DECISION: no se agrega 'unsafe-eval'. Se quito la API de iframes.
+# assets/spotify.js ahora inyecta un <iframe> normal, que frame-src ya permite.
+# Motivo: 'unsafe-eval' aplica a TODO el sitio y la zona de miembros vive en el
+# mismo index.html, el mismo documento que pinta letras y titulos que vienen de
+# la base de datos. _headers no puede acotar por ruta lo que comparte documento.
+# Pagar eso por un embed de marketing es mal negocio.
+# Verificado en produccion: track, album, playlist y re-clic, cero violaciones.
 #
 # Clarity necesita el comodin *.clarity.ms: reparte carga entre a.clarity.ms ...
 # z.clarity.ms, asi que un host unico no basta (doc oficial de Microsoft).
 #
-# NO incluido a proposito: static.cloudflareinsights.com (Cloudflare Web Analytics).
-# Cloudflare lo inyecta solo. Queda BLOQUEADO hasta decidir si se declara en la
-# politica de privacidad o se desactiva en el panel de Cloudflare.
+# NO incluido a proposito: static.cloudflareinsights.com (Cloudflare Web
+# Analytics). Cloudflare lo inyecta solo. DECISION 17-09-2026: se desactiva en
+# el panel de Cloudflare en vez de permitirlo -- Clarity ya mide mas y si esta
+# declarado en privacidad.html. Mientras no se desactive, cada visitante ve un
+# error de consola y la analitica de Cloudflare esta muerta sin avisar.
 
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://open.spotify.com https://*.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.spotifycdn.com https://i.ytimg.com https://fdahfltjaqzdgmsgedcp.supabase.co https://*.clarity.ms https://c.bing.com; media-src 'self' blob: https://fdahfltjaqzdgmsgedcp.supabase.co; connect-src 'self' https://fdahfltjaqzdgmsgedcp.supabase.co https://*.clarity.ms https://c.bing.com; frame-src https://open.spotify.com https://www.youtube-nocookie.com https://www.tiktok.com https://www.instagram.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
@@ -31,5 +41,9 @@
 # re-descargarse enteros en cada visita: el documento paso de 261 a 65 KB.
 # Una hora, no 'immutable': los .js no llevan hash en el nombre y un
 # 'immutable' dejaria a los visitantes con codigo viejo tras un despliegue.
+#
+# OJO 17-09-2026: produccion sirve max-age=14400, no 3600. Cloudflare esta
+# pisando esta cabecera (ajuste "Browser Cache TTL" del panel, 4 h). No es
+# grave, pero esta linea NO es lo que ve el visitante.
 /assets/*
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
