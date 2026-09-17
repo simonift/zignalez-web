@@ -338,6 +338,11 @@ audio{width:100%;display:block}
           <label class="lbl" for="up-desc">Descripción</label>
           <textarea id="up-desc"></textarea>
         </div>
+        <div class="field">
+          <label class="lbl" for="up-lyrics">Letra <span class="hint">(opcional · sin tiempos · los tiempos se marcan después, escuchando)</span></label>
+          <textarea id="up-lyrics" rows="6" spellcheck="false"></textarea>
+        </div>
+        <div class="status hidden" id="up-aviso" role="status" aria-live="polite"></div>
         <div class="row-actions">
           <button class="btn primary" id="btn-upload" type="button">Subir y crear maqueta</button>
           <button class="btn ghost" id="btn-upload-cancel" type="button">Cancelar</button>

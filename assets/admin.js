@@ -106,7 +106,7 @@
   }
 
   /* ---------------- state ---------------- */
-  var state = { user: null, tracks: [], pendingFile: null, pendingDuration: null, booted: false };
+  var state = { user: null, tracks: [], pendingFile: null, pendingDuration: null, pendingPeaks: null, booted: false, listadoOk: false };
 
   /* ---------------- auth ---------------- */
   var loginForm = $('login-form');
@@ -246,18 +246,30 @@
       .order('created_at', { ascending: true })
       .then(function (res) {
         if (res.error) {
+          state.listadoOk = false;
+          state.tracks = [];
           listEl.textContent = '';
           var e = document.createElement('div');
           e.className = 'empty';
           e.textContent = 'No se pudo cargar el listado.';
           listEl.appendChild(e);
-          setStatus(listStatus, errMsg(res.error, 'Error al cargar maquetas.'), 'err');
+          /* Un fallo por columna ausente no es "error al cargar": es una
+             migracion sin ejecutar, y el mensaje crudo de PostgREST no lo
+             dice. Nombrarla ahorra la investigacion entera. */
+          var m = String(res.error && res.error.message || '');
+          var falta = m.match(/'([a-z_]+)' column of '([a-z_]+)'/i);
+          setStatus(listStatus, falta
+            ? 'Falta la columna "' + falta[1] + '" en la tabla "' + falta[2] + '": hay una migracion sin ejecutar en Supabase. Hasta que la ejecutes, el listado y la subida no funcionan.'
+            : errMsg(res.error, 'Error al cargar maquetas.'), 'err');
+          if (typeof revisarSlug === 'function') revisarSlug();
           return;
         }
         clearStatus(listStatus);
+        state.listadoOk = true;
         state.tracks = res.data || [];
         renderTracks();
         updateStats();
+        if (typeof revisarSlug === 'function') revisarSlug();
       });
   }
   $('btn-reload').addEventListener('click', loadTracks);
@@ -859,7 +871,10 @@
     $('up-title').value = '';
     $('up-slug').value = '';
     $('up-desc').value = '';
+    $('up-lyrics').value = '';
     $('up-order').value = '0';
+    state.pendingPeaks = null;
+    var av = $('up-aviso'); av.classList.add('hidden'); av.textContent = '';
     drop.querySelector('.big').textContent = 'Suelta el audio acá';
     drop.querySelector('.sub').textContent = 'o haz clic para elegirlo';
   }
@@ -882,6 +897,7 @@
     var s = slugify(base) || ('maqueta-' + Date.now());
     $('up-slug').value = s;
     if (!$('up-title').value.trim()) $('up-title').value = base;
+    revisarSlug();
 
     var mb = (f.size / (1024 * 1024)).toFixed(1);
     drop.querySelector('.big').textContent = f.name;
@@ -908,6 +924,46 @@
         (state.pendingDuration ? fmtDur(state.pendingDuration) : 'duración desconocida') + ' · sin onda';
     });
   }
+
+  /* Decir en voz alta si esto va a CREAR o a ACTUALIZAR, y con que.
+     El panel ya lo decidia solo, en silencio, mirando state.tracks. Cuando el
+     listado no carga esa lista queda vacia y la decision se vuelve "crear"
+     sin que nadie lo note: dos fichas con el mismo slug. El indice unico de
+     fix-07 lo impide en el servidor; esto lo hace visible antes de tocar nada. */
+  function buscarPorSlug(slug) {
+    for (var i = 0; i < state.tracks.length; i++) {
+      if (state.tracks[i].slug === slug) return state.tracks[i];
+    }
+    return null;
+  }
+
+  function revisarSlug() {
+    var av = $('up-aviso');
+    var slug = slugify($('up-slug').value.trim() || $('up-title').value.trim());
+    if (!slug) { av.classList.add('hidden'); av.textContent = ''; return; }
+
+    if (!state.listadoOk) {
+      av.textContent = 'El listado no cargo, asi que no puedo saber si este slug ya existe. ' +
+                       'Recarga el listado antes de subir: si existe y no lo detecto, se crearia una ficha duplicada.';
+      av.className = 'status err';
+      return;
+    }
+    var t = buscarPorSlug(slug);
+    if (t) {
+      av.textContent = 'Vas a ACTUALIZAR "' + (t.title || slug) + '". El archivo se reemplaza. ' +
+                       'Lo que dejes vacio aqui se conserva como esta.';
+      av.className = 'status ok';
+    } else {
+      av.textContent = 'Vas a CREAR una maqueta nueva con el slug "' + slug + '".';
+      av.className = 'status';
+    }
+  }
+
+  $('up-slug').addEventListener('input', revisarSlug);
+  $('up-slug').addEventListener('blur', revisarSlug);
+  $('up-title').addEventListener('input', function () {
+    if (!$('up-slug').value.trim()) revisarSlug();
+  });
 
   btnUpload.addEventListener('click', function () {
     var f = state.pendingFile;
@@ -948,11 +1004,23 @@
         title: title,
         slug: slug,
         file_path: filename,
-        duration_seconds: state.pendingDuration,
-        peaks: state.pendingPeaks || null,
-        sort_order: isFinite(orderVal) ? orderVal : 0,
-        description: desc || null
+        sort_order: isFinite(orderVal) ? orderVal : 0
       };
+
+      /* Reemplazar el archivo de un tema que YA existe no puede borrar lo que
+         no volviste a escribir. Antes el payload mandaba description:null y
+         peaks:null siempre, asi que resubir un master con la caja de
+         descripcion vacia dejaba la ficha sin descripcion, en silencio.
+         Para BORRAR un campo esta el editor de la fila, que viene relleno:
+         ahi una caja vacia si es una decision tuya. Aqui no lo es. */
+      function poner(campo, valor) {
+        if (valor !== null && valor !== undefined && valor !== '') payload[campo] = valor;
+        else if (!existing) payload[campo] = null;
+      }
+      poner('description', desc);
+      poner('peaks', state.pendingPeaks);
+      poner('duration_seconds', state.pendingDuration);
+
       if (existing) {
         return sb.from('tracks').update(payload).eq('id', existing.id).select();
       }
@@ -965,9 +1033,40 @@
         setStatus(uploadStatus, errMsg(res.error, 'El archivo subió pero no se pudo guardar la ficha.'), 'err');
         return;
       }
-      setStatus(uploadStatus, 'Maqueta subida: ' + filename, 'ok');
-      resetUploadForm();
-      loadTracks();
+      var fila = (res.data && res.data[0]) ? res.data[0] : null;
+      var letra = $('up-lyrics').value.trim();
+
+      /* Sin letra escrita NO se toca track_lyrics. Si se guardara un registro
+         vacio, resubir el archivo de un tema que ya tiene la letra marcada con
+         tiempos la borraria. */
+      if (!letra || !fila) {
+        setStatus(uploadStatus, 'Maqueta subida: ' + filename, 'ok');
+        resetUploadForm();
+        loadTracks();
+        return;
+      }
+
+      var L = parseLetra(letra);
+      var conTiempo = L.filter(function (x) { return x.t !== null && x.t !== undefined; });
+      setStatus(uploadStatus, 'Ficha lista. Guardando la letra…', null);
+      sb.from('track_lyrics').upsert({
+        track_id: fila.id,
+        lines: conTiempo,
+        plain: L.map(function (x) { return x.l; }).join('\n')
+      }, { onConflict: 'track_id' }).then(function (lres) {
+        if (lres.error) {
+          /* El audio y la ficha YA estan guardados. Decirlo, y no perder la
+             letra: el formulario no se limpia para que puedas reintentar. */
+          setStatus(uploadStatus, 'Maqueta subida, pero la letra no se guardo: ' +
+            errMsg(lres.error, '') + ' La letra sigue en el formulario.', 'err');
+          loadTracks();
+          return;
+        }
+        setStatus(uploadStatus, 'Maqueta subida: ' + filename + ' · letra con ' +
+          L.length + ' lineas' + (conTiempo.length ? ' (' + conTiempo.length + ' con tiempo)' : ' (sin tiempos todavia)'), 'ok');
+        resetUploadForm();
+        loadTracks();
+      });
     }).catch(function (e) {
       busy(btnUpload, false);
       uploadBar.classList.add('hidden');
