@@ -1,0 +1,35 @@
+# Cabeceras de seguridad · Cloudflare Pages
+# Zignalez · 16-09-2026
+#
+# Hosts derivados del inventario REAL de index.html / admin.html / privacidad.html.
+# Si agregas un tercero nuevo y no lo sumas aqui, el navegador lo bloquea en silencio:
+# revisa la consola ante cualquier recurso que no cargue.
+#
+# 16-09-2026: la primera version rompio el reproductor de Spotify. index.html:1180
+# carga https://open.spotify.com/embed/iframe-api/v1 y ese host no estaba en
+# script-src. Corregido. Leccion: un host que aparece como href PUEDE ademas ser
+# un <script>; hay que mirar la etiqueta, no solo el dominio.
+#
+# Clarity necesita el comodin *.clarity.ms: reparte carga entre a.clarity.ms ...
+# z.clarity.ms, asi que un host unico no basta (doc oficial de Microsoft).
+#
+# NO incluido a proposito: static.cloudflareinsights.com (Cloudflare Web Analytics).
+# Cloudflare lo inyecta solo. Queda BLOQUEADO hasta decidir si se declara en la
+# politica de privacidad o se desactiva en el panel de Cloudflare.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://open.spotify.com https://*.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.spotifycdn.com https://i.ytimg.com https://fdahfltjaqzdgmsgedcp.supabase.co https://*.clarity.ms https://c.bing.com; media-src 'self' blob: https://fdahfltjaqzdgmsgedcp.supabase.co; connect-src 'self' https://fdahfltjaqzdgmsgedcp.supabase.co https://*.clarity.ms https://c.bing.com; frame-src https://open.spotify.com https://www.youtube-nocookie.com https://www.tiktok.com https://www.instagram.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Resource-Policy: same-origin
+  Cross-Origin-Opener-Policy: same-origin
+
+# Los scripts y posters salieron del HTML. Ahora se cachean aparte en vez de
+# re-descargarse enteros en cada visita: el documento paso de 261 a 65 KB.
+# Una hora, no 'immutable': los .js no llevan hash en el nombre y un
+# 'immutable' dejaria a los visitantes con codigo viejo tras un despliegue.
+/assets/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
