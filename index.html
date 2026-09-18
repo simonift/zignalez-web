@@ -111,9 +111,20 @@
   .gcell:hover img{transform:scale(1.05)}
 
   /* ZONA MIEMBROS (maquetas) */
-  .members{background:radial-gradient(70% 120% at 100% 0%,rgba(139,61,255,.18),transparent 60%),var(--ink-2);border:1px solid var(--line-2);border-radius:16px;padding:clamp(28px,5vw,52px);text-align:center;position:relative;overflow:hidden}
+  .members{background:radial-gradient(70% 120% at 100% 0%,rgba(139,61,255,.18),transparent 60%),var(--ink-2);border:1px solid var(--line-2);border-radius:16px;padding:clamp(28px,5vw,52px);text-align:center;position:relative;overflow:hidden;overflow:clip}
   .lock{font-size:34px;margin-bottom:10px}
   .members h2{font-size:clamp(26px,4vw,40px);margin-bottom:12px}
+  /* En dos columnas la cabecera ya no puede comerse media pantalla: el objetivo
+     del rediseno es ver disco y lista a la vez. Se compacta, no se esconde. */
+  @media (min-width:980px){
+    #members-content .lock{display:none}
+    #members-content h2{font-size:30px;margin-bottom:6px}
+    /* margin:0 auto, no margin:0. `.members p` centra su caja de 56ch con
+       `auto`; poner `margin:0 0 4px` mataba ese auto y el parrafo quedaba
+       pegado a la izquierda bajo un titulo centrado. */
+    #members-content > p{margin:0 auto 4px;font-size:14px}
+    #members-content > p.muted{margin:0 auto 14px}
+  }
   .members p{max-width:56ch;margin:0 auto 8px;color:var(--chrome)}
   .members .btn-primary{margin-top:22px}
   .members .fineprint{font-family:var(--font-m);font-size:11px;color:var(--smoke);margin-top:18px}
@@ -131,44 +142,57 @@
   .members-content{display:none}
   .members-content.visible{display:block}
   /* ===== Reproductor de maquetas (zona miembros) ===== */
-  .track-player{margin:24px auto 0;max-width:480px;text-align:left;
-      container-type:inline-size;container-name:zp}
+  .track-player{margin:24px auto 0;max-width:1180px;text-align:left}
+  /* Dos columnas. MEDIA QUERY, no @container: el bloque @container zp se borro
+     porque con .track-player a 1180px la consulta disparaba DENTRO de .zp-izq y
+     partia el disco en dos columnas propias encima de la rejilla nueva. */
+  .zp-cols{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
+  /* iOS: la franja fija era el unico sitio con safe-area. Se replica aqui. */
+  .zp-izq{min-width:0;
+     padding-left:env(safe-area-inset-left,0px);
+     padding-right:env(safe-area-inset-right,0px);
+     padding-bottom:env(safe-area-inset-bottom,0px)}
+  .zp-der{min-width:0}
+  @media (min-width:980px){
+    .zp-cols{grid-template-columns:448px minmax(0,1fr);gap:36px}
+    /* El sticky SOLO pega porque .members paso a overflow:clip: un
+       overflow:hidden es contenedor de scroll y anclaba .zp-izq a un elemento
+       que no scrollea nunca. */
+    .zp-izq{position:sticky;top:76px}
+  }
+  /* Pantalla baja: pegado tapa la lista y deja controles fuera de vista. */
+  @media (max-height:700px){
+    .zp-izq{position:static}
+  }
   .tp-state{font-family:var(--font-m);font-size:12px;letter-spacing:.06em;color:var(--smoke);text-align:center;padding:18px 0;margin:0}
   .tp-item{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
   .tp-item:last-of-type{border-bottom:none}
-  .tp-play{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:transparent;color:var(--uv-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;transition:background .15s ease,border-color .15s ease,color .15s ease}
+  /* 40x40 visibles, 44x44 tocables. El area la da el ::before, igual que en
+     .zp-b: agrandar el circulo a 44 desequilibra la fila. Incumplia WCAG 2.5.8
+     desde antes de este cambio. */
+  .tp-play::before{content:'';position:absolute;top:50%;left:50%;width:44px;height:44px;
+     transform:translate(-50%,-50%);border-radius:50%}
+  .tp-play{position:relative;width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:transparent;color:var(--uv-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;transition:background .15s ease,border-color .15s ease,color .15s ease}
   .tp-play:hover:not(:disabled){background:rgba(139,61,255,.12);border-color:var(--uv);color:var(--uv-soft)}
   .tp-play:disabled{opacity:.4;cursor:default}
   .tp-play.is-playing{background:var(--uv);border-color:var(--uv);color:var(--white)}
   .tp-play svg{width:15px;height:15px;fill:currentColor;pointer-events:none}
   .tp-info{flex:1;min-width:0}
   .tp-title{font-family:var(--font-d);color:var(--white);font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .tp-desc{font-family:var(--font-m);font-size:11px;color:var(--smoke);letter-spacing:.04em;margin-top:2px}
+  /* UNA linea. Con 6 temas y descripciones de 3-4 lineas la lista medía ~900px
+     y empujaba el disco fuera de la pantalla: ese era el problema original.
+     La descripcion completa sigue estando junto al disco. */
+  .tp-desc{font-family:var(--font-m);font-size:11px;color:var(--smoke);letter-spacing:.04em;margin-top:2px;
+     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .tp-dur{font-family:var(--font-m);font-size:11px;color:var(--smoke);flex-shrink:0;font-variant-numeric:tabular-nums}
   /* ====== EL DISCO · reproductor propio ==================================
      Oro sobre negro. El disco es un OBJETO, no una certificacion: aqui no se
      usa esa expresion de certificacion ni ningun sello. Ver
      PROMPT_MAESTRO_DISCO_Y_LETRAS.md §0.2.
      ====================================================================== */
-  /* container-type, no media query: MEDIDO el 17-09-2026, #zp mide 480px en
-     TODOS los anchos de viewport porque vive en una columna fija.
-     CORREGIDO 17-09-2026 tras revision por roles: el container-type estaba en
-     .zp, es decir, en el PROPIO elemento consultado. Un elemento nunca es su
-     contenedor, asi que @container no podia casar nunca y la regla de dos
-     columnas llevaba muerta desde que la escribi. Ahora el contenedor es
-     .track-player.
-     El umbral sigue en 560 y .track-player mide 480: hoy el reproductor va en
-     UNA columna, que es lo que se ve bien a este ancho. Si algun dia se
-     ensancha esa columna por encima de 560px, las dos columnas se activan
-     solas. La regla ya no miente: esta viva y con su condicion a la vista. */
   .zp{margin-top:20px;border:1px solid var(--line);border-radius:6px;
       background:linear-gradient(180deg,var(--ink-2),var(--ink));padding:22px;display:none}
   .zp.visible{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:20px}
-  @container zp (min-width:560px){
-    .zp.visible{grid-template-columns:auto minmax(0,1fr);justify-items:stretch;
-                align-items:center;gap:26px}
-    .zp-disco{--d:min(34cqw,240px)}
-  }
 
   /* ---- Escena 3D ----------------------------------------------------
      Tres transformaciones SEPARADAS, y el orden importa:
@@ -190,7 +214,7 @@
     50%    {transform:rotateX(30deg) rotateY(7deg)}
   }
 
-  .zp-disco{--d:min(58cqw,230px);width:var(--d);height:var(--d);border-radius:50%;position:relative;
+  .zp-disco{--d:min(58vw,230px);width:var(--d);height:var(--d);border-radius:50%;position:relative;
      transform-style:preserve-3d;
      background:
        repeating-radial-gradient(circle at 50% 50%,rgba(0,0,0,.34) 0 1px,rgba(0,0,0,0) 1px 3px),
@@ -269,21 +293,80 @@
   .zp-desc{font-family:var(--font-m);font-size:11px;letter-spacing:.05em;color:var(--smoke);
      margin:5px 0 0}
 
-  /* ---- Letra ---- */
-  .zp-letra{height:132px;overflow:hidden;position:relative;margin:15px 0 13px;
-     -webkit-mask-image:linear-gradient(to bottom,transparent,#000 24%,#000 76%,transparent);
-             mask-image:linear-gradient(to bottom,transparent,#000 24%,#000 76%,transparent)}
-  .zp-letra[hidden]{display:none}
-  .zp-pista{position:absolute;left:0;right:0;top:50%;will-change:transform;
-     transition:transform .34s cubic-bezier(.22,1,.36,1)}
-  .zp-l{font-family:var(--font-d);font-size:16px;line-height:1.42;color:var(--smoke);opacity:.62;
-     overflow-wrap:anywhere;
-     padding:6px 0;margin:0;transition:opacity .25s ease,color .25s ease}
-  .zp-l.on{color:var(--white);opacity:1}
+  /* ---- Letra permanente (columna derecha, siempre visible) ---- */
+  /* Maqueta A, no los tokens grises del sitio: tarjeta violeta tenue, esquinas
+     de 18 y la marca de tiempo SIEMPRE visible en su propia columna. La version
+     anterior escondia el tiempo salvo en la linea activa, y con el audio sin
+     arrancar no habia linea activa: se leia como un volcado de texto plano. */
+  .zp-lf{border:1px solid rgba(166,107,255,.22);border-radius:18px;
+     background:linear-gradient(180deg,rgba(166,107,255,.10),rgba(166,107,255,.03));
+     padding:18px 22px 20px;margin:0 0 18px}
+  .zp-lf[hidden]{display:none}
+  .zp-lf-cab{font-family:var(--font-m);font-size:10px;letter-spacing:.20em;
+     text-transform:uppercase;color:var(--uv-soft);margin:0 0 13px}
+  .zp-lf-lin{display:block}
+  .zp-l{display:flex;gap:14px;align-items:baseline;
+     font-family:var(--font-d);font-size:15.5px;line-height:1.34;color:#b3a9c9;opacity:1;
+     overflow-wrap:anywhere;padding:3px 0;margin:0;
+     transition:color .25s ease,font-size .2s ease}
+  .zp-l.on{color:var(--white);font-size:20px;font-weight:600;line-height:1.3}
+  .zp-l.ya{color:#6f6689}
+  .zp-l-t{flex-shrink:0;width:38px;font-family:var(--font-m);font-size:10.5px;letter-spacing:.06em;
+     color:#5d5575;font-variant-numeric:tabular-nums;display:inline-block}
+  .zp-l.on .zp-l-t{color:var(--uv-soft)}
+  .zp-lf-sep{height:1px;background:rgba(199,204,209,.12);margin:16px 0 13px}
+  .zp-lf-sig .zp-l{font-size:14px;color:#7b7194;padding:2px 0;font-weight:400}
+  .zp-lf-sig .zp-l-t{color:#4b4460}
+  .zp-lf-sig[hidden],.zp-lf-sep[hidden]{display:none}
   .zp-plana{font-family:var(--font-b);font-size:14px;color:var(--chrome);white-space:pre-wrap;
      overflow-wrap:anywhere;
-     max-height:132px;overflow-y:auto;margin:15px 0 13px}
+     max-height:200px;overflow-y:auto;margin:0}
   .zp-plana[hidden]{display:none}
+  .zp-lista{min-width:0}
+
+  /* ===== Reposo: carrusel horizontal a todo el ancho =====
+     Mientras no suena nada, las dos columnas no tienen nada que mostrar: el
+     disco esta apagado y la letra vacia. Los temas se recorren de lado. */
+  .zp-carrusel{display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;
+     padding:4px 2px 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+     scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+  .zp-carrusel::-webkit-scrollbar{height:6px}
+  .zp-carrusel::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:3px}
+  .zp-card{flex:0 0 250px;scroll-snap-align:start}
+  .zp-card-btn{display:flex;flex-direction:column;gap:8px;width:100%;min-height:150px;
+     text-align:left;padding:16px;border:1px solid var(--line);border-radius:14px;
+     background:linear-gradient(180deg,var(--ink-2),var(--ink));color:inherit;cursor:pointer;
+     transition:border-color .18s ease,transform .18s ease}
+  .zp-card-btn:hover:not(:disabled){border-color:var(--uv);transform:translateY(-2px)}
+  .zp-card-btn:disabled{opacity:.45;cursor:default}
+  .zp-card-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+     justify-content:center;background:rgba(139,61,255,.14);color:var(--uv-soft)}
+  .zp-card-ico svg{width:13px;height:13px;fill:currentColor}
+  .zp-card-t{font-family:var(--font-d);font-size:14px;color:var(--white);line-height:1.25;
+     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .zp-card-d{font-family:var(--font-m);font-size:11px;color:var(--smoke);line-height:1.4;
+     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .zp-card-dur{font-family:var(--font-m);font-size:11px;color:var(--smoke);margin-top:auto}
+
+  /* Reposo manda el carrusel; al sonar, las columnas. */
+  #track-player .zp-cols{display:none}
+  #track-player.suena .zp-carrusel{display:none}
+  #track-player.suena .zp-cols{display:grid}
+
+  /* ===== Ventana de 3 temas, DENTRO del cuadro de la letra ===== */
+  .zp-vent{display:block}
+  .zp-vent[hidden]{display:none}
+  .zp-vt-b{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;
+     padding:7px 0;background:none;border:0;cursor:pointer;text-align:left;color:inherit}
+  .zp-vt-b:disabled{opacity:.45;cursor:default}
+  .zp-vt-t{flex:1;min-width:0;font-family:var(--font-d);font-size:13.5px;color:#7b7194;
+     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s ease}
+  .zp-vt-d{flex-shrink:0;font-family:var(--font-m);font-size:11px;color:#5d5575;
+     font-variant-numeric:tabular-nums}
+  .zp-vt.on .zp-vt-t{color:var(--white);font-weight:600}
+  .zp-vt.on .zp-vt-d{color:var(--uv-soft)}
+  .zp-vt.on .zp-vt-b::before{content:'';width:3px;height:16px;border-radius:2px;
+     background:var(--uv-soft);flex-shrink:0;margin-left:-11px;margin-right:8px}
 
   /* ---- Transporte ---- */
   .zp-tr{display:flex;flex-direction:column;gap:11px}
@@ -298,133 +381,42 @@
   /* El area de golpeo llega a 44x44 aunque el circulo visible sea menor.
      Sin esto, 6 de los 7 controles del reproductor quedaban por debajo del
      minimo tactil. */
-  .zp-b,.zf-b,.zf-exp{position:relative}
-  .zp-b::before,.zf-b::before,.zf-exp::before{content:'';position:absolute;
+  .zp-b{position:relative}
+  .zp-b::before{content:'';position:absolute;
      top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%}
   .zp-b.zp-grande{width:44px;height:44px;background:rgba(255,214,128,.12);
      border-color:rgba(255,214,128,.45);color:rgba(255,226,160,1)}
   .zp-b.zp-grande svg{width:16px;height:16px}
+  /* Estado activo de repetir y de silencio. El color no puede ser el unico
+     indicador: va con punto. Estaba solo en la franja, que ya no existe. */
+  .zp-b.on{color:#f2d391;border-color:rgba(255,214,128,.6)}
+  .zp-b.on::after{content:'';position:absolute;bottom:2px;left:50%;
+     transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#f2d391}
   .zp-t{font-family:var(--font-m);font-size:11px;color:var(--smoke);font-variant-numeric:tabular-nums;
      flex-shrink:0;min-width:36px}
-  .zp-barra{flex:1;height:22px;position:relative;cursor:pointer;touch-action:none;min-width:0}
-  .zp-barra:focus-visible{outline:2px solid rgba(255,214,128,.7);outline-offset:3px;border-radius:3px}
-  .zp-riel,.zp-buf,.zp-prog{position:absolute;top:50%;transform:translateY(-50%);height:3px;
-     left:0;border-radius:2px}
-  .zp-riel{right:0;background:rgba(199,204,209,.46)}
-  .zp-buf,.zp-prog{width:100%;transform-origin:left center}
-  .zp-buf{background:rgba(199,204,209,.40);transform:translateY(-50%) scaleX(0)}
-  .zp-prog{background:linear-gradient(90deg,#b8862c,#f2d391);transform:translateY(-50%) scaleX(0)}
-  .zp-pin{position:absolute;top:50%;left:0;width:9px;height:9px;border-radius:50%;background:#f2d391;
-     transform:translate(-50%,-50%);will-change:transform;box-shadow:0 0 8px rgba(242,211,145,.65)}
+  /* La onda sustituye a la barra: mismo rol de slider, mismo scrub, mismo
+     teclado. Venia de la franja y se movio aqui entera. */
+  .zp-onda{flex:1;min-width:0;height:44px;position:relative;cursor:pointer;touch-action:none}
+  .zp-onda:focus-visible{outline:2px solid rgba(255,214,128,.7);outline-offset:3px;border-radius:3px}
+  .zp-onda canvas{display:block;width:100%;height:100%}
   .zp-estado{font-family:var(--font-m);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
      color:var(--smoke);margin-top:9px;min-height:13px}
 
   .zp-panel{width:100%}
   @media (max-width:480px){ .zp{padding:16px} }
   @media (max-width:420px){ .zp-btns{gap:8px} }
+  @media (max-width:360px){ .zp-btns{gap:6px} }
   /* No es un detalle opcional: para parte del publico una rotacion continua
      produce malestar fisico. */
   @media (prefers-reduced-motion: reduce){
     .zp-disco,.zp-iris,.zp-sombra{animation:none}
     .zp-escena{animation:none;transform:rotateX(26deg)}
     .zp-par{transition:none}
-    .zp-pista{transition:none}
     .zp-l{transition:none}
   }
 
-  /* ====== LA FRANJA · reproductor persistente ============================
-     Barra fija abajo, al modo de untitled.stream. NO es un segundo
-     reproductor: comparte el MISMO elemento <audio> que el disco. Dos
-     reproductores serian dos fuentes de verdad y acabarian sonando a la vez.
-     ====================================================================== */
-  .zf{position:fixed;left:0;right:0;bottom:0;z-index:70;display:none;pointer-events:none;
-      padding:10px max(16px,env(safe-area-inset-right,0px))
-              calc(10px + env(safe-area-inset-bottom,0px))
-              max(16px,env(safe-area-inset-left,0px))}
-  .zf.visible{display:block}
-  .zf-fila{pointer-events:none;max-width:880px;margin:0 auto;
-      display:flex;gap:10px;align-items:center}
-  body.con-franja{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
-  /* El foco no puede quedar bajo la franja fija ni bajo la cabecera. */
+  /* El foco no puede quedar bajo la cabecera fija. */
   html{scroll-padding-top:72px}
-  html:has(body.con-franja){scroll-padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
-
-  .zf-caja{pointer-events:auto;flex:1;min-width:0;overflow:hidden;
-      display:flex;align-items:center;gap:14px;
-      background:rgba(17,17,22,.92);backdrop-filter:blur(16px) saturate(1.2);
-      border:1px solid var(--line-2);border-radius:999px;padding:9px 16px 9px 9px;
-      box-shadow:0 10px 40px rgba(0,0,0,.6)}
-
-  /* Mini disco: el mismo lenguaje que el grande, sin la escena 3D. A 42px la
-     perspectiva no aporta nada y si cuesta composicion. */
-  .zf-disco{width:42px;height:42px;border-radius:50%;flex-shrink:0;position:relative;
-      background:
-        repeating-radial-gradient(circle at 50% 50%,rgba(0,0,0,.3) 0 1px,rgba(0,0,0,0) 1px 2px),
-        conic-gradient(from 0deg,#7a5210,#e8c169,#fff4cd,#d9a63f,#8a5f14,#f2d391,#b8862c,#e8c169,#7a5210);
-      box-shadow:0 0 0 1px rgba(255,214,128,.3),inset 0 0 8px rgba(0,0,0,.4);
-      animation:zp-girar 1.8s linear infinite;animation-play-state:paused}
-  .zf-disco.suena{animation-play-state:running}
-  .zf-disco::after{content:'';position:absolute;inset:38%;border-radius:50%;
-      background:var(--ink);box-shadow:inset 0 0 0 1px rgba(255,214,128,.3)}
-
-  .zf-meta{min-width:0;width:132px;flex-shrink:0}
-  .zf-t1{font-family:var(--font-d);font-size:13px;color:var(--white);
-      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .zf-t2{font-family:var(--font-m);font-size:10px;color:var(--smoke);letter-spacing:.08em;
-      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-  .zf-onda{flex:1;min-width:0;height:38px;position:relative;cursor:pointer;touch-action:none}
-  .zf-onda:focus-visible{outline:2px solid rgba(255,214,128,.7);outline-offset:2px;border-radius:4px}
-  .zf-onda canvas{display:block;width:100%;height:100%}
-
-  .zf-tiempo{font-family:var(--font-m);font-size:11px;color:var(--smoke);flex-shrink:0;
-      font-variant-numeric:tabular-nums;letter-spacing:.02em}
-
-  .zf-btns{display:flex;align-items:center;gap:6px;flex-shrink:0}
-  .zf-b{width:32px;height:32px;border-radius:50%;border:none;background:transparent;
-      color:var(--chrome);cursor:pointer;display:grid;place-items:center;padding:0;
-      transition:color .15s ease,background .15s ease}
-  .zf-b:hover:not(:disabled){color:#ffe2a0;background:rgba(255,214,128,.12)}
-  .zf-b:disabled{opacity:.35;cursor:default}
-  .zf-b svg{width:15px;height:15px;fill:currentColor;pointer-events:none}
-  .zf-b.zf-rep{display:grid}
-  .zf-b.on{color:#f2d391}
-  /* El color no puede ser el unico indicador de estado. */
-  .zf-b.on::after{content:'';position:absolute;bottom:3px;left:50%;
-     transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#f2d391}
-  .zf-b.zf-play{width:36px;height:36px;background:rgba(255,214,128,.14);color:#ffe2a0}
-
-  .zf-exp{width:40px;height:40px;border-radius:50%;flex-shrink:0;border:1px solid var(--line-2);
-      background:rgba(17,17,22,.92);color:var(--chrome);cursor:pointer;display:grid;place-items:center;
-      padding:0;transition:color .15s ease,border-color .15s ease}
-  .zf-exp:hover{color:#ffe2a0;border-color:rgba(255,214,128,.5)}
-  .zf-exp svg{width:15px;height:15px;fill:currentColor;pointer-events:none}
-
-  /* En pantallas estrechas caen los tiempos y los secundarios. Lo que NO cae
-     es la onda: es el unico control de posicion que queda. */
-  @media (max-width:820px){
-    .zf-meta{width:auto;flex:0 1 96px}
-    .zf-tiempo{display:none}
-    .zf-vol{display:none}   /* repetir NO se oculta: no existe en ningun otro sitio */
-  }
-  @media (max-width:520px){
-    .zf{padding:8px max(10px,env(safe-area-inset-right,0px))
-                calc(8px + env(safe-area-inset-bottom,0px))
-                max(10px,env(safe-area-inset-left,0px))}
-    .zf-caja{gap:9px;padding:7px 10px 7px 7px}
-    .zf-meta{flex:1 1 56px;min-width:52px}
-    .zf-onda{flex:4 1 140px;min-width:96px;height:32px}
-  }
-  @media (max-width:380px){
-    .zf-t2{display:none}
-    .zf-meta{flex:1 1 46px;min-width:44px}
-    .zf-onda{min-width:72px}
-    .zf-caja{gap:7px}
-    .zf-prev,.zf-next{display:none}
-    .zf-exp{width:36px;height:36px}
-    body.con-franja{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-  }
-  @media (prefers-reduced-motion: reduce){ .zf-disco{animation:none} }
 
   /* Apaisado corto (telefono girado): con 360px de alto, menos la cabecera
      y la franja, quedan ~214px utiles. El reproductor en vertical ocupaba
@@ -434,13 +426,13 @@
     .zp{padding:14px}
     .zp.visible{grid-template-columns:auto minmax(0,1fr);justify-items:stretch;
                 align-items:center;gap:16px}
-    .zp-disco{--d:min(30cqw,112px)}
+    .zp-disco{--d:min(30vw,112px)}
     .zp-zona{padding:4px 0 12px}
-    .zp-letra{height:62px;margin:8px 0}
+    .zp-lf{padding:10px 12px;margin-bottom:12px}
     .zp-plana{max-height:62px}
     .zp-title{font-size:17px;-webkit-line-clamp:1}
     .zp-sombra{height:9px}
-    .zf-onda{height:30px}
+    .zp-onda{height:34px}
   }
 
   .tp-now{margin-top:18px;padding:14px;border:1px solid var(--line);border-radius:4px;background:var(--ink-2);display:none}

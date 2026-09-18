@@ -308,12 +308,51 @@
     var m = Math.floor(s/60), r = s % 60;
     return m + ':' + (r < 10 ? '0' : '') + r;
   }
-  function setState(msg){
+  /* Las dos columnas se crean UNA vez y nadie las vacia enteras. Antes
+     setState hacia trackMount.textContent='', que ahora se llevaria por
+     delante el disco, la onda y el transporte junto con la lista. */
+  function asegurarCols(){
+    if(ZP.cols && ZP.cols.parentNode === trackMount) return;
     trackMount.textContent = '';
+    var cols  = el('div','zp-cols','zp-cols');
+    var izq   = el('div','zp-izq','zp-izq');
+    var der   = el('div','zp-der','zp-der');
+    var lf    = el('div','zp-lf','zp-lf'); lf.hidden = true;
+    var cab   = el('div','zp-lf-cab','zp-lf-cab');
+    var lin   = el('div','zp-lf-lin','zp-lf-lin');
+    var sep   = el('div','zp-lf-sep','zp-lf-sep'); sep.hidden = true;
+    var cab2  = el('div','zp-lf-cab','zp-lf-cab2'); cab2.hidden = true;
+    var sig   = el('div','zp-lf-sig','zp-lf-sig'); sig.hidden = true;
+    var plana = el('div','zp-plana','zp-plana'); plana.hidden = true;
+    lf.appendChild(cab); lf.appendChild(lin); lf.appendChild(sep);
+    lf.appendChild(cab2); lf.appendChild(sig); lf.appendChild(plana);
+    /* La ventana de 3 temas vive DENTRO del cuadro de la letra: un solo
+       recuadro, dos zonas que se deslizan. */
+    var sep2  = el('div','zp-lf-sep','zp-vent-sep'); sep2.hidden = true;
+    var vent  = el('div','zp-vent','zp-vent'); vent.hidden = true;
+    lf.appendChild(sep2); lf.appendChild(vent);
+
+    var lista = el('div','zp-lista','zp-lista');   /* solo para mensajes de estado */
+    der.appendChild(lf); der.appendChild(lista);
+    cols.appendChild(izq); cols.appendChild(der);
+
+    /* En reposo manda el carrusel horizontal, a todo el ancho. */
+    var carr = el('div','zp-carrusel','zp-carrusel');
+    carr.setAttribute('role','list');
+    trackMount.appendChild(carr);
+    trackMount.appendChild(cols);
+    ZP.carr=carr; ZP.vent=vent; ZP.ventSep=sep2;
+    ZP.cols=cols; ZP.izq=izq; ZP.der=der; ZP.lista=lista;
+    ZP.lf=lf; ZP.lfCab=cab; ZP.lfLin=lin; ZP.lfSep=sep; ZP.lfCab2=cab2; ZP.lfSig=sig;
+    ZP.plana=plana;
+  }
+  function setState(msg){
+    asegurarCols();
+    ZP.lista.textContent = '';
     var p = document.createElement('p');
     p.className = 'tp-state';
     p.textContent = msg;
-    trackMount.appendChild(p);
+    ZP.lista.appendChild(p);
   }
   function stopPlayback(){
     if(ZP.raf){ cancelAnimationFrame(ZP.raf); ZP.raf = 0; }
@@ -321,9 +360,9 @@
     if(playingBtn){ playingBtn.innerHTML = ICON_PLAY; playingBtn.classList.remove('is-playing'); playingBtn = null; }
     if(ZP.disco) ZP.disco.classList.remove('suena');
     if(ZP.raiz) ZP.raiz.classList.remove('visible');
-    if(ZF){ ZF.raiz.classList.remove('visible'); ZF.mini.classList.remove('suena'); }
-    document.body.classList.remove('con-franja');
     ZP.idx = -1;
+    if(trackMount) trackMount.classList.remove('suena');
+    if(ZP.vent){ ZP.vent.hidden = true; ZP.ventSep.hidden = true; }
   }
 
   function loadTracks(){
@@ -354,8 +393,10 @@
   }
 
   function renderTracks(tracks){
-    trackMount.textContent = '';
+    asegurarCols();
+    ZP.lista.textContent = '';
     ZP.tracks = tracks;
+    ZP.filas = [];
 
     tracks.forEach(function(t){
       var row = document.createElement('div');
@@ -386,7 +427,7 @@
       dur.textContent = fmtDur(t.duration_seconds);
 
       row.appendChild(btn); row.appendChild(info); row.appendChild(dur);
-      trackMount.appendChild(row);
+      ZP.filas.push(row);          /* no se monta: es el molde de la ventana */
 
       btn.addEventListener('click', function(){
         if(playingBtn === btn && audioEl){
@@ -396,9 +437,57 @@
         }
         playTrack(t, btn);
       });
+
+      /* Tarjeta del carrusel: mismo tema, otra forma. */
+      var card = el('div','zp-card'); card.setAttribute('role','listitem');
+      var cb = document.createElement('button');
+      cb.type='button'; cb.className='zp-card-btn';
+      cb.setAttribute('aria-label','Reproducir ' + (t.title || ''));
+      if(!t.file_path){ cb.disabled = true; cb.title = 'Todavía no lo subo'; }
+      var ct = el('div','zp-card-t'); ct.textContent = t.title || '';
+      var cd = el('div','zp-card-d'); cd.textContent = t.description || '';
+      var cdur = el('div','zp-card-dur'); cdur.textContent = fmtDur(t.duration_seconds);
+      var cico = el('div','zp-card-ico'); cico.innerHTML = ICON_PLAY;
+      cb.appendChild(cico); cb.appendChild(ct); cb.appendChild(cd); cb.appendChild(cdur);
+      card.appendChild(cb);
+      ZP.carr.appendChild(card);
+      cb.addEventListener('click', function(){ playTrack(t, btn); });
     });
 
     montarZP();
+  }
+
+  /* Ventana de 3: el anterior, el que suena y el siguiente. Se desliza. */
+  function pintarVentana(){
+    if(!ZP.vent || !ZP.tracks.length || ZP.idx < 0){
+      if(ZP.vent){ ZP.vent.hidden = true; ZP.ventSep.hidden = true; }
+      return;
+    }
+    var n = ZP.tracks.length, i = ZP.idx;
+    var ini = Math.max(0, Math.min(i - 1, n - 3));
+    var fin = Math.min(n - 1, ini + 2);
+    ZP.vent.textContent = '';
+    for(var j = ini; j <= fin; j++){
+      (function(k){
+        var t = ZP.tracks[k];
+        var f = el('div','zp-vt' + (k === i ? ' on' : ''));
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'zp-vt-b';
+        b.setAttribute('aria-label', (k === i ? 'Sonando: ' : 'Reproducir ') + (t.title || ''));
+        if(k === i) b.setAttribute('aria-current','true');
+        if(!t.file_path) b.disabled = true;
+        var tt = el('span','zp-vt-t'); tt.textContent = t.title || '';
+        var dd = el('span','zp-vt-d'); dd.textContent = fmtDur(t.duration_seconds);
+        b.appendChild(tt); b.appendChild(dd);
+        f.appendChild(b);
+        ZP.vent.appendChild(f);
+        b.addEventListener('click', function(){
+          if(k === i){ if(audioEl.paused) audioEl.play().catch(function(){}); else audioEl.pause(); return; }
+          zpAbrir(k, ZP.filas[k] ? ZP.filas[k].querySelector('.tp-play') : null);
+        });
+      })(j);
+    }
+    ZP.vent.hidden = false; ZP.ventSep.hidden = false;
   }
 
   function playTrack(track, btn){
@@ -412,9 +501,12 @@
      tematizar de forma consistente entre navegadores y rompe la inmersion.
      ══════════════════════════════════════════════════════════════════ */
 
-  var ZP = { tracks:[], idx:-1, letra:[], lineEls:[], iLinea:-1,
+  var ZP = { tracks:[], filas:[], idx:-1, letra:[], estrofas:[], numerar:false, iLinea:-1,
              raf:0, cacheOk:false, arrastrando:false, tLento:0,
-             firmadoEn:0, refirmando:false };
+             firmadoEn:0, refirmando:false,
+             /* 0 parar al final · 1 seguir la lista · 2 repetir este tema.
+                Vivia en la franja; el boton se mudo al transporte. */
+             repetir:0, picos:null, previa:null, ultBarra:-1 };
 
   /* Vida de la firma. 300s era demasiado corto para una sesion de escucha
      real; una hora cubre el caso normal y la re-firma cubre el resto. */
@@ -433,6 +525,11 @@
   }
 
   function montarZP(){
+    asegurarCols();
+    /* Desmontaje explicito: renderTracks solo vacia la lista, no la columna
+       del disco, asi que el nodo anterior hay que quitarlo a mano. */
+    if(ZP.obs){ try{ ZP.obs.disconnect(); }catch(e){} ZP.obs = null; }
+    if(ZP.raiz && ZP.raiz.parentNode) ZP.raiz.parentNode.removeChild(ZP.raiz);
     var raiz = el('div','zp','zp');
 
     var zona   = el('div','zp-zona');
@@ -459,16 +556,6 @@
     var desc    = el('p','zp-desc','zp-desc');
     panel.appendChild(eyebrow); panel.appendChild(titulo); panel.appendChild(desc);
 
-    var letra = el('div','zp-letra','zp-letra');
-    var pista = el('div','zp-pista','zp-pista');
-    letra.appendChild(pista);
-    letra.hidden = true;
-    panel.appendChild(letra);
-
-    var plana = el('div','zp-plana','zp-plana');
-    plana.hidden = true;
-    panel.appendChild(plana);
-
     var tr = el('div','zp-tr');
     var bPrev = el('button','zp-b','zp-prev'); bPrev.type='button'; bPrev.innerHTML = SVG_PREV;
     bPrev.setAttribute('aria-label','Anterior');
@@ -477,23 +564,25 @@
     var bNext = el('button','zp-b','zp-next'); bNext.type='button'; bNext.innerHTML = SVG_NEXT;
     bNext.setAttribute('aria-label','Siguiente');
     var tAct = el('span','zp-t','zp-actual'); tAct.textContent = '0:00';
-    var barra = el('div','zp-barra','zp-barra');
-    barra.setAttribute('role','slider'); barra.tabIndex = 0;
-    barra.setAttribute('aria-label','Posicion');
-    barra.setAttribute('aria-valuemin','0'); barra.setAttribute('aria-valuemax','0');
-    barra.setAttribute('aria-valuenow','0'); barra.setAttribute('aria-valuetext','0:00');
-    barra.appendChild(el('div','zp-riel'));
-    barra.appendChild(el('div','zp-buf','zp-buf'));
-    barra.appendChild(el('div','zp-prog','zp-prog'));
-    barra.appendChild(el('div','zp-pin','zp-pin'));
+    /* La onda REEMPLAZA a .zp-barra: mismo role=slider, mismo scrub. */
+    var onda = el('div','zp-onda','zp-onda');
+    onda.setAttribute('role','slider'); onda.tabIndex = 0;
+    onda.setAttribute('aria-label','Posicion');
+    onda.setAttribute('aria-valuemin','0'); onda.setAttribute('aria-valuemax','0');
+    onda.setAttribute('aria-valuenow','0'); onda.setAttribute('aria-valuetext','0:00');
+    var lienzo = document.createElement('canvas');
+    onda.appendChild(lienzo);
     var tTot = el('span','zp-t','zp-total'); tTot.textContent = '0:00';
+    var bRep = el('button','zp-b','zp-rep'); bRep.type='button'; bRep.innerHTML = SVG_REP;
+    bRep.setAttribute('aria-label','Repetir: desactivado'); bRep.setAttribute('aria-pressed','false');
     var bVol = el('button','zp-b','zp-vol'); bVol.type='button'; bVol.innerHTML = SVG_VOL;
     bVol.setAttribute('aria-label','Silenciar'); bVol.setAttribute('aria-pressed','false');
 
     var linea = el('div','zp-linea');
-    linea.appendChild(tAct); linea.appendChild(barra); linea.appendChild(tTot);
+    linea.appendChild(tAct); linea.appendChild(onda); linea.appendChild(tTot);
     var btns = el('div','zp-btns');
-    btns.appendChild(bPrev); btns.appendChild(bPlay); btns.appendChild(bNext); btns.appendChild(bVol);
+    btns.appendChild(bPrev); btns.appendChild(bPlay); btns.appendChild(bNext);
+    btns.appendChild(bRep);  btns.appendChild(bVol);
     tr.appendChild(linea); tr.appendChild(btns);
     panel.appendChild(tr);
 
@@ -502,7 +591,7 @@
     panel.appendChild(estado);
 
     raiz.appendChild(zona); raiz.appendChild(panel);
-    trackMount.appendChild(raiz);
+    ZP.izq.appendChild(raiz);
 
     audioEl = document.createElement('audio');
     audioEl.preload = 'none';
@@ -512,15 +601,15 @@
     panel.appendChild(audioEl);
 
     ZP.raiz=raiz; ZP.disco=disco; ZP.par=par; ZP.zona=zona; ZP.labelTxt=labelTxt; ZP.titulo=titulo; ZP.desc=desc;
-    ZP.letra=[]; ZP.cajaLetra=letra; ZP.pista=pista; ZP.plana=plana;
-    ZP.bPlay=bPlay; ZP.bPrev=bPrev; ZP.bNext=bNext; ZP.bVol=bVol;
-    ZP.tAct=tAct; ZP.tTot=tTot; ZP.barra=barra; ZP.buf=document.getElementById('zp-buf');
-    ZP.prog=document.getElementById('zp-prog'); ZP.pin=document.getElementById('zp-pin');
+    ZP.bPlay=bPlay; ZP.bPrev=bPrev; ZP.bNext=bNext; ZP.bRep=bRep; ZP.bVol=bVol;
+    ZP.tAct=tAct; ZP.tTot=tTot;
+    ZP.onda=onda; ZP.lienzo=lienzo; ZP.ctx=lienzo.getContext('2d');
+    ZP.picos=null; ZP.previa=null; ZP.ultBarra=-1; ZP.anchoBarra=0;
     ZP.estado=estado;
 
     cablearZP();
+    cablearOnda();
     cablearParalaje();
-    montarFranja();
   }
 
   function cablearZP(){
@@ -528,12 +617,21 @@
     ZP.bPrev.addEventListener('click', function(){ saltar(-1); });
     ZP.bNext.addEventListener('click', function(){ saltar(1); });
     ZP.bVol.addEventListener('click', function(){ audioEl.muted = !audioEl.muted; pintarMudo(); });
+    /* 0 = parar al final · 1 = seguir la lista · 2 = repetir este tema.
+       El control estaba en la franja; sin el, 'ended' encadenaria seis WAV
+       master sin que nadie lo pida. */
+    ZP.bRep.addEventListener('click', function(){
+      ZP.repetir = (ZP.repetir + 1) % 3;
+      ZP.bRep.innerHTML = ZP.repetir === 2 ? SVG_REP1 : SVG_REP;
+      ZP.bRep.classList.toggle('on', ZP.repetir > 0);
+      ZP.bRep.setAttribute('aria-pressed', ZP.repetir > 0 ? 'true' : 'false');
+      ZP.bRep.setAttribute('aria-label',
+        ZP.repetir === 0 ? 'Repetir: desactivado' :
+        ZP.repetir === 1 ? 'Repetir: toda la lista' : 'Repetir: este tema');
+    });
 
     audioEl.addEventListener('play',  function(){
       ZP.disco.classList.add('suena');
-      if(ZF){ ZF.mini.classList.add('suena'); ZF.play.innerHTML = ICON_PAUSE;
-              ZF.play.setAttribute('aria-label','Pausar');
-              ZF.play.setAttribute('aria-pressed','true'); }
       ZP.bPlay.innerHTML = ICON_PAUSE;
       ZP.bPlay.setAttribute('aria-label','Pausar');
       ZP.bPlay.setAttribute('aria-pressed','true');
@@ -543,9 +641,6 @@
     audioEl.addEventListener('pause', function(){
       /* El disco NO vuelve al origen: se queda donde esta, como un tocadiscos. */
       ZP.disco.classList.remove('suena');
-      if(ZF){ ZF.mini.classList.remove('suena'); ZF.play.innerHTML = ICON_PLAY;
-              ZF.play.setAttribute('aria-label','Reproducir');
-              ZF.play.setAttribute('aria-pressed','false'); }
       ZP.bPlay.innerHTML = ICON_PLAY;
       ZP.bPlay.setAttribute('aria-label','Reproducir');
       ZP.bPlay.setAttribute('aria-pressed','false');
@@ -554,8 +649,8 @@
       pintar();
     });
     audioEl.addEventListener('ended', function(){
-      if(ZF && ZF.repetir === 2){ audioEl.currentTime = 0; audioEl.play().catch(function(){}); return; }
-      if(ZF && ZF.repetir === 0 && ZP.idx === ZP.tracks.length - 1){ return; }
+      if(ZP.repetir === 2){ audioEl.currentTime = 0; audioEl.play().catch(function(){}); return; }
+      if(ZP.repetir === 0 && ZP.idx === ZP.tracks.length - 1){ return; }
       saltar(1);
     });
 
@@ -589,30 +684,6 @@
       if(ZP.idx >= 0 && firmaVencida() && !ZP.refirmando) refirmar('stalled');
     });
 
-    /* --- scrub --- */
-    conectarArrastre(ZP.barra, function(f){
-      /* vista previa: solo pintura, sin tocar el audio */
-      ZP.prog.style.transform = 'translateY(-50%) scaleX(' + f.toFixed(4) + ')';
-      if(!ZP.anchoBarra) ZP.anchoBarra = ZP.barra.getBoundingClientRect().width;
-      ZP.pin.style.transform = 'translate(-50%,-50%) translateX(' + (f * ZP.anchoBarra).toFixed(1) + 'px)';
-      var d = duracion();
-      if(d) ZP.tAct.textContent = fmtDur(Math.floor(f * d));
-    });
-    ZP.barra.addEventListener('keydown', function(e){
-      var dur = duracion();
-      if(!dur) return;
-      var paso = e.shiftKey ? 30 : 5, d = 0;
-      if(e.key === 'ArrowRight') d = paso;
-      else if(e.key === 'ArrowLeft') d = -paso;
-      else if(e.key === 'PageUp')   d = 60;
-      else if(e.key === 'PageDown') d = -60;
-      else if(e.key === 'Home'){ audioEl.currentTime = 0;   e.preventDefault(); pintar(); return; }
-      else if(e.key === 'End'){  audioEl.currentTime = dur; e.preventDefault(); pintar(); return; }
-      else return;
-      e.preventDefault();
-      audioEl.currentTime = Math.min(dur, Math.max(0, audioEl.currentTime + d));
-      pintar();
-    });
   }
 
   function decir(msg){ if(ZP.estado) ZP.estado.textContent = msg; }
@@ -642,8 +713,8 @@
       activo = false; rect = null;
       var d = duracion();
       if(d){ audioEl.currentTime = ultimo * d; }
-      ZF && (ZF.previa = null);
-      pintar(); if(ZF) pintarOnda(true);
+      ZP.previa = null;
+      pintar(); pintarOnda(true);
     }
 
     elm.addEventListener('pointerdown', function(e){
@@ -670,7 +741,7 @@
   }
 
   function sliderSinDuracion(){
-    [ZP.barra, ZF && ZF.onda].forEach(function(elm){
+    [ZP.onda].forEach(function(elm){
       if(!elm) return;
       elm.setAttribute('aria-disabled','true');
       elm.setAttribute('aria-valuenow','0');
@@ -684,7 +755,7 @@
      "Silenciar". */
   function pintarMudo(){
     var m = audioEl.muted;
-    [ZP.bVol, ZF && ZF.vol].forEach(function(b){
+    [ZP.bVol].forEach(function(b){
       if(!b) return;
       b.innerHTML = m ? SVG_MUDO : SVG_VOL;
       b.setAttribute('aria-pressed', m ? 'true' : 'false');
@@ -744,8 +815,12 @@
     if(playingBtn && playingBtn !== btn){
       playingBtn.innerHTML = ICON_PLAY; playingBtn.classList.remove('is-playing');
     }
-    playingBtn = btn || document.querySelector('.tp-item:nth-of-type(' + (i+1) + ') .tp-play');
+    /* :nth-of-type se rompia en silencio en cuanto entraba cualquier nodo
+       entre las filas. La lista se guarda al construirla. */
+    playingBtn = btn || (ZP.filas[i] ? ZP.filas[i].querySelector('.tp-play') : null);
     ZP.idx = i;
+    trackMount.classList.add('suena');
+    pintarVentana();
     ZP.raiz.classList.add('visible');
 
     ZP.titulo.textContent   = t.title || '';
@@ -753,12 +828,10 @@
     ZP.labelTxt.textContent = 'Zignalez';
     ZP.tAct.textContent     = '0:00';
     ZP.tTot.textContent     = fmtDur(t.duration_seconds) || '0:00';
-    ZP.prog.style.transform = 'translateY(-50%) scaleX(0)';
-    ZP.buf.style.transform  = 'translateY(-50%) scaleX(0)';
-    ZP.pin.style.left       = '0%';
+    ZP.previa = null;
 
     cargarLetra(t.id);
-    franjaTema(t);
+    temaOnda(t);
     decir('Firmando enlace…');
 
     /* Signed URL de 300s: el archivo nunca es publico, el link caduca solo. */
@@ -823,12 +896,39 @@
       });
   }
 
-  /* ---------- Letra ---------- */
+  /* ---------- Letra permanente ----------
+     Vive en .zp-der, arriba, siempre visible. 'lines' es plana: se agrupa en
+     estrofas por hueco entre marcas consecutivas. Antes hay que ORDENAR por
+     t: cargarLetra filtraba pero no ordenaba y buscarLinea ya asume orden. */
+
+  /* [Suposicion] 4s. No hay ninguna letra cargada con que calibrarlo. Si el
+     agrupamiento degenera (una sola estrofa, o una estrofa por linea) se cae
+     a ventana deslizante sin numerar, que es correcta en los dos extremos. */
+  var HUECO_ESTROFA = 4;
+
+  function limpiarLetra(){
+    ZP.letra = []; ZP.estrofas = []; ZP.numerar = false;
+    ZP.iLinea = -1; ZP.cacheOk = false;
+    if(!ZP.lf) return;
+    ZP.lfCab.textContent = ''; ZP.lfLin.textContent = '';
+    ZP.lfCab2.textContent = ''; ZP.lfSig.textContent = '';
+    ZP.lfSep.hidden = true; ZP.lfCab2.hidden = true; ZP.lfSig.hidden = true;
+    ZP.plana.textContent = ''; ZP.plana.hidden = true;
+    ZP.lf.hidden = true;                 /* sin letra el bloque no se dibuja */
+  }
+
+  function agruparEstrofas(L){
+    var g = [], ini = 0;
+    for(var i = 1; i < L.length; i++){
+      if(L[i].t - L[i-1].t > HUECO_ESTROFA){ g.push([ini, i-1]); ini = i; }
+    }
+    g.push([ini, L.length - 1]);
+    return g;
+  }
+
   function cargarLetra(trackId){
-    ZP.letra = []; ZP.lineEls = []; ZP.iLinea = -1; ZP.cacheOk = false;
-    ZP.pista.textContent = '';
-    ZP.cajaLetra.hidden = true;
-    ZP.plana.hidden = true; ZP.plana.textContent = '';
+    asegurarCols();
+    limpiarLetra();
     if(!sb) return;
 
     sb.from('track_lyrics').select('lines,plain').eq('track_id', trackId).maybeSingle()
@@ -839,24 +939,81 @@
           L = L.filter(function(x){
             return x && typeof x.l === 'string' && typeof x.t === 'number' && isFinite(x.t);
           });
+          L.sort(function(a,b){ return a.t - b.t; });
         }
         if(Array.isArray(L) && L.length){
           ZP.letra = L;
-          L.forEach(function(x){
-            var p = el('p','zp-l');
-            p.textContent = x.l || '';                 /* textContent: sin XSS desde la BD */
-            ZP.pista.appendChild(p);
-            ZP.lineEls.push(p);
-          });
-          ZP.cajaLetra.hidden = false;
-          ZP.pista.style.transform = 'translateY(0px)';
-          /* Una sola pasada de medicion, fuera del bucle de reproduccion. */
-          ZP.offsets = ZP.lineEls.map(function(q){ return q.offsetTop + q.offsetHeight/2; });
+          ZP.estrofas = agruparEstrofas(L);
+          /* Una sola estrofa para todo el tema, o una estrofa por linea: en
+             los dos casos numerar no informa de nada. */
+          ZP.numerar = !(ZP.estrofas.length <= 1 || ZP.estrofas.length === L.length);
+          ZP.lf.hidden = false;
+          pintarLetraFija(-1);
         } else if(res.data.plain){
+          /* Letra sin sincronizar: se muestra igual, sin tiempos. */
           ZP.plana.textContent = res.data.plain;
           ZP.plana.hidden = false;
+          ZP.lf.hidden = false;
         }
       });
+  }
+
+  function lineaLetraEl(x, activa, ya){
+    var p = el('p', 'zp-l' + (activa ? ' on' : (ya ? ' ya' : '')));
+    var marca = el('span','zp-l-t');
+    marca.textContent = fmtDur(Math.floor(x.t));
+    p.appendChild(marca);
+    p.appendChild(document.createTextNode(x.l || ''));   /* sin XSS desde la BD */
+    if(activa && ya !== 'reposo') p.setAttribute('aria-current','true');
+    return p;
+  }
+
+  /* Ventana DESLIZANTE de 5 lineas centrada en la activa. No hay bloque fijo
+     de "lo que viene": lo que viene son sencillamente las lineas de abajo, y
+     se mueven con el audio. Un bloque estatico obliga a leer en dos sitios. */
+  var VENTANA_LETRA = 5;
+  function ventanaLetra(ini, fin, i){
+    var n = fin - ini + 1;
+    if(n <= VENTANA_LETRA) return [ini, fin];
+    var a = Math.max(ini, Math.min(i - 2, fin - (VENTANA_LETRA - 1)));
+    return [a, a + VENTANA_LETRA - 1];
+  }
+
+  function pintarLetraFija(i){
+    if(!ZP.lf || ZP.lf.hidden || !ZP.letra.length) return;
+    var L = ZP.letra, ult = L.length - 1;
+    var act = (i < 0) ? 0 : i;
+    var ini, fin, e = -1, v;
+
+    /* La cabecera dice en que estrofa vas; la VENTANA no se corta en el limite
+       de la estrofa, cruza con naturalidad. Cortarla ahi dejaba media tarjeta
+       vacia al final de cada estrofa. */
+    if(ZP.numerar){
+      for(var k = 0; k < ZP.estrofas.length; k++){
+        if(act >= ZP.estrofas[k][0] && act <= ZP.estrofas[k][1]){ e = k; break; }
+      }
+      if(e < 0) e = 0;
+      ZP.lfCab.textContent = 'Letra · Estrofa ' + (e + 1) + ' · En curso';
+    } else {
+      ZP.lfCab.textContent = 'Letra · En curso';
+    }
+    v = ventanaLetra(0, ult, act);
+    ini = v[0]; fin = v[1];
+
+    /* En reposo (i < 0) la linea 0 va resaltada igual: la maqueta A siempre
+       tiene una linea destacada, y sin ella el bloque se lee como un volcado
+       de texto plano. No lleva aria-current porque nada esta sonando. */
+    var reposo = (i < 0);
+    ZP.lfLin.textContent = '';
+    for(var j = ini; j <= fin; j++){
+      var esAct = reposo ? (j === ini) : (j === i);
+      ZP.lfLin.appendChild(lineaLetraEl(L[j], esAct, reposo ? 'reposo' : (j < i)));
+    }
+
+    /* Sin bloque estatico de "lo que viene": esas lineas ya estan en la
+       ventana de arriba y se deslizan solas. */
+    ZP.lfSig.textContent = '';
+    ZP.lfSep.hidden = true; ZP.lfCab2.hidden = true; ZP.lfSig.hidden = true;
   }
 
   /* Camino rapido primero: en reproduccion normal la linea siguiente es casi
@@ -879,18 +1036,8 @@
   }
 
   function marcarLinea(i){
-    if(ZP.iLinea >= 0 && ZP.lineEls[ZP.iLinea]){
-      ZP.lineEls[ZP.iLinea].classList.remove('on');
-      ZP.lineEls[ZP.iLinea].removeAttribute('aria-current');
-    }
     ZP.iLinea = i;
-    if(i < 0 || !ZP.lineEls[i]){ ZP.pista.style.transform = 'translateY(0px)'; return; }
-    var e = ZP.lineEls[i];
-    e.classList.add('on');
-    e.setAttribute('aria-current','true');
-    var off = (ZP.offsets && ZP.offsets[i] != null)
-      ? ZP.offsets[i] : (e.offsetTop + e.offsetHeight/2);
-    ZP.pista.style.transform = 'translateY(' + (-off) + 'px)';
+    pintarLetraFija(i);
   }
 
   /* ---------- Pintado ---------- */
@@ -907,29 +1054,22 @@
     return 0;
   }
 
+  /* Lo cargado ya no es una barra propia: se pinta dentro del mismo lienzo. */
   function pintarBuffer(){
-    var d = duracion();
-    if(!d) return;
-    var b = audioEl.buffered;
-    if(!b || !b.length) return;
-    var fin = Math.min(1, b.end(b.length - 1) / d);
-    ZP.buf.style.transform = 'translateY(-50%) scaleX(' + fin.toFixed(4) + ')';
+    if(!ZP.ctx) return;
+    pintarOnda(true);
   }
 
   function pintar(){
     var d = duracion();
     if(!d){
-      /* Sin duracion no hay barra posible. Se dice, no se finge. */
+      /* Sin duracion no hay posicion posible. Se dice, no se finge. */
       ZP.tAct.textContent = fmtDur(Math.floor(audioEl.currentTime));
       ZP.tTot.textContent = '--:--';
       sliderSinDuracion();
       return;
     }
-    var f = Math.min(1, audioEl.currentTime / d);
-    ZP.prog.style.transform = 'translateY(-50%) scaleX(' + f.toFixed(4) + ')';
-    if(!ZP.anchoBarra) ZP.anchoBarra = ZP.barra.getBoundingClientRect().width;
-    ZP.pin.style.transform = 'translate(-50%,-50%) translateX(' + (f * ZP.anchoBarra).toFixed(1) + 'px)';
-    if(ZF) pintarOnda(false);
+    pintarOnda(false);
     var seg = Math.floor(audioEl.currentTime);
     if(seg !== ZP.ultSeg){
       ZP.ultSeg = seg;
@@ -937,12 +1077,7 @@
       ZP.tAct.textContent = fmtDur(seg);
       /* En SEGUNDOS, no en porcentaje: un paso de 5s sobre 5min es 1,67% y
          redondeado no se movia, asi que el lector de pantalla callaba. */
-      ponerSlider(ZP.barra, seg, total, txt);
-      if(ZF){
-        ZF.ultSeg = seg;
-        ZF.tiempo.textContent = fmtDur(seg) + ' / ' + fmtDur(total);
-        ponerSlider(ZF.onda, seg, total, txt);
-      }
+      ponerSlider(ZP.onda, seg, total, txt);
     }
   }
 
@@ -959,127 +1094,32 @@
   }
 
   /* ══════════════════════════════════════════════════════════════════
-     LA FRANJA
-     Comparte audioEl con el disco. Todo lo que pinta sale del MISMO
-     estado; no guarda una copia propia de nada.
+     LA ONDA
+     Venia de la franja, que se desmonto entera. Aqui estan, funcionando y en
+     .zp-izq: el canvas y su dimensionado, pintarOnda, la lectura de
+     tracks.peaks, la cabeza de posicion con su cache de ancho, el scrub por
+     puntero y el scrub por TECLADO, que era el unico que habia.
      ══════════════════════════════════════════════════════════════════ */
 
   var SVG_REP  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>';
   var SVG_REP1 = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/><text x="12" y="15" font-size="9" font-family="monospace" fill="currentColor" text-anchor="middle">1</text></svg>';
-  var SVG_EXP  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8l6 6H6z"/></svg>';
 
-  function montarFranja(){
-    /* Desmontaje explicito. La franja cuelga de <body>, no de trackMount, asi
-       que el textContent='' de renderTracks no la alcanza. */
-    if(ZF){
-      if(ZF.obs) try{ ZF.obs.disconnect(); }catch(e){}
-      if(ZF.raiz && ZF.raiz.parentNode) ZF.raiz.parentNode.removeChild(ZF.raiz);
-      ZF = null;
-    }
-    var raiz = el('div','zf','zf');
-    raiz.setAttribute('role','region');
-    raiz.setAttribute('aria-label','Reproductor');
-    /* La zona privada no se graba: la mascara esta en <section id="miembros">
-       y la franja es HERMANA de esa seccion, no descendiente, asi que no la
-       heredaba. El titulo de cada maqueta inedita se estaba grabando. */
-    raiz.setAttribute('data-clarity-mask','True');
-    var caja = el('div','zf-caja');
-
-    var mini = el('div','zf-disco','zf-disco');
-    mini.setAttribute('aria-hidden','true');
-
-    var meta = el('div','zf-meta');
-    var t1 = el('div','zf-t1','zf-t1');
-    var t2 = el('div','zf-t2','zf-t2'); t2.textContent = 'Zignalez';
-    meta.appendChild(t1); meta.appendChild(t2);
-
-    var onda = el('div','zf-onda','zf-onda');
-    onda.setAttribute('role','slider'); onda.tabIndex = 0;
-    onda.setAttribute('aria-label','Posicion');
-    onda.setAttribute('aria-valuemin','0'); onda.setAttribute('aria-valuemax','0');
-    onda.setAttribute('aria-valuenow','0'); onda.setAttribute('aria-valuetext','0:00');
-    var lienzo = document.createElement('canvas');
-    onda.appendChild(lienzo);
-
-    var tiempo = el('div','zf-tiempo','zf-tiempo'); tiempo.textContent = '0:00 / 0:00';
-
-    var btns = el('div','zf-btns');
-    function bt(cls, svg, etiqueta){
-      var b = el('button','zf-b ' + cls); b.type='button'; b.innerHTML = svg;
-      b.setAttribute('aria-label', etiqueta); return b;
-    }
-    var fPrev = bt('zf-prev', SVG_PREV, 'Anterior');
-    var fPlay = bt('zf-play', ICON_PLAY, 'Reproducir');
-    fPlay.setAttribute('aria-pressed','false');
-    var fNext = bt('zf-next', SVG_NEXT, 'Siguiente');
-    var fRep  = bt('zf-rep',  SVG_REP,  'Repetir: desactivado');
-    var fVol  = bt('zf-vol',  SVG_VOL,  'Silenciar');
-    btns.appendChild(fPrev); btns.appendChild(fPlay); btns.appendChild(fNext);
-    btns.appendChild(fRep);  btns.appendChild(fVol);
-
-    caja.appendChild(mini); caja.appendChild(meta); caja.appendChild(onda);
-    caja.appendChild(tiempo); caja.appendChild(btns);
-
-    var exp = el('button','zf-exp','zf-exp'); exp.type='button';
-    exp.innerHTML = SVG_EXP; exp.setAttribute('aria-label','Ver el disco');
-
-    var fila = el('div','zf-fila');
-    exp.style.pointerEvents = 'auto';
-    fila.appendChild(caja); fila.appendChild(exp);
-    raiz.appendChild(fila);
-    document.body.appendChild(raiz);
-
-    ZF = { raiz:raiz, mini:mini, t1:t1, tiempo:tiempo, onda:onda, lienzo:lienzo,
-           ctx:lienzo.getContext('2d'), play:fPlay, prev:fPrev, next:fNext,
-           rep:fRep, vol:fVol, exp:exp, picos:null, ultBarra:-1, repetir:0 };
-
-    cablearFranja();
-    dimensionarOnda();
-    if(window.ResizeObserver){
-      ZF.obs = new ResizeObserver(function(){ ZP.anchoBarra = 0; dimensionarOnda(); pintarOnda(true); });
-      ZF.obs.observe(onda);
-    } else {
-      window.addEventListener('resize', function(){ dimensionarOnda(); pintarOnda(true); });
-    }
-  }
-
-  var ZF = null;
+  /* Este resize es de ZP, no de la franja: invalida el ancho cacheado. */
   window.addEventListener('resize', function(){ ZP.anchoBarra = 0; });
 
-  function cablearFranja(){
-    ZF.play.addEventListener('click', function(){ alternar(); });
-    ZF.prev.addEventListener('click', function(){ saltar(-1); });
-    ZF.next.addEventListener('click', function(){ saltar(1); });
-    ZF.vol.addEventListener('click', function(){
-      audioEl.muted = !audioEl.muted;
-      ZF.vol.innerHTML = audioEl.muted ? SVG_MUDO : SVG_VOL;
-      ZF.vol.classList.toggle('on', audioEl.muted);
-      if(ZP.bVol){ ZP.bVol.innerHTML = ZF.vol.innerHTML;
-                   ZP.bVol.setAttribute('aria-pressed', audioEl.muted ? 'true':'false'); }
-    });
-    /* 0 = sin repetir · 1 = repetir todo · 2 = repetir este */
-    ZF.rep.addEventListener('click', function(){
-      ZF.repetir = (ZF.repetir + 1) % 3;
-      ZF.rep.innerHTML = ZF.repetir === 2 ? SVG_REP1 : SVG_REP;
-      ZF.rep.classList.toggle('on', ZF.repetir > 0);
-      ZF.rep.setAttribute('aria-label',
-        ZF.repetir === 0 ? 'Repetir: desactivado' :
-        ZF.repetir === 1 ? 'Repetir: toda la lista' : 'Repetir: este tema');
-    });
-    ZF.exp.addEventListener('click', function(){
-      if(!ZP.raiz || !ZP.raiz.scrollIntoView) return;
-      var quieto = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      ZP.raiz.scrollIntoView({ behavior: quieto ? 'auto' : 'smooth', block:'center' });
-    });
-
-    /* --- scrub sobre la onda --- */
-    conectarArrastre(ZF.onda, function(f){
-      ZF.previa = f;
+  function cablearOnda(){
+    /* --- scrub por puntero --- */
+    conectarArrastre(ZP.onda, function(f){
+      ZP.previa = f;
       pintarOnda(true);
       var d = duracion();
-      if(d) ZF.tiempo.textContent = fmtDur(Math.floor(f * d)) + ' / ' + fmtDur(Math.round(d));
+      if(d) ZP.tAct.textContent = fmtDur(Math.floor(f * d));
     });
-    ZF.onda.addEventListener('keydown', function(e){
+
+    /* --- scrub por TECLADO: flechas ±5s, Shift ±30s, PageUp/Down ±60s,
+       Home/End. Colgaba de la franja; sin el, el reproductor dejaba de ser
+       usable con teclado. --- */
+    ZP.onda.addEventListener('keydown', function(e){
       var d = duracion(); if(!d) return;
       var paso = e.shiftKey ? 30 : 5, dd = 0;
       if(e.key === 'ArrowRight') dd = paso;
@@ -1093,33 +1133,57 @@
       audioEl.currentTime = Math.min(d, Math.max(0, audioEl.currentTime + dd));
       pintar(); pintarOnda(true);
     });
+
+    dimensionarOnda();
+    if(window.ResizeObserver){
+      ZP.obs = new ResizeObserver(function(){ dimensionarOnda(); pintarOnda(true); });
+      ZP.obs.observe(ZP.onda);
+    } else {
+      window.addEventListener('resize', function(){ dimensionarOnda(); pintarOnda(true); });
+    }
   }
 
   function dimensionarOnda(){
-    if(!ZF) return;
-    var r = ZF.onda.getBoundingClientRect();
+    if(!ZP.ctx || !ZP.onda) return;
+    var r = ZP.onda.getBoundingClientRect();
     var dpr = Math.min(2, window.devicePixelRatio || 1);
-    ZF.lienzo.width  = Math.max(1, Math.round(r.width  * dpr));
-    ZF.lienzo.height = Math.max(1, Math.round(r.height * dpr));
-    ZF.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ZF.ancho = r.width; ZF.alto = r.height;
+    ZP.lienzo.width  = Math.max(1, Math.round(r.width  * dpr));
+    ZP.lienzo.height = Math.max(1, Math.round(r.height * dpr));
+    ZP.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ZP.ancho = r.width; ZP.alto = r.height;
+    ZP.anchoBarra = r.width;
+    ZP.ultBarra = -1;
   }
 
   /* Sin picos NO se dibuja una onda inventada: se dibuja una barra neutra.
      Una onda que no corresponde al audio es peor que ninguna, porque el
      usuario la usa para orientarse y le miente. */
   function pintarOnda(forzar){
-    if(!ZF || !ZF.ancho) return;
+    if(!ZP.ctx || !ZP.ancho) return;
     var d = duracion();
-    var f = (ZF.previa != null) ? ZF.previa : (d ? Math.min(1, audioEl.currentTime / d) : 0);
-    var P = ZF.picos;
+    var f = (ZP.previa != null) ? ZP.previa : (d ? Math.min(1, audioEl.currentTime / d) : 0);
+    var P = ZP.picos;
     var n = P ? P.length : 0;
     var barra = n ? Math.floor(f * n) : Math.floor(f * 100);
-    if(!forzar && barra === ZF.ultBarra) return;    /* solo al CAMBIAR de barra */
-    ZF.ultBarra = barra;
+    if(!forzar && barra === ZP.ultBarra) return;    /* solo al CAMBIAR de barra */
+    ZP.ultBarra = barra;
 
-    var c = ZF.ctx, W = ZF.ancho, H = ZF.alto, mitad = H/2;
+    var c = ZP.ctx, W = ZP.ancho, H = ZP.alto, mitad = H/2;
     c.clearRect(0, 0, W, H);
+
+    /* Lo cargado, antes en .zp-buf. */
+    var fb = 0;
+    try{
+      var b = audioEl && audioEl.buffered;
+      if(d && b && b.length) fb = Math.min(1, b.end(b.length - 1) / d);
+    }catch(e){}
+    /* Franja FINA abajo, no un rectangulo a toda altura: a toda altura se lee
+       como una caja gris mal puesta detras de las barras y compite con ellas.
+       Abajo informa de lo cargado sin ensuciar la onda. */
+    if(fb > 0){
+      c.fillStyle = 'rgba(199,204,209,.20)';
+      c.fillRect(0, H - 2, W * fb, 2);
+    }
 
     if(!n){
       c.fillStyle = 'rgba(199,204,209,.22)';
@@ -1139,26 +1203,24 @@
     dibujarCabeza(c, W*f, H);
   }
 
-  /* La cabeza lectora: la linea vertical de untitled. Una sola, a 1,5px,
-     con un halo tenue para que se despegue de las barras claras. */
+  /* La cabeza lectora: una sola linea vertical a 1,5px, con un halo tenue
+     para que se despegue de las barras claras. */
   function dibujarCabeza(c, x, H){
-    var px = Math.max(0.75, Math.min(ZF.ancho - 0.75, x));
+    var px = Math.max(0.75, Math.min(ZP.ancho - 0.75, x));
     c.fillStyle = 'rgba(255,233,176,.28)';
     c.fillRect(px - 2.5, 0, 5, H);
     c.fillStyle = '#ffe9b0';
     c.fillRect(px - 0.75, 0, 1.5, H);
   }
 
-  function franjaTema(t){
-    if(!ZF) return;
-    ZF.t1.textContent = t.title || '';
+  function temaOnda(t){
+    if(!ZP.ctx) return;
     var pk = t.peaks;
-    ZF.picos = (Array.isArray(pk) && pk.length)
+    ZP.picos = (Array.isArray(pk) && pk.length)
       ? pk.slice(0, 512).map(function(v){ v = +v; return (isFinite(v) && v > 0) ? Math.min(1, v) : 0; })
       : null;
-    ZF.ultBarra = -1;
-    ZF.raiz.classList.add('visible');
-    document.body.classList.add('con-franja');
+    ZP.previa = null;
+    ZP.ultBarra = -1;
     dimensionarOnda();
     pintarOnda(true);
   }
