@@ -119,8 +119,11 @@
   @media (min-width:980px){
     #members-content .lock{display:none}
     #members-content h2{font-size:30px;margin-bottom:6px}
-    #members-content > p{margin:0 0 4px;font-size:14px}
-    #members-content > p.muted{margin-bottom:14px}
+    /* margin:0 auto, no margin:0. `.members p` centra su caja de 56ch con
+       `auto`; poner `margin:0 0 4px` mataba ese auto y el parrafo quedaba
+       pegado a la izquierda bajo un titulo centrado. */
+    #members-content > p{margin:0 auto 4px;font-size:14px}
+    #members-content > p.muted{margin:0 auto 14px}
   }
   .members p{max-width:56ch;margin:0 auto 8px;color:var(--chrome)}
   .members .btn-primary{margin-top:22px}
