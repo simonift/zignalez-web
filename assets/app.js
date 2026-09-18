@@ -577,6 +577,7 @@
        que haya letra o no lo deciden sus piezas internas, no el contenedor. */
     ZP.lf.hidden = false;
     ZP.vent.hidden = false;
+    if(ZP.lf.classList.contains('sin-letra')) marcarSinLetra(true);
     ZP.ventSep.hidden = ZP.lf.classList.contains('sin-letra');
 
     /* Si el foco estaba en la lista, se devuelve: pintarVentana la reconstruye
@@ -1045,11 +1046,19 @@
     marcarSinLetra(true);
   }
 
-  /* El separador entre letra y lista solo tiene sentido si hay letra encima. */
+  /* El separador entre letra y lista solo tiene sentido si hay letra encima.
+     Y sin letra el cuadro se quedaba sin titulo, huerfano: la cabecera pasa a
+     anunciar la lista, que es lo unico que queda dentro. */
   function marcarSinLetra(sin){
     if(!ZP.lf) return;
     ZP.lf.classList.toggle('sin-letra', !!sin);
     if(ZP.ventSep && !ZP.vent.hidden) ZP.ventSep.hidden = !!sin;
+    if(sin && ZP.lfCab && ZP.idx >= 0){
+      var n = ZP.tracks ? ZP.tracks.length : 0;
+      ZP.lfCab.textContent = n ? ('Maquetas · ' + n + (n === 1 ? ' tema' : ' temas'))
+                               : 'Maquetas';
+      ZP.lfCab.hidden = false;
+    }
   }
 
   function agruparEstrofas(L){
