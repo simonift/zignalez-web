@@ -345,7 +345,41 @@
     ZP.cols=cols; ZP.izq=izq; ZP.der=der; ZP.lista=lista;
     ZP.lf=lf; ZP.lfCab=cab; ZP.lfLin=lin; ZP.lfSep=sep; ZP.lfCab2=cab2; ZP.lfSig=sig;
     ZP.plana=plana;
+    ajustarTope();
   }
+
+  /* El tope del modulo se MIDE, no se adivina. calc(100vh - 210px) era un
+     numero inventado: el encabezado de la zona de miembros mide 250px en
+     escritorio y 330px en movil (el titulo envuelve), asi que el modulo
+     terminaba 21px por debajo del borde inferior justo donde decia caber.
+     Aqui se calcula el hueco real y se publica como --zp-tope. */
+  var topePend = 0;
+  function ajustarTope(){
+    if(!ZP.cols) return;
+    var nav = document.querySelector('.nav, header.nav, .site-nav');
+    var altoNav = nav ? Math.round(nav.getBoundingClientRect().height) : 72;
+    var sec = document.getElementById('miembros');
+    var interno = 0;
+    if(sec){
+      /* Ambos rectangulos se desplazan juntos, asi que la resta no depende
+         de donde este el scroll: es la altura del encabezado de la seccion. */
+      interno = Math.round(ZP.cols.getBoundingClientRect().top - sec.getBoundingClientRect().top);
+      if(interno < 0) interno = 0;
+    }
+    var anchoGrande = window.innerWidth >= 980;
+    var hueco = window.innerHeight - altoNav - 16 - (anchoGrande ? interno : 0);
+    var piso = anchoGrande ? 420 : 380;
+    if(hueco < piso) hueco = piso;
+    ZP.cols.style.setProperty('--zp-tope', hueco + 'px');
+  }
+  function ajustarTopeDiferido(){
+    if(topePend) return;
+    topePend = window.requestAnimationFrame ? requestAnimationFrame(function(){
+      topePend = 0; ajustarTope();
+    }) : setTimeout(function(){ topePend = 0; ajustarTope(); }, 60);
+  }
+  window.addEventListener('resize', ajustarTopeDiferido);
+  window.addEventListener('orientationchange', ajustarTopeDiferido);
   function setState(msg){
     asegurarCols();
     ZP.lista.textContent = '';
@@ -457,15 +491,16 @@
     montarZP();
   }
 
-  /* Ventana de 3: el anterior, el que suena y el siguiente. Se desliza. */
+  /* TODOS los temas, con scroll propio y el que suena resaltado. Antes eran
+     solo tres fijos: con 6 maquetas eso escondia la mitad del catalogo sin
+     que nada indicara que habia mas. */
   function pintarVentana(){
     if(!ZP.vent || !ZP.tracks.length || ZP.idx < 0){
       if(ZP.vent){ ZP.vent.hidden = true; ZP.ventSep.hidden = true; }
       return;
     }
     var n = ZP.tracks.length, i = ZP.idx;
-    var ini = Math.max(0, Math.min(i - 1, n - 3));
-    var fin = Math.min(n - 1, ini + 2);
+    var ini = 0, fin = n - 1;
     ZP.vent.textContent = '';
     for(var j = ini; j <= fin; j++){
       (function(k){
@@ -488,6 +523,22 @@
       })(j);
     }
     ZP.vent.hidden = false; ZP.ventSep.hidden = false;
+
+    /* El que suena, a la vista. Se mueve SOLO el scroll de la lista con
+       aritmetica propia: scrollIntoView, incluso con block:'nearest',
+       arrastra a todos los ancestros con scroll -- la pagina incluida --
+       y el modulo se iba de pantalla al cambiar de tema. */
+    var act = ZP.vent.querySelector('.zp-vt.on');
+    if(act){
+      var rv = ZP.vent.getBoundingClientRect(), ra = act.getBoundingClientRect();
+      var arriba = (ra.top - rv.top) + ZP.vent.scrollTop;
+      var abajo  = arriba + ra.height;
+      if(arriba < ZP.vent.scrollTop){
+        ZP.vent.scrollTop = arriba;
+      } else if(abajo > ZP.vent.scrollTop + ZP.vent.clientHeight){
+        ZP.vent.scrollTop = abajo - ZP.vent.clientHeight;
+      }
+    }
   }
 
   function playTrack(track, btn){
@@ -820,6 +871,9 @@
     playingBtn = btn || (ZP.filas[i] ? ZP.filas[i].querySelector('.tp-play') : null);
     ZP.idx = i;
     trackMount.classList.add('suena');
+    /* Antes de pintar: en reposo .zp-cols esta en display:none y su rectangulo
+       es cero, asi que el tope medido al construir no servia. */
+    ajustarTope();
     pintarVentana();
     ZP.raiz.classList.add('visible');
 
@@ -1008,6 +1062,22 @@
     for(var j = ini; j <= fin; j++){
       var esAct = reposo ? (j === ini) : (j === i);
       ZP.lfLin.appendChild(lineaLetraEl(L[j], esAct, reposo ? 'reposo' : (j < i)));
+    }
+
+    /* En movil el cuadro de la letra tiene su propio scroll (la pantalla no da
+       para las cinco lineas), asi que la activa se acerca a la vista con la
+       misma aritmetica que la lista: nada de scrollIntoView, que arrastraria
+       la pagina entera. */
+    if(ZP.lfLin.scrollHeight > ZP.lfLin.clientHeight + 1){
+      var la = ZP.lfLin.querySelector('.zp-l.on');
+      if(la){
+        var rl = ZP.lfLin.getBoundingClientRect(), ra2 = la.getBoundingClientRect();
+        var ar2 = (ra2.top - rl.top) + ZP.lfLin.scrollTop;
+        var ab2 = ar2 + ra2.height;
+        if(ar2 < ZP.lfLin.scrollTop) ZP.lfLin.scrollTop = ar2;
+        else if(ab2 > ZP.lfLin.scrollTop + ZP.lfLin.clientHeight)
+          ZP.lfLin.scrollTop = ab2 - ZP.lfLin.clientHeight;
+      }
     }
 
     /* Sin bloque estatico de "lo que viene": esas lineas ya estan en la
