@@ -356,6 +356,9 @@
   var topePend = 0;
   function ajustarTope(){
     if(!ZP.cols) return;
+    /* En reposo .zp-cols esta en display:none: su rectangulo es cero y la
+       medida no vale nada. Mejor no escribir que escribir un numero falso. */
+    if(!ZP.cols.getBoundingClientRect().height) return;
     var nav = document.querySelector('.nav, header.nav, .site-nav');
     var altoNav = nav ? Math.round(nav.getBoundingClientRect().height) : 72;
     var sec = document.getElementById('miembros');
@@ -368,10 +371,39 @@
     }
     var anchoGrande = window.innerWidth >= 980;
     var hueco = window.innerHeight - altoNav - 16 - (anchoGrande ? interno : 0);
-    var piso = anchoGrande ? 420 : 380;
-    if(hueco < piso) hueco = piso;
+
+    /* El suelo tampoco se inventa: es el alto REAL del contenido de la columna
+       del disco. Con un piso fijo (420/380) el modulo se comprimia por debajo
+       de sus mandos y el play quedaba 85px fuera del borde en cualquier
+       portatil de 768px, recortado por .members{overflow:clip}. Y en apaisado
+       380px era mas alto que la pantalla entera. Si no cabe, el modulo crece y
+       scrollea la pagina: preferible a perder el boton de reproducir. */
+    /* Se mide con el tope QUITADO: con el tope puesto la columna ya esta
+       comprimida y scrollHeight devuelve la caja, no el contenido, asi que el
+       minimo salia mas bajo que el contenido real y seguia recortando. */
+    ZP.cols.style.removeProperty('--zp-tope');
+    var minIzq = ZP.izq ? Math.ceil(ZP.izq.getBoundingClientRect().height) : 0;
+    var minimo = anchoGrande ? minIzq : (minIzq + 16 + minimoDer());
+    if(minimo && hueco < minimo) hueco = minimo;
+    if(hueco < 260) hueco = 260;
     ZP.cols.style.setProperty('--zp-tope', hueco + 'px');
   }
+  /* Lo que el cuadro de la derecha no puede ceder: sus partes fijas
+     (cabecera, separadores y relleno) mas los minimos de las dos zonas que
+     scrollean. Se mide, porque la cabecera envuelve a dos lineas en pantallas
+     estrechas y una constante se quedaba corta entre 20 y 45px. */
+  function minimoDer(){
+    if(!ZP.lf || ZP.lf.hidden) return 200;
+    var alto  = ZP.lf.getBoundingClientRect().height;
+    var lin   = ZP.lfLin.getBoundingClientRect().height;
+    var vent  = ZP.vent.getBoundingClientRect().height;
+    var fijo  = alto - lin - vent;
+    var mLin  = parseFloat(getComputedStyle(ZP.lfLin).minHeight) || 0;
+    var mVent = parseFloat(getComputedStyle(ZP.vent).minHeight) || 0;
+    var m = Math.ceil(fijo + mLin + mVent);
+    return (m > 0 && isFinite(m)) ? m : 200;
+  }
+
   function ajustarTopeDiferido(){
     if(topePend) return;
     topePend = window.requestAnimationFrame ? requestAnimationFrame(function(){
@@ -380,6 +412,23 @@
   }
   window.addEventListener('resize', ajustarTopeDiferido);
   window.addEventListener('orientationchange', ajustarTopeDiferido);
+
+  /* El contenido de la columna izquierda no tiene su alto final en el momento
+     de montar: la onda se dimensiona despues y las fuentes entran mas tarde.
+     Medido en banco, la primera medida daba 448px donde el contenido real eran
+     550px, y el tope solo se corregia si el usuario cambiaba el tamano de la
+     ventana. Se vigila el contenido, no la columna: la columna va comprimida y
+     su caja no cambia, el contenido si. */
+  function vigilarIzq(){
+    if(ZP.obsIzq || !window.ResizeObserver || !ZP.izq) return;
+    var dentro = ZP.izq.firstElementChild;
+    if(!dentro) return;
+    ZP.obsIzq = new ResizeObserver(ajustarTopeDiferido);
+    ZP.obsIzq.observe(dentro);
+  }
+  if(document.fonts && document.fonts.ready && document.fonts.ready.then){
+    document.fonts.ready.then(ajustarTopeDiferido).catch(function(){});
+  }
   function setState(msg){
     asegurarCols();
     ZP.lista.textContent = '';
@@ -397,6 +446,7 @@
     ZP.idx = -1;
     if(trackMount) trackMount.classList.remove('suena');
     if(ZP.vent){ ZP.vent.hidden = true; ZP.ventSep.hidden = true; }
+    if(ZP.lf){ ZP.lf.hidden = true; }
   }
 
   function loadTracks(){
@@ -501,6 +551,7 @@
     }
     var n = ZP.tracks.length, i = ZP.idx;
     var ini = 0, fin = n - 1;
+    var volvia = ZP.vent.contains(document.activeElement);
     ZP.vent.textContent = '';
     for(var j = ini; j <= fin; j++){
       (function(k){
@@ -522,7 +573,22 @@
         });
       })(j);
     }
-    ZP.vent.hidden = false; ZP.ventSep.hidden = false;
+    /* El cuadro contiene la lista, asi que se muestra siempre que algo suene;
+       que haya letra o no lo deciden sus piezas internas, no el contenedor. */
+    ZP.lf.hidden = false;
+    ZP.vent.hidden = false;
+    ZP.ventSep.hidden = ZP.lf.classList.contains('sin-letra');
+
+    /* Si el foco estaba en la lista, se devuelve: pintarVentana la reconstruye
+       entera, el boton enfocado desaparece y el foco caia en BODY, mandando al
+       usuario de teclado al principio del documento (WCAG 2.4.3). */
+    if(volvia){
+      var nuevo = ZP.vent.querySelector('.zp-vt.on button') ||
+                  ZP.vent.querySelector('button');
+      if(nuevo){
+        try{ nuevo.focus({ preventScroll:true }); }catch(e){ nuevo.focus(); }
+      }
+    }
 
     /* El que suena, a la vista. Se mueve SOLO el scroll de la lista con
        aritmetica propia: scrollIntoView, incluso con block:'nearest',
@@ -871,11 +937,14 @@
     playingBtn = btn || (ZP.filas[i] ? ZP.filas[i].querySelector('.tp-play') : null);
     ZP.idx = i;
     trackMount.classList.add('suena');
-    /* Antes de pintar: en reposo .zp-cols esta en display:none y su rectangulo
-       es cero, asi que el tope medido al construir no servia. */
-    ajustarTope();
     pintarVentana();
     ZP.raiz.classList.add('visible');
+    vigilarIzq();
+    /* El tope se mide DESPUES de montar y mostrar: llamado antes, .zp-cols
+       todavia estaba vacio (.zp aun sin 'visible'), el rectangulo daba cero y
+       la medida se descartaba, asi que en la primera reproduccion no habia
+       tope y solo aparecia tras el primer resize. */
+    ajustarTope();
 
     ZP.titulo.textContent   = t.title || '';
     ZP.desc.textContent     = t.description || '';
@@ -968,7 +1037,19 @@
     ZP.lfCab2.textContent = ''; ZP.lfSig.textContent = '';
     ZP.lfSep.hidden = true; ZP.lfCab2.hidden = true; ZP.lfSig.hidden = true;
     ZP.plana.textContent = ''; ZP.plana.hidden = true;
-    ZP.lf.hidden = true;                 /* sin letra el bloque no se dibuja */
+    /* Se ocultan SOLO las piezas de la letra, nunca el cuadro entero.
+       Desde que la lista de temas vive DENTRO de .zp-lf, ocultar el cuadro
+       borraba tambien la lista: al pasar a un tema sin letra la columna
+       derecha se quedaba en blanco y ya no volvia. Reproducido en banco. */
+    ZP.lfCab.hidden = true; ZP.lfLin.hidden = true;
+    marcarSinLetra(true);
+  }
+
+  /* El separador entre letra y lista solo tiene sentido si hay letra encima. */
+  function marcarSinLetra(sin){
+    if(!ZP.lf) return;
+    ZP.lf.classList.toggle('sin-letra', !!sin);
+    if(ZP.ventSep && !ZP.vent.hidden) ZP.ventSep.hidden = !!sin;
   }
 
   function agruparEstrofas(L){
@@ -1001,13 +1082,15 @@
           /* Una sola estrofa para todo el tema, o una estrofa por linea: en
              los dos casos numerar no informa de nada. */
           ZP.numerar = !(ZP.estrofas.length <= 1 || ZP.estrofas.length === L.length);
-          ZP.lf.hidden = false;
+          ZP.lfCab.hidden = false; ZP.lfLin.hidden = false;
+          marcarSinLetra(false);
           pintarLetraFija(-1);
         } else if(res.data.plain){
           /* Letra sin sincronizar: se muestra igual, sin tiempos. */
           ZP.plana.textContent = res.data.plain;
           ZP.plana.hidden = false;
-          ZP.lf.hidden = false;
+          ZP.lfCab.hidden = false;
+          marcarSinLetra(false);
         }
       });
   }
@@ -1034,7 +1117,7 @@
   }
 
   function pintarLetraFija(i){
-    if(!ZP.lf || ZP.lf.hidden || !ZP.letra.length) return;
+    if(!ZP.lf || !ZP.letra.length) return;
     var L = ZP.letra, ult = L.length - 1;
     var act = (i < 0) ? 0 : i;
     var ini, fin, e = -1, v;

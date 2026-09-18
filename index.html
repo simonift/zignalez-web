@@ -168,10 +168,13 @@
        DENTRO de la lista, no empujando la pagina.
        grid-template-rows:minmax(0,1fr) es lo que hace que ese tope SIRVA:
        con la fila en 'auto' la pista se dimensiona a max-content, ignora el
-       max-height del contenedor y .zp-vent nunca recibia altura que repartir. */
+       max-height del contenedor y .zp-vent nunca recibia altura que repartir.
+       El respaldo es 'none' a proposito: si app.js llega viejo o falla, el
+       modulo queda largo (como antes del cambio) en vez de recortado por un
+       numero fijo que no corresponde a esta pantalla. */
     .zp-cols{grid-template-columns:448px minmax(0,1fr);gap:36px;
        grid-template-rows:minmax(0,1fr);
-       align-items:stretch;max-height:var(--zp-tope,calc(100vh - 340px))}
+       align-items:stretch;max-height:var(--zp-tope,none)}
     /* El sticky SOLO pega porque .members paso a overflow:clip: un
        overflow:hidden es contenedor de scroll y anclaba .zp-izq a un elemento
        que no scrollea nunca. */
@@ -340,6 +343,10 @@
   .zp-lf-sig .zp-l{font-size:14px;color:#7b7194;padding:2px 0;font-weight:400}
   .zp-lf-sig .zp-l-t{color:#4b4460}
   .zp-lf-sig[hidden],.zp-lf-sep[hidden]{display:none}
+  /* .zp-lf-lin trae display:block propio, que gana al [hidden] del navegador:
+     sin esta regla el bloque de la letra seguia ocupando sitio (vacio) en los
+     temas sin letra. */
+  .zp-lf-lin[hidden],.zp-lf-cab[hidden]{display:none}
   .zp-plana{font-family:var(--font-b);font-size:14px;color:var(--chrome);white-space:pre-wrap;
      overflow-wrap:anywhere;
      max-height:200px;overflow-y:auto;margin:0}
@@ -438,16 +445,16 @@
     /* align-items:stretch es imprescindible: con el 'start' de la regla base
        el bloque de la derecha se dimensiona a su contenido y se salta la
        altura de la fila, asi que el tope del modulo no lo tocaba. */
-    .zp-cols{max-height:var(--zp-tope,none);grid-template-rows:auto minmax(180px,1fr);
+    .zp-cols{max-height:var(--zp-tope,none);grid-template-rows:auto minmax(200px,1fr);
        gap:16px;align-items:stretch}
     /* El disco es lo unico que se puede encoger sin romper nada: los mandos
        no bajan de 44px (WCAG 2.5.8) y la letra ya scrollea. */
     .zp-disco{--d:min(34vw,16vh,130px)}
     /* La descripcion vive en la ficha de la lista; arriba solo duplicaba. */
     .zp-izq .zp-desc{display:none}
-    #zp-lf-lin{flex:1 1 auto;min-height:88px;overflow-y:auto;
+    #zp-lf-lin{flex:1 1 auto;min-height:56px;overflow-y:auto;
        scrollbar-width:thin;scrollbar-color:rgba(166,107,255,.35) transparent}
-    .zp-vent{flex:1 1 auto;min-height:110px}
+    .zp-vent{flex:1 1 auto;min-height:96px}
   }
   /* No es un detalle opcional: para parte del publico una rotacion continua
      produce malestar fisico. */
