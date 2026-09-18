@@ -18,67 +18,156 @@
   h2{font-family:'Syne',sans-serif;color:#fff;font-size:20px;margin:38px 0 10px}
   .eyebrow{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--uv-soft)}
   .meta{font-family:'Space Mono',monospace;font-size:12px;color:var(--smoke);margin:12px 0 0}
-  .falta{background:rgba(139,61,255,.1);border:1px solid rgba(199,204,209,.28);border-radius:6px;padding:10px 14px;font-family:'Space Mono',monospace;font-size:13px;color:var(--uv-soft);margin:10px 0}
   ul{padding-left:20px}
   .back{display:inline-block;margin-top:40px;font-family:'Space Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:.1em}
   strong{color:var(--chrome-hi)}
+  /* Historial de versiones: la primera fila es la fuente de la fecha que aparece
+     en la cabecera. comprobar-privacidad.sh falla si las dos no coinciden. */
+  .hist{border-top:1px solid var(--line);margin-top:44px;padding-top:18px}
+  .hist table{width:100%;border-collapse:collapse;font-size:14px}
+  .hist th{text-align:left;font-family:'Space Mono',monospace;font-size:11px;
+     letter-spacing:.14em;text-transform:uppercase;color:var(--smoke);
+     padding:0 12px 8px 0;font-weight:400;white-space:nowrap}
+  .hist td{padding:8px 12px 8px 0;vertical-align:top;border-top:1px solid var(--line)}
+  .hist td:first-child{font-family:'Space Mono',monospace;font-size:13px;
+     color:var(--chrome-hi);white-space:nowrap}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">Zignalez</div>
   <h1>Política de Privacidad</h1>
-  <p class="meta">Vigente desde: <strong>7 de septiembre de 2026</strong> · Última actualización: 7 de septiembre de 2026</p>
-  <p class="falta">Revisión final antes de publicar: (1) confirmar el <strong>plazo de conservación</strong> (abajo se propone 24 meses tras la baja); (2) decidir si se incluye un <strong>domicilio</strong> físico o basta el correo de contacto. Recomendado revisar con un/a abogado/a. Marco: Ley 19.628 y Ley 21.719 (rige el 01-12-2026). Quita esta nota al publicar.</p>
+  <!-- FECHA-CABECERA: debe coincidir con la primera fila de #historial.
+       No la edites sola: agrega una fila al historial y copia su fecha aqui. -->
+  <p class="meta">Vigente desde: <strong>7 de septiembre de 2026</strong> · Última actualización: <strong>18-09-2026</strong> · <a href="#historial">ver historial de cambios</a></p>
 
   <h2>1. Responsable del tratamiento</h2>
   <p>El responsable de tus datos es la persona natural detrás del proyecto artístico Zignalez:</p>
   <ul>
     <li><strong>Nombre:</strong> Simón Ignacio Faúndez Torres</li>
-    <li><strong>RUT:</strong> 18.574.242-3</li>
     <li><strong>Ubicación:</strong> Santiago, Chile</li>
     <li><strong>Contacto para tus datos:</strong> <a href="mailto:simon.faundezt@gmail.com">simon.faundezt@gmail.com</a></li>
   </ul>
 
   <h2>2. Qué datos recogemos</h2>
+  <p><strong>Si te suscribes a la lista:</strong></p>
   <ul>
     <li><strong>Correo electrónico</strong> — obligatorio, para avisarte de lanzamientos y fechas.</li>
     <li><strong>Número de WhatsApp</strong> — opcional, con finalidad propia: avisos el día del drop. Solo si lo entregas voluntariamente.</li>
-    <li>Datos técnicos mínimos de la solicitud (marca de tiempo). No usamos cookies de seguimiento ni perfilamiento publicitario.</li>
+    <li>La <strong>marca de tiempo</strong> de tu suscripción y de tu confirmación, para acreditar que diste tu consentimiento.</li>
   </ul>
+  <p><strong>Si entras a la zona de miembros:</strong></p>
+  <ul>
+    <li>Tu <strong>correo electrónico</strong>, con el que se crea tu cuenta y se te envía el enlace de acceso.</li>
+    <li>Los datos de tu <strong>sesión</strong> (identificador de cuenta y credenciales temporales de acceso), que tu navegador guarda para mantenerte dentro sin pedirte el enlace en cada visita.</li>
+  </ul>
+  <p><strong>Al visitar el sitio</strong>, y de forma automática, nuestros proveedores tratan datos
+    técnicos de la conexión: <strong>dirección IP</strong>, tipo de navegador y sistema, país aproximado,
+    página visitada y hora. En las páginas públicas, Microsoft Clarity además registra cómo te
+    mueves por la página (desplazamientos y clics). Ver el punto 6.</p>
+  <p><strong>Sobre cookies:</strong> no usamos cookies publicitarias, no hacemos perfilamiento
+    publicitario y no vendemos tus datos. Sí se usan: cookies <strong>necesarias</strong> para mantener
+    tu sesión en la zona de miembros; cookies de <strong>medición</strong> de Microsoft Clarity en las
+    páginas públicas; y las cookies propias de los servicios que incrustamos (Spotify, YouTube,
+    TikTok, Instagram) cuando cargas uno de esos contenidos.</p>
 
   <h2>3. Para qué los usamos (finalidad)</h2>
-  <p>Únicamente para comunicarte lanzamientos, fechas y novedades de Zignalez. <strong>No</strong> vendemos ni cedemos tus datos con fines comerciales de terceros. Cada finalidad es la declarada aquí; no se usarán para un fin distinto sin tu consentimiento.</p>
+  <ul>
+    <li><strong>Comunicarte</strong> lanzamientos, fechas y novedades de Zignalez, si te suscribiste.</li>
+    <li><strong>Darte acceso</strong> a la zona de miembros y mantener tu sesión iniciada.</li>
+    <li><strong>Entender el uso del sitio</strong> de forma agregada, para saber qué mejorar.</li>
+    <li><strong>Acreditar tu consentimiento</strong> si alguna vez se nos exige demostrarlo.</li>
+  </ul>
+  <p><strong>No</strong> vendemos ni cedemos tus datos con fines comerciales de terceros. No se usarán
+    para un fin distinto de los declarados aquí sin tu consentimiento.</p>
 
   <h2>4. Base de licitud y doble opt-in</h2>
-  <p>Tratamos tus datos sobre la base de tu <strong>consentimiento explícito</strong>, que otorgas al marcar la casilla del formulario (no preseleccionada) y <strong>confirmar</strong> mediante el correo de verificación (doble opt-in). Sin esa confirmación, no te enviamos nada.</p>
+  <p>Tratamos los datos de la lista sobre la base de tu <strong>consentimiento explícito</strong>, que
+    otorgas al marcar la casilla del formulario (no preseleccionada) y <strong>confirmar</strong> mediante
+    el correo de verificación (doble opt-in). Sin esa confirmación, no te enviamos nada.</p>
+  <p>Los datos de acceso a la zona de miembros se tratan porque son <strong>necesarios para prestarte
+    ese servicio</strong>: sin ellos no hay forma de identificarte ni de dejarte entrar.</p>
 
   <h2>5. Cuánto tiempo los conservamos</h2>
-  <p>Conservamos tu contacto mientras estés suscrito y hasta <strong>24 meses</strong> después de tu baja, únicamente para acreditar que otorgaste tu consentimiento. Cumplido ese plazo, tus datos se eliminan.</p>
-
-  <h2>6. Con quién los compartimos (encargados)</h2>
-  <p>Usamos proveedores que tratan datos por nuestra cuenta, bajo contrato:</p>
   <ul>
-    <li><strong>Cloudflare</strong> (hosting del sitio).</li>
-    <li><strong>Supabase</strong> (cuentas, inicio de sesión y almacenamiento de las maquetas).</li>
-    <li><strong>Resend</strong> (envío de los correos con tu enlace de acceso).</li>
-    <li><strong>Microsoft Clarity</strong> (medición de uso del sitio: cuánta gente entra, desde dónde
-      y cómo se mueve por la página, para saber qué mejorar). Clarity graba la navegación en las
+    <li><strong>Lista de correo:</strong> mientras estés suscrito y hasta <strong>24 meses</strong> después de
+      tu baja, únicamente para acreditar que otorgaste tu consentimiento. Cumplido ese plazo, se eliminan.</li>
+    <li><strong>Cuenta de miembro:</strong> mientras mantengas el acceso. Si pides que se elimine, se
+      elimina junto con el historial de accesos asociado.</li>
+    <li><strong>Datos técnicos y de medición:</strong> según los plazos de retención de cada proveedor
+      (punto 6); no los conservamos por nuestra cuenta más allá de eso.</li>
+  </ul>
+
+  <h2>6. Con quién los compartimos</h2>
+  <p>Estos proveedores tratan datos por nuestra cuenta, para las finalidades del punto 3:</p>
+  <ul>
+    <li><strong>Cloudflare</strong> — alojamiento y entrega del sitio. Trata datos técnicos de la conexión.</li>
+    <li><strong>Supabase</strong> — cuentas, inicio de sesión y almacenamiento de las maquetas de audio.</li>
+    <li><strong>Resend</strong> — envío de los correos con tu enlace de acceso.</li>
+    <li><strong>Microsoft Clarity</strong> — medición de uso del sitio. Graba la navegación en las
       <strong>páginas públicas</strong> y enmascara correos y números.
       <strong>La zona de miembros está excluida y no se graba.</strong>
       Puedes desactivarlo desde la
-      <a href="https://privacy.microsoft.com/es-es/privacystatement" rel="noopener">configuración de privacidad de Microsoft</a>.</li>
+      <a href="https://privacy.microsoft.com/es-es/privacystatement" rel="noopener">configuración de privacidad de Microsoft</a>,
+      activar la señal <em>Do Not Track</em> de tu navegador o bloquear el dominio
+      <code>clarity.ms</code>; el sitio funciona igual.</li>
   </ul>
-  <p>Clarity usa cookies propias y de Microsoft para distinguir visitas. Si prefieres no ser
-    medido, puedes activar la señal <em>Do Not Track</em> de tu navegador o bloquear el dominio
-    <code>clarity.ms</code>; el sitio funciona igual.</p>
-  <p>Estos proveedores pueden procesar datos <strong>fuera de Chile</strong>; al suscribirte aceptas esa transferencia internacional para las finalidades descritas.</p>
+  <p>Además, el sitio <strong>incrusta contenido de terceros</strong> que tú decides reproducir:
+    <strong>Spotify</strong>, <strong>YouTube</strong> (en su modo sin cookies de seguimiento),
+    <strong>TikTok</strong> e <strong>Instagram</strong>. Cuando cargas uno de esos contenidos, ese
+    servicio recibe tu dirección IP y puede usar sus propias cookies, bajo <em>sus</em> políticas de
+    privacidad, sobre las que no tenemos control.</p>
+  <p><strong>Transferencia internacional.</strong> Todos estos proveedores están fuera de Chile y tus
+    datos se procesan en sus servidores, principalmente en Estados Unidos y la Unión Europea. Chile
+    no ha declarado que esos países ofrezcan un nivel de protección equivalente al nacional, de modo
+    que la transferencia se ampara en las condiciones contractuales que cada proveedor ofrece para el
+    tratamiento de datos por cuenta de terceros. Si prefieres que tus datos no salgan del país, no
+    podemos prestarte el servicio: dínoslo y damos de baja tu suscripción y tu cuenta.</p>
 
   <h2>7. Tus derechos</h2>
-  <p>Puedes ejercer en cualquier momento tus derechos de <strong>acceso, rectificación, cancelación (baja) y oposición</strong> sobre tus datos. Cada correo incluye un enlace de baja directo. Para lo demás, escríbenos a <a href="mailto:simon.faundezt@gmail.com">simon.faundezt@gmail.com</a> y respondemos en un plazo razonable.</p>
+  <p>Puedes ejercer en cualquier momento, y sin costo, tus derechos de <strong>acceso</strong>,
+    <strong>rectificación</strong>, <strong>supresión</strong> (eliminación), <strong>oposición</strong>,
+    <strong>bloqueo</strong> y <strong>portabilidad</strong> de tus datos. También puedes
+    <strong>retirar tu consentimiento</strong> cuando quieras, sin que eso afecte al tratamiento
+    anterior.</p>
+  <p>La vía rápida: cada correo incluye un enlace de baja directo. Para todo lo demás escríbenos a
+    <a href="mailto:simon.faundezt@gmail.com">simon.faundezt@gmail.com</a> y respondemos dentro de
+    <strong>30 días corridos</strong>.</p>
+  <p>Si crees que no atendimos bien tu solicitud, puedes reclamar ante la <strong>Agencia de
+    Protección de Datos Personales</strong>, el organismo creado por la Ley 21.719 para fiscalizar
+    estas materias.</p>
 
   <h2>8. Cambios a esta política</h2>
-  <p>Si cambiamos esta política, publicaremos la nueva versión aquí con su fecha de vigencia. Los cambios sustanciales se te comunicarán por correo.</p>
+  <p>Cada vez que cambiamos esta política publicamos la nueva versión aquí, actualizamos la fecha de
+    la cabecera y dejamos constancia del cambio en el historial de abajo. Los cambios sustanciales
+    se te comunican además por correo.</p>
+
+  <div class="hist" id="historial">
+    <h2 style="margin-top:0">Historial de versiones</h2>
+    <table>
+      <thead>
+        <tr><th>Fecha</th><th>Qué cambió</th></tr>
+      </thead>
+      <tbody>
+        <!-- La fila mas reciente va PRIMERO y su fecha manda sobre la cabecera. -->
+        <tr>
+          <td>18-09-2026</td>
+          <td>Se declaran los datos técnicos que tratan los proveedores (IP, navegador, país, hora) y
+            las cookies que realmente se usan, corrigiendo la afirmación anterior de que no había
+            ninguna. Se incorpora la zona de miembros como tratamiento propio, con su base de
+            licitud y su plazo de conservación. Se declaran los contenidos incrustados de Spotify,
+            YouTube, TikTok e Instagram. Se reescribe la cláusula de transferencia internacional. Se
+            amplían los derechos a supresión, bloqueo, portabilidad y retiro del consentimiento, con
+            plazo de respuesta de 30 días corridos y mención a la Agencia de Protección de Datos
+            Personales. Se retira el RUT del responsable.</td>
+        </tr>
+        <tr>
+          <td>07-09-2026</td>
+          <td>Primera versión publicada.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <a class="back" href="/">← Volver a zignalez</a>
 </div>
