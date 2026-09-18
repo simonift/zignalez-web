@@ -39,11 +39,24 @@
 
 # Los scripts y posters salieron del HTML. Ahora se cachean aparte en vez de
 # re-descargarse enteros en cada visita: el documento paso de 261 a 65 KB.
-# Una hora, no 'immutable': los .js no llevan hash en el nombre y un
-# 'immutable' dejaria a los visitantes con codigo viejo tras un despliegue.
 #
-# OJO 17-09-2026: produccion sirve max-age=14400, no 3600. Cloudflare esta
-# pisando esta cabecera (ajuste "Browser Cache TTL" del panel, 4 h). No es
-# grave, pero esta linea NO es lo que ve el visitante.
+# 18-09-2026 · max-age=3600 -> no-cache. POR QUE:
+# Los .js NO llevan hash en el nombre. Con cualquier max-age > 0 el navegador
+# y el borde se quedan con el archivo viejo tras un despliegue, mientras el
+# HTML -que no se cachea- ya es el nuevo. Eso paso de verdad: el 18-09 el
+# sitio sirvio index.html nuevo con app.js viejo durante horas, y la unica
+# salida era purgar a mano en el panel de Cloudflare.
+#
+# 'no-cache' NO significa "no cachees": significa "guardalo pero revalida
+# antes de usarlo". Con ETag, si nada cambio la respuesta es un 304 sin
+# cuerpo -- unos pocos cientos de bytes. Sobre archivos de 60 KB el ahorro
+# perdido es irrelevante frente a una hora de sitio roto.
+#
+# Cuando exista un paso de build que ponga hash en el nombre (app.a1b2c3.js),
+# esto vuelve a max-age largo + immutable, que es lo correcto de verdad.
+#
+# OJO: el panel de Cloudflare puede pisar esta cabecera con su "Browser Cache
+# TTL". El 17-09 servia 14400 con un 3600 declarado aqui. Si tras desplegar
+# sigue apareciendo contenido viejo, mira ese ajuste antes que este archivo.
 /assets/*
-  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  Cache-Control: no-cache
