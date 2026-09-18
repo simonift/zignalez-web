@@ -210,6 +210,11 @@
      usa esa expresion de certificacion ni ningun sello. Ver
      PROMPT_MAESTRO_DISCO_Y_LETRAS.md §0.2.
      ====================================================================== */
+  /* En la rejilla de dos columnas ese margen superior es lo unico que
+     desalineaba las dos tarjetas: la izquierda arrancaba 20px mas abajo que
+     el cuadro de la letra. El margen viene del diseno anterior, cuando .zp era
+     un bloque suelto bajo el titulo de la seccion. */
+  .zp-izq > .zp{margin-top:0}
   .zp{margin-top:20px;border:1px solid var(--line);border-radius:6px;
       background:linear-gradient(180deg,var(--ink-2),var(--ink));padding:22px;display:none}
   .zp.visible{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:20px}
