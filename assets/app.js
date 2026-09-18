@@ -326,10 +326,22 @@
     var plana = el('div','zp-plana','zp-plana'); plana.hidden = true;
     lf.appendChild(cab); lf.appendChild(lin); lf.appendChild(sep);
     lf.appendChild(cab2); lf.appendChild(sig); lf.appendChild(plana);
-    var lista = el('div','zp-lista','zp-lista');
+    /* La ventana de 3 temas vive DENTRO del cuadro de la letra: un solo
+       recuadro, dos zonas que se deslizan. */
+    var sep2  = el('div','zp-lf-sep','zp-vent-sep'); sep2.hidden = true;
+    var vent  = el('div','zp-vent','zp-vent'); vent.hidden = true;
+    lf.appendChild(sep2); lf.appendChild(vent);
+
+    var lista = el('div','zp-lista','zp-lista');   /* solo para mensajes de estado */
     der.appendChild(lf); der.appendChild(lista);
     cols.appendChild(izq); cols.appendChild(der);
+
+    /* En reposo manda el carrusel horizontal, a todo el ancho. */
+    var carr = el('div','zp-carrusel','zp-carrusel');
+    carr.setAttribute('role','list');
+    trackMount.appendChild(carr);
     trackMount.appendChild(cols);
+    ZP.carr=carr; ZP.vent=vent; ZP.ventSep=sep2;
     ZP.cols=cols; ZP.izq=izq; ZP.der=der; ZP.lista=lista;
     ZP.lf=lf; ZP.lfCab=cab; ZP.lfLin=lin; ZP.lfSep=sep; ZP.lfCab2=cab2; ZP.lfSig=sig;
     ZP.plana=plana;
@@ -349,6 +361,8 @@
     if(ZP.disco) ZP.disco.classList.remove('suena');
     if(ZP.raiz) ZP.raiz.classList.remove('visible');
     ZP.idx = -1;
+    if(trackMount) trackMount.classList.remove('suena');
+    if(ZP.vent){ ZP.vent.hidden = true; ZP.ventSep.hidden = true; }
   }
 
   function loadTracks(){
@@ -413,8 +427,7 @@
       dur.textContent = fmtDur(t.duration_seconds);
 
       row.appendChild(btn); row.appendChild(info); row.appendChild(dur);
-      ZP.lista.appendChild(row);
-      ZP.filas.push(row);
+      ZP.filas.push(row);          /* no se monta: es el molde de la ventana */
 
       btn.addEventListener('click', function(){
         if(playingBtn === btn && audioEl){
@@ -424,9 +437,57 @@
         }
         playTrack(t, btn);
       });
+
+      /* Tarjeta del carrusel: mismo tema, otra forma. */
+      var card = el('div','zp-card'); card.setAttribute('role','listitem');
+      var cb = document.createElement('button');
+      cb.type='button'; cb.className='zp-card-btn';
+      cb.setAttribute('aria-label','Reproducir ' + (t.title || ''));
+      if(!t.file_path){ cb.disabled = true; cb.title = 'Todavía no lo subo'; }
+      var ct = el('div','zp-card-t'); ct.textContent = t.title || '';
+      var cd = el('div','zp-card-d'); cd.textContent = t.description || '';
+      var cdur = el('div','zp-card-dur'); cdur.textContent = fmtDur(t.duration_seconds);
+      var cico = el('div','zp-card-ico'); cico.innerHTML = ICON_PLAY;
+      cb.appendChild(cico); cb.appendChild(ct); cb.appendChild(cd); cb.appendChild(cdur);
+      card.appendChild(cb);
+      ZP.carr.appendChild(card);
+      cb.addEventListener('click', function(){ playTrack(t, btn); });
     });
 
     montarZP();
+  }
+
+  /* Ventana de 3: el anterior, el que suena y el siguiente. Se desliza. */
+  function pintarVentana(){
+    if(!ZP.vent || !ZP.tracks.length || ZP.idx < 0){
+      if(ZP.vent){ ZP.vent.hidden = true; ZP.ventSep.hidden = true; }
+      return;
+    }
+    var n = ZP.tracks.length, i = ZP.idx;
+    var ini = Math.max(0, Math.min(i - 1, n - 3));
+    var fin = Math.min(n - 1, ini + 2);
+    ZP.vent.textContent = '';
+    for(var j = ini; j <= fin; j++){
+      (function(k){
+        var t = ZP.tracks[k];
+        var f = el('div','zp-vt' + (k === i ? ' on' : ''));
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'zp-vt-b';
+        b.setAttribute('aria-label', (k === i ? 'Sonando: ' : 'Reproducir ') + (t.title || ''));
+        if(k === i) b.setAttribute('aria-current','true');
+        if(!t.file_path) b.disabled = true;
+        var tt = el('span','zp-vt-t'); tt.textContent = t.title || '';
+        var dd = el('span','zp-vt-d'); dd.textContent = fmtDur(t.duration_seconds);
+        b.appendChild(tt); b.appendChild(dd);
+        f.appendChild(b);
+        ZP.vent.appendChild(f);
+        b.addEventListener('click', function(){
+          if(k === i){ if(audioEl.paused) audioEl.play().catch(function(){}); else audioEl.pause(); return; }
+          zpAbrir(k, ZP.filas[k] ? ZP.filas[k].querySelector('.tp-play') : null);
+        });
+      })(j);
+    }
+    ZP.vent.hidden = false; ZP.ventSep.hidden = false;
   }
 
   function playTrack(track, btn){
@@ -758,6 +819,8 @@
        entre las filas. La lista se guarda al construirla. */
     playingBtn = btn || (ZP.filas[i] ? ZP.filas[i].querySelector('.tp-play') : null);
     ZP.idx = i;
+    trackMount.classList.add('suena');
+    pintarVentana();
     ZP.raiz.classList.add('visible');
 
     ZP.titulo.textContent   = t.title || '';
@@ -905,11 +968,15 @@
     return p;
   }
 
-  /* Como mucho 4 lineas, centradas en la activa dentro de [ini,fin]. */
+  /* Ventana DESLIZANTE de 5 lineas centrada en la activa. No hay bloque fijo
+     de "lo que viene": lo que viene son sencillamente las lineas de abajo, y
+     se mueven con el audio. Un bloque estatico obliga a leer en dos sitios. */
+  var VENTANA_LETRA = 5;
   function ventanaLetra(ini, fin, i){
-    if(fin - ini + 1 <= 4) return [ini, fin];
-    var a = Math.max(ini, Math.min(i - 1, fin - 3));
-    return [a, a + 3];
+    var n = fin - ini + 1;
+    if(n <= VENTANA_LETRA) return [ini, fin];
+    var a = Math.max(ini, Math.min(i - 2, fin - (VENTANA_LETRA - 1)));
+    return [a, a + VENTANA_LETRA - 1];
   }
 
   function pintarLetraFija(i){
@@ -918,17 +985,19 @@
     var act = (i < 0) ? 0 : i;
     var ini, fin, e = -1, v;
 
+    /* La cabecera dice en que estrofa vas; la VENTANA no se corta en el limite
+       de la estrofa, cruza con naturalidad. Cortarla ahi dejaba media tarjeta
+       vacia al final de cada estrofa. */
     if(ZP.numerar){
       for(var k = 0; k < ZP.estrofas.length; k++){
         if(act >= ZP.estrofas[k][0] && act <= ZP.estrofas[k][1]){ e = k; break; }
       }
       if(e < 0) e = 0;
-      v = ventanaLetra(ZP.estrofas[e][0], ZP.estrofas[e][1], act);
       ZP.lfCab.textContent = 'Letra · Estrofa ' + (e + 1) + ' · En curso';
     } else {
-      v = ventanaLetra(0, ult, act);
       ZP.lfCab.textContent = 'Letra · En curso';
     }
+    v = ventanaLetra(0, ult, act);
     ini = v[0]; fin = v[1];
 
     /* En reposo (i < 0) la linea 0 va resaltada igual: la maqueta A siempre
@@ -941,24 +1010,10 @@
       ZP.lfLin.appendChild(lineaLetraEl(L[j], esAct, reposo ? 'reposo' : (j < i)));
     }
 
-    var s0 = -1, s1 = -1, rotulo = '';
-    if(ZP.numerar && e + 1 < ZP.estrofas.length){
-      s0 = ZP.estrofas[e+1][0];
-      s1 = Math.min(ZP.estrofas[e+1][1], s0 + 1);
-      rotulo = 'Lo que viene · Estrofa ' + (e + 2);
-    } else if(!ZP.numerar && fin < ult){
-      s0 = fin + 1; s1 = Math.min(ult, s0 + 1);
-      rotulo = 'Lo que viene';
-    }
-    if(s0 < 0){
-      ZP.lfSig.textContent = '';
-      ZP.lfSep.hidden = true; ZP.lfCab2.hidden = true; ZP.lfSig.hidden = true;
-      return;
-    }
-    ZP.lfCab2.textContent = rotulo;
+    /* Sin bloque estatico de "lo que viene": esas lineas ya estan en la
+       ventana de arriba y se deslizan solas. */
     ZP.lfSig.textContent = '';
-    for(var q = s0; q <= s1; q++) ZP.lfSig.appendChild(lineaLetraEl(L[q], false, false));
-    ZP.lfSep.hidden = false; ZP.lfCab2.hidden = false; ZP.lfSig.hidden = false;
+    ZP.lfSep.hidden = true; ZP.lfCab2.hidden = true; ZP.lfSig.hidden = true;
   }
 
   /* Camino rapido primero: en reproduccion normal la linea siguiente es casi

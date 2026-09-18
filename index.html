@@ -321,6 +321,50 @@
   .zp-plana[hidden]{display:none}
   .zp-lista{min-width:0}
 
+  /* ===== Reposo: carrusel horizontal a todo el ancho =====
+     Mientras no suena nada, las dos columnas no tienen nada que mostrar: el
+     disco esta apagado y la letra vacia. Los temas se recorren de lado. */
+  .zp-carrusel{display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;
+     padding:4px 2px 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+     scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+  .zp-carrusel::-webkit-scrollbar{height:6px}
+  .zp-carrusel::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:3px}
+  .zp-card{flex:0 0 250px;scroll-snap-align:start}
+  .zp-card-btn{display:flex;flex-direction:column;gap:8px;width:100%;min-height:150px;
+     text-align:left;padding:16px;border:1px solid var(--line);border-radius:14px;
+     background:linear-gradient(180deg,var(--ink-2),var(--ink));color:inherit;cursor:pointer;
+     transition:border-color .18s ease,transform .18s ease}
+  .zp-card-btn:hover:not(:disabled){border-color:var(--uv);transform:translateY(-2px)}
+  .zp-card-btn:disabled{opacity:.45;cursor:default}
+  .zp-card-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+     justify-content:center;background:rgba(139,61,255,.14);color:var(--uv-soft)}
+  .zp-card-ico svg{width:13px;height:13px;fill:currentColor}
+  .zp-card-t{font-family:var(--font-d);font-size:14px;color:var(--white);line-height:1.25;
+     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .zp-card-d{font-family:var(--font-m);font-size:11px;color:var(--smoke);line-height:1.4;
+     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .zp-card-dur{font-family:var(--font-m);font-size:11px;color:var(--smoke);margin-top:auto}
+
+  /* Reposo manda el carrusel; al sonar, las columnas. */
+  #track-player .zp-cols{display:none}
+  #track-player.suena .zp-carrusel{display:none}
+  #track-player.suena .zp-cols{display:grid}
+
+  /* ===== Ventana de 3 temas, DENTRO del cuadro de la letra ===== */
+  .zp-vent{display:block}
+  .zp-vent[hidden]{display:none}
+  .zp-vt-b{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;
+     padding:7px 0;background:none;border:0;cursor:pointer;text-align:left;color:inherit}
+  .zp-vt-b:disabled{opacity:.45;cursor:default}
+  .zp-vt-t{flex:1;min-width:0;font-family:var(--font-d);font-size:13.5px;color:#7b7194;
+     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s ease}
+  .zp-vt-d{flex-shrink:0;font-family:var(--font-m);font-size:11px;color:#5d5575;
+     font-variant-numeric:tabular-nums}
+  .zp-vt.on .zp-vt-t{color:var(--white);font-weight:600}
+  .zp-vt.on .zp-vt-d{color:var(--uv-soft)}
+  .zp-vt.on .zp-vt-b::before{content:'';width:3px;height:16px;border-radius:2px;
+     background:var(--uv-soft);flex-shrink:0;margin-left:-11px;margin-right:8px}
+
   /* ---- Transporte ---- */
   .zp-tr{display:flex;flex-direction:column;gap:11px}
   .zp-linea{display:flex;align-items:center;gap:10px;width:100%}
