@@ -895,13 +895,13 @@
       });
   }
 
-  function lineaLetraEl(x, activa){
-    var p = el('p', 'zp-l' + (activa ? ' on' : ''));
+  function lineaLetraEl(x, activa, ya){
+    var p = el('p', 'zp-l' + (activa ? ' on' : (ya ? ' ya' : '')));
     var marca = el('span','zp-l-t');
     marca.textContent = fmtDur(Math.floor(x.t));
     p.appendChild(marca);
     p.appendChild(document.createTextNode(x.l || ''));   /* sin XSS desde la BD */
-    if(activa) p.setAttribute('aria-current','true');
+    if(activa && ya !== 'reposo') p.setAttribute('aria-current','true');
     return p;
   }
 
@@ -931,9 +931,14 @@
     }
     ini = v[0]; fin = v[1];
 
+    /* En reposo (i < 0) la linea 0 va resaltada igual: la maqueta A siempre
+       tiene una linea destacada, y sin ella el bloque se lee como un volcado
+       de texto plano. No lleva aria-current porque nada esta sonando. */
+    var reposo = (i < 0);
     ZP.lfLin.textContent = '';
     for(var j = ini; j <= fin; j++){
-      ZP.lfLin.appendChild(lineaLetraEl(L[j], i >= 0 && j === i));
+      var esAct = reposo ? (j === ini) : (j === i);
+      ZP.lfLin.appendChild(lineaLetraEl(L[j], esAct, reposo ? 'reposo' : (j < i)));
     }
 
     var s0 = -1, s1 = -1, rotulo = '';
@@ -952,7 +957,7 @@
     }
     ZP.lfCab2.textContent = rotulo;
     ZP.lfSig.textContent = '';
-    for(var q = s0; q <= s1; q++) ZP.lfSig.appendChild(lineaLetraEl(L[q], false));
+    for(var q = s0; q <= s1; q++) ZP.lfSig.appendChild(lineaLetraEl(L[q], false, false));
     ZP.lfSep.hidden = false; ZP.lfCab2.hidden = false; ZP.lfSig.hidden = false;
   }
 

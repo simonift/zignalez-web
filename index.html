@@ -291,21 +291,29 @@
      margin:5px 0 0}
 
   /* ---- Letra permanente (columna derecha, siempre visible) ---- */
-  .zp-lf{border:1px solid var(--line);border-radius:6px;background:var(--ink-2);
-     padding:16px 18px;margin:0 0 18px}
+  /* Maqueta A, no los tokens grises del sitio: tarjeta violeta tenue, esquinas
+     de 18 y la marca de tiempo SIEMPRE visible en su propia columna. La version
+     anterior escondia el tiempo salvo en la linea activa, y con el audio sin
+     arrancar no habia linea activa: se leia como un volcado de texto plano. */
+  .zp-lf{border:1px solid rgba(166,107,255,.22);border-radius:18px;
+     background:linear-gradient(180deg,rgba(166,107,255,.10),rgba(166,107,255,.03));
+     padding:18px 22px 20px;margin:0 0 18px}
   .zp-lf[hidden]{display:none}
-  .zp-lf-cab{font-family:var(--font-m);font-size:10px;letter-spacing:.24em;
-     text-transform:uppercase;color:rgba(255,214,128,.72);margin:0 0 10px}
+  .zp-lf-cab{font-family:var(--font-m);font-size:10px;letter-spacing:.20em;
+     text-transform:uppercase;color:var(--uv-soft);margin:0 0 13px}
   .zp-lf-lin{display:block}
-  .zp-l{font-family:var(--font-d);font-size:16px;line-height:1.42;color:var(--smoke);opacity:.62;
-     overflow-wrap:anywhere;padding:4px 0;margin:0;
-     transition:opacity .25s ease,color .25s ease}
-  .zp-l.on{color:var(--white);opacity:1;font-size:20px;font-weight:600;line-height:1.3}
-  .zp-l-t{font-family:var(--font-m);font-size:11px;letter-spacing:.06em;
-     color:rgba(255,214,128,.85);margin-right:8px;font-variant-numeric:tabular-nums;display:none}
-  .zp-l.on .zp-l-t{display:inline}
-  .zp-lf-sep{height:1px;background:var(--line);margin:14px 0 11px}
-  .zp-lf-sig .zp-l{font-size:14px;opacity:.5;padding:2px 0;font-weight:400}
+  .zp-l{display:flex;gap:14px;align-items:baseline;
+     font-family:var(--font-d);font-size:15.5px;line-height:1.34;color:#b3a9c9;opacity:1;
+     overflow-wrap:anywhere;padding:3px 0;margin:0;
+     transition:color .25s ease,font-size .2s ease}
+  .zp-l.on{color:var(--white);font-size:20px;font-weight:600;line-height:1.3}
+  .zp-l.ya{color:#6f6689}
+  .zp-l-t{flex-shrink:0;width:38px;font-family:var(--font-m);font-size:10.5px;letter-spacing:.06em;
+     color:#5d5575;font-variant-numeric:tabular-nums;display:inline-block}
+  .zp-l.on .zp-l-t{color:var(--uv-soft)}
+  .zp-lf-sep{height:1px;background:rgba(199,204,209,.12);margin:16px 0 13px}
+  .zp-lf-sig .zp-l{font-size:14px;color:#7b7194;padding:2px 0;font-weight:400}
+  .zp-lf-sig .zp-l-t{color:#4b4460}
   .zp-lf-sig[hidden],.zp-lf-sep[hidden]{display:none}
   .zp-plana{font-family:var(--font-b);font-size:14px;color:var(--chrome);white-space:pre-wrap;
      overflow-wrap:anywhere;
