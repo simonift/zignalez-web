@@ -1,0 +1,9 @@
+# zignalez.cl
+# Este archivo existe de verdad. Antes, /robots.txt devolvia HTTP 200 con el
+# HTML de la home (fallback de Cloudflare Pages): parecia existir y no existia.
+
+User-agent: *
+Allow: /
+Disallow: /admin.html
+
+Sitemap: https://zignalez.cl/sitemap.xml
