@@ -32,7 +32,10 @@ esac
 
 # 3. El archivo de la imagen existe, mide 1200x630 y pesa menos de 600 KB
 #    (por encima de ese peso algunas plataformas de mensajeria no la renderizan).
-arch="$DIR/$(basename "$img")"
+# El nombre del archivo se toma SIN la cadena de consulta: la imagen se
+# versiona con ?v=N para que las plataformas no sirvan la cacheada, pero en
+# disco el archivo se llama igual.
+arch="$DIR/$(basename "${img%%\?*}")"
 if [ ! -f "$arch" ]; then
   aviso "la imagen de compartir no esta en el directorio publicable: $arch"
 else
