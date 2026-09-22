@@ -1,45 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zignalez — música urbana desde Santiago de Chile</title>
-<meta name="description" content="Seis temas terminados que todavía no salen. Suenan acá con la letra corriendo, línea por línea. Perreo oscuro desde Santiago de Chile.">
-<link rel="canonical" href="https://zignalez.cl/">
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Zignalez — música urbana desde Santiago de Chile</title>
+   <meta name="description"
+      content="Seis temas terminados que todavía no salen. Suenan acá con la letra corriendo, línea por línea. Perreo oscuro desde Santiago de Chile.">
+   <link rel="canonical" href="https://zignalez.cl/">
 
-<!-- Identidad en la pestaña y en el escritorio. Antes no habia ninguna: el
+   <!-- Identidad en la pestaña y en el escritorio. Antes no habia ninguna: el
      sitio salia con el icono gris generico del navegador. -->
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" href="/icono.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="theme-color" content="#0A0A0B">
+   <link rel="icon" href="/favicon.ico" sizes="any">
+   <link rel="icon" href="/icono.svg" type="image/svg+xml">
+   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+   <meta name="theme-color" content="#0A0A0B">
 
-<!-- La tarjeta al compartir. Este sitio se difunde persona a persona por DM y
+   <!-- La tarjeta al compartir. Este sitio se difunde persona a persona por DM y
      WhatsApp; sin estas etiquetas el enlace llegaba como texto pelado y el
      esfuerzo de quien lo comparte se perdia entero. URL absoluta obligatoria:
      las relativas no las resuelve ningun rastreador social. -->
-<meta property="og:type" content="profile">
-<meta property="og:site_name" content="Zignalez">
-<meta property="og:locale" content="es_CL">
-<meta property="og:url" content="https://zignalez.cl/">
-<meta property="og:title" content="Zignalez — urbano desde Santiago de Chile">
-<meta property="og:description" content="Seis temas terminados que todavía no salen. Suenan acá con la letra corriendo, línea por línea.">
-<meta property="og:image" content="https://zignalez.cl/og-zignalez.jpg?v=2">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Zignalez, artista urbano de Santiago de Chile, de frente con lentes rojos">
+   <meta property="og:type" content="profile">
+   <meta property="og:site_name" content="Zignalez">
+   <meta property="og:locale" content="es_CL">
+   <meta property="og:url" content="https://zignalez.cl/">
+   <meta property="og:title" content="Zignalez — urbano desde Santiago de Chile">
+   <meta property="og:description"
+      content="Seis temas terminados que todavía no salen. Suenan acá con la letra corriendo, línea por línea.">
+   <meta property="og:image" content="https://zignalez.cl/og-zignalez.jpg?v=2">
+   <meta property="og:image:type" content="image/jpeg">
+   <meta property="og:image:width" content="1200">
+   <meta property="og:image:height" content="630">
+   <meta property="og:image:alt" content="Zignalez, artista urbano de Santiago de Chile, de frente con lentes rojos">
 
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Zignalez — urbano desde Santiago de Chile">
-<meta name="twitter:description" content="Seis temas terminados que todavía no salen.">
-<meta name="twitter:image" content="https://zignalez.cl/og-zignalez.jpg?v=2">
+   <meta name="twitter:card" content="summary_large_image">
+   <meta name="twitter:title" content="Zignalez — urbano desde Santiago de Chile">
+   <meta name="twitter:description" content="Seis temas terminados que todavía no salen.">
+   <meta name="twitter:image" content="https://zignalez.cl/og-zignalez.jpg?v=2">
 
-<!-- MusicGroup NO produce resultados enriquecidos en Google: eso es folclore
+   <!-- MusicGroup NO produce resultados enriquecidos en Google: eso es folclore
      SEO. Lo que hace es desambiguar la entidad (Zignalez = artista musical
      chileno) enlazando los perfiles. Se pone por eso, no por el panel de
      conocimiento, que no se obtiene con schema. -->
-<script type="application/ld+json">
+   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "MusicGroup",
@@ -65,164 +68,797 @@
   ]
 }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
-<style>
-  :root{
-    --ink:#0A0A0B; --ink-2:#111116; --ink-3:#17171d;
-    --uv:#8B3DFF; --uv-soft:#A66BFF;
-    --chrome:#C7CCD1; --chrome-hi:#E8EAED; --smoke:#8A86A0; --white:#FFFFFF;
-    --line:rgba(199,204,209,.14); --line-2:rgba(199,204,209,.28);
-    --maxw:1140px;
-    --font-d:'Syne',system-ui,sans-serif; --font-b:'Manrope',system-ui,sans-serif; --font-m:'Space Mono',ui-monospace,monospace;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--ink);color:var(--chrome);font-family:var(--font-b);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-  a{color:inherit}
-  h1,h2,h3{font-family:var(--font-d);color:var(--white);text-wrap:balance;letter-spacing:-.01em;margin:0}
-  .eyebrow{font-family:var(--font-m);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--uv-soft)}
-  .muted{color:var(--smoke)}
-  img{max-width:100%;display:block}
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+   <style>
+      :root {
+         --ink: #0A0A0B;
+         --ink-2: #111116;
+         --ink-3: #17171d;
+         --uv: #8B3DFF;
+         --uv-soft: #A66BFF;
+         --chrome: #C7CCD1;
+         --chrome-hi: #E8EAED;
+         --smoke: #8A86A0;
+         --white: #FFFFFF;
+         --line: rgba(199, 204, 209, .14);
+         --line-2: rgba(199, 204, 209, .28);
+         --maxw: 1140px;
+         --font-d: 'Syne', system-ui, sans-serif;
+         --font-b: 'Manrope', system-ui, sans-serif;
+         --font-m: 'Space Mono', ui-monospace, monospace;
+      }
 
-  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:linear-gradient(to bottom,rgba(10,10,11,.9),rgba(10,10,11,.55));border-bottom:1px solid var(--line)}
-  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
-  .brandmark{font-family:var(--font-d);font-weight:800;font-size:20px;color:var(--white);letter-spacing:.02em;text-decoration:none}
-  .brandmark span{color:var(--uv)}
-  .nav-links{display:flex;gap:22px;align-items:center}
-  .nav-links a{font-family:var(--font-m);font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--smoke)}
-  .nav-links a:hover{color:var(--chrome-hi)}
-  .nav-cta{font-family:var(--font-m);font-size:12px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--ink)!important;background:var(--chrome-hi);padding:10px 16px;border-radius:2px;transition:transform .15s ease,background .15s ease}
-  /* A 320px: marca 142 + CTA 157 no caben en los 272 que deja el .wrap.
+      * {
+         box-sizing: border-box
+      }
+
+      html {
+         scroll-behavior: smooth
+      }
+
+      body {
+         margin: 0;
+         background: var(--ink);
+         color: var(--chrome);
+         font-family: var(--font-b);
+         font-size: 17px;
+         line-height: 1.6;
+         -webkit-font-smoothing: antialiased;
+         overflow-x: hidden
+      }
+
+      .wrap {
+         max-width: var(--maxw);
+         margin: 0 auto;
+         padding: 0 24px
+      }
+
+      a {
+         color: inherit
+      }
+
+      h1,
+      h2,
+      h3 {
+         font-family: var(--font-d);
+         color: var(--white);
+         text-wrap: balance;
+         letter-spacing: -.01em;
+         margin: 0
+      }
+
+      .eyebrow {
+         font-family: var(--font-m);
+         font-size: 12px;
+         letter-spacing: .28em;
+         text-transform: uppercase;
+         color: var(--uv-soft)
+      }
+
+      .muted {
+         color: var(--smoke)
+      }
+
+      img {
+         max-width: 100%;
+         display: block
+      }
+
+      header.nav {
+         position: sticky;
+         top: 0;
+         z-index: 50;
+         -webkit-backdrop-filter: blur(10px);
+         backdrop-filter: blur(10px);
+         background: linear-gradient(to bottom, rgba(10, 10, 11, .9), rgba(10, 10, 11, .55));
+         border-bottom: 1px solid var(--line)
+      }
+
+      .nav .wrap {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         height: 64px
+      }
+
+      .brandmark {
+         font-family: var(--font-d);
+         font-weight: 800;
+         font-size: 20px;
+         color: var(--white);
+         letter-spacing: .02em;
+         text-decoration: none
+      }
+
+      .brandmark span {
+         color: var(--uv)
+      }
+
+      .nav-links {
+         display: flex;
+         gap: 22px;
+         align-items: center
+      }
+
+      .nav-links a {
+         font-family: var(--font-m);
+         font-size: 12px;
+         letter-spacing: .1em;
+         text-transform: uppercase;
+         text-decoration: none;
+         color: var(--smoke)
+      }
+
+      .nav-links a:hover {
+         color: var(--chrome-hi)
+      }
+
+      .nav-cta {
+         font-family: var(--font-m);
+         font-size: 12px;
+         letter-spacing: .12em;
+         text-transform: uppercase;
+         text-decoration: none;
+         color: var(--ink) !important;
+         background: var(--chrome-hi);
+         padding: 10px 16px;
+         border-radius: 2px;
+         transition: transform .15s ease, background .15s ease
+      }
+
+      /* A 320px: marca 142 + CTA 157 no caben en los 272 que deja el .wrap.
      Medido, no estimado. Se encoge la marca y se reduce el padding lateral. */
-  @media (max-width:400px){
-    .nav .wrap{padding:0 14px}
-    .nav-links{gap:10px}
-    .nav-links a:not(.nav-cta){display:none}
-    .nav-cta{padding:8px 10px;font-size:9px;letter-spacing:.03em;white-space:nowrap}
-    .brandmark{font-size:14px;letter-spacing:0}
-  }
-  .nav-cta:hover{background:var(--white);transform:translateY(-1px)}
-  @media (max-width:720px){.nav-links a:not(.nav-cta){display:none}}
+      @media (max-width:400px) {
+         .nav .wrap {
+            padding: 0 14px
+         }
 
-  .hero{position:relative;padding:92px 0 64px;overflow:hidden}
-  .hero-bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-  .hero .wrap{position:relative;z-index:1}
-  .hero .eyebrow{margin-bottom:22px}
-  .display{font-family:var(--font-d);font-weight:800;color:var(--white);font-size:clamp(44px,12vw,150px);line-height:.9;letter-spacing:-.03em;margin:0;word-break:break-word}
-  .display .uv{color:var(--uv);text-shadow:0 0 34px rgba(139,61,255,.55)}
-  .sub{font-family:var(--font-d);color:var(--chrome-hi);font-size:clamp(18px,3vw,26px);margin:10px 0 0;font-weight:700}
-  .tagline{max-width:54ch;margin:20px 0 0;font-size:18px;color:var(--chrome)}
-  .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;align-items:center}
-  .btn{font-family:var(--font-m);font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:15px 26px;border-radius:2px;display:inline-flex;align-items:center;gap:10px;transition:transform .15s ease;cursor:pointer;border:0}
-  .btn-primary{background:var(--uv);color:var(--white)}
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(139,61,255,.35)}
-  .btn-ghost{border:1px solid var(--line-2);color:var(--chrome-hi);background:transparent}
-  .btn-ghost:hover{border-color:var(--uv);transform:translateY(-2px)}
-  .btn-sm{padding:11px 18px;font-size:12px}
-  .link-inline{font-family:var(--font-m);font-size:12px;letter-spacing:.06em;color:var(--uv-soft);text-decoration:none}
-  .link-inline:hover{color:var(--white)}
-  .hero-meta{margin-top:40px;display:flex;flex-wrap:wrap;gap:26px;font-family:var(--font-m);font-size:12px;letter-spacing:.08em;color:var(--smoke);border-top:1px solid var(--line);padding-top:18px}
-  .hero-meta b{color:var(--chrome-hi);font-weight:700}
+         .nav-links {
+            gap: 10px
+         }
 
-  section{padding:70px 0}
-  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;margin-bottom:30px;flex-wrap:wrap}
-  .sec-head h2{font-size:clamp(28px,5vw,44px);font-weight:700}
-  .sec-head .eyebrow{white-space:nowrap}
+         .nav-links a:not(.nav-cta) {
+            display: none
+         }
 
-  /* GRILLA DE VIDEOS (portada YouTube maxres) */
-  .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:20px}
-  .vcard{position:relative;background:var(--ink-3);border:1px solid var(--line);border-radius:8px;overflow:hidden;transition:border-color .18s ease,transform .18s ease}
-  .vcard:hover{border-color:var(--uv);transform:translateY(-3px)}
-  .vthumb{position:relative;aspect-ratio:16/9;background:linear-gradient(155deg,#221a33,#0d0d12 70%);cursor:pointer;border:0;padding:0;width:100%;display:block}
-  .vthumb img{width:100%;height:100%;object-fit:cover}
-  .vthumb::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,11,.55),transparent 55%)}
-  .vplay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:rgba(10,10,11,.62);border:1px solid var(--line-2);display:grid;place-items:center;z-index:2;transition:background .15s,transform .15s}
-  .vcard:hover .vplay{background:var(--uv);transform:translate(-50%,-50%) scale(1.06)}
-  .vplay svg{fill:var(--white);margin-left:3px}
-  .vbadge{position:absolute;top:12px;left:12px;z-index:2;font-family:var(--font-m);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:rgba(10,10,11,.7);border:1px solid var(--line-2);color:var(--chrome-hi);padding:5px 9px;border-radius:2px}
-  .vbadge.uv{background:rgba(139,61,255,.85);border-color:transparent;color:#fff}
-  .vbody{padding:14px 16px 16px}
-  .vtitle{font-family:var(--font-d);font-weight:700;color:var(--white);font-size:16px;line-height:1.2}
-  .vactions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-  .chip{font-family:var(--font-m);font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;padding:8px 12px;border-radius:2px;border:1px solid var(--line-2);color:var(--chrome-hi);transition:border-color .15s,color .15s}
-  .chip:hover{border-color:var(--uv);color:#fff}
-  .chip.sp{color:var(--uv-soft)}
-  .chip[aria-disabled="true"]{opacity:.4;pointer-events:none}
-  .vcard.open .vthumb{display:none}
-  .vframe{display:none;aspect-ratio:16/9}
-  .vcard.open .vframe{display:block}
-  .vframe iframe{width:100%;height:100%;border:0}
+         .nav-cta {
+            padding: 8px 10px;
+            font-size: 9px;
+            letter-spacing: .03em;
+            white-space: nowrap
+         }
 
-  /* CARRUSEL TikTok */
-  .rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px;-webkit-overflow-scrolling:touch}
-  .rail::-webkit-scrollbar{height:8px}.rail::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px}
-  /* .tk (celda del carrusel TikTok anterior) eliminado: ahora se usa .tkc */
-  .tk blockquote{margin:0}
-  .placeholder-note{border:1px solid var(--line);border-radius:8px;padding:20px 22px;color:var(--smoke);font-family:var(--font-m);font-size:13px;line-height:1.6;background:var(--ink-3)}
-  .placeholder-note b{color:var(--chrome-hi);font-weight:400}
+         .brandmark {
+            font-size: 14px;
+            letter-spacing: 0
+         }
+      }
 
-  /* GALERIA IG */
-  .ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-  .gcell{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--ink-3)}
-  .gcell img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
-  .gcell:hover img{transform:scale(1.05)}
+      .nav-cta:hover {
+         background: var(--white);
+         transform: translateY(-1px)
+      }
 
-  /* ZONA MIEMBROS (maquetas) */
-  .members{background:radial-gradient(70% 120% at 100% 0%,rgba(139,61,255,.18),transparent 60%),var(--ink-2);border:1px solid var(--line-2);border-radius:16px;padding:clamp(28px,5vw,52px);text-align:center;position:relative;overflow:hidden;overflow:clip}
-  .lock{font-size:34px;margin-bottom:10px}
-  .members h2{font-size:clamp(26px,4vw,40px);margin-bottom:12px}
-  /* En dos columnas la cabecera ya no puede comerse media pantalla: el objetivo
+      @media (max-width:720px) {
+         .nav-links a:not(.nav-cta) {
+            display: none
+         }
+      }
+
+      .hero {
+         position: relative;
+         padding: 92px 0 64px;
+         overflow: hidden
+      }
+
+      .hero-bg {
+         position: absolute;
+         inset: 0;
+         width: 100%;
+         height: 100%;
+         z-index: 0;
+         pointer-events: none
+      }
+
+      .hero .wrap {
+         position: relative;
+         z-index: 1
+      }
+
+      .hero .eyebrow {
+         margin-bottom: 22px
+      }
+
+      .display {
+         font-family: var(--font-d);
+         font-weight: 800;
+         color: var(--white);
+         font-size: clamp(44px, 12vw, 150px);
+         line-height: .9;
+         letter-spacing: -.03em;
+         margin: 0;
+         word-break: break-word
+      }
+
+      .display .uv {
+         color: var(--uv);
+         text-shadow: 0 0 34px rgba(139, 61, 255, .55)
+      }
+
+      .sub {
+         font-family: var(--font-d);
+         color: var(--chrome-hi);
+         font-size: clamp(18px, 3vw, 26px);
+         margin: 10px 0 0;
+         font-weight: 700
+      }
+
+      .tagline {
+         max-width: 54ch;
+         margin: 20px 0 0;
+         font-size: 18px;
+         color: var(--chrome)
+      }
+
+      .hero-actions {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 14px;
+         margin-top: 30px;
+         align-items: center
+      }
+
+      .btn {
+         font-family: var(--font-m);
+         font-size: 13px;
+         letter-spacing: .1em;
+         text-transform: uppercase;
+         text-decoration: none;
+         padding: 15px 26px;
+         border-radius: 2px;
+         display: inline-flex;
+         align-items: center;
+         gap: 10px;
+         transition: transform .15s ease;
+         cursor: pointer;
+         border: 0
+      }
+
+      .btn-primary {
+         background: var(--uv);
+         color: var(--white)
+      }
+
+      .btn-primary:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 10px 30px rgba(139, 61, 255, .35)
+      }
+
+      .btn-ghost {
+         border: 1px solid var(--line-2);
+         color: var(--chrome-hi);
+         background: transparent
+      }
+
+      .btn-ghost:hover {
+         border-color: var(--uv);
+         transform: translateY(-2px)
+      }
+
+      .btn-sm {
+         padding: 11px 18px;
+         font-size: 12px
+      }
+
+      .link-inline {
+         font-family: var(--font-m);
+         font-size: 12px;
+         letter-spacing: .06em;
+         color: var(--uv-soft);
+         text-decoration: none
+      }
+
+      .link-inline:hover {
+         color: var(--white)
+      }
+
+      .hero-meta {
+         margin-top: 40px;
+         display: flex;
+         flex-wrap: wrap;
+         gap: 26px;
+         font-family: var(--font-m);
+         font-size: 12px;
+         letter-spacing: .08em;
+         color: var(--smoke);
+         border-top: 1px solid var(--line);
+         padding-top: 18px
+      }
+
+      .hero-meta b {
+         color: var(--chrome-hi);
+         font-weight: 700
+      }
+
+      section {
+         padding: 70px 0
+      }
+
+      .sec-head {
+         display: flex;
+         align-items: baseline;
+         justify-content: space-between;
+         gap: 20px;
+         margin-bottom: 30px;
+         flex-wrap: wrap
+      }
+
+      .sec-head h2 {
+         font-size: clamp(28px, 5vw, 44px);
+         font-weight: 700
+      }
+
+      .sec-head .eyebrow {
+         white-space: nowrap
+      }
+
+      /* GRILLA DE VIDEOS (portada YouTube maxres) */
+      .vgrid {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+         gap: 20px
+      }
+
+      .vcard {
+         position: relative;
+         background: var(--ink-3);
+         border: 1px solid var(--line);
+         border-radius: 8px;
+         overflow: hidden;
+         transition: border-color .18s ease, transform .18s ease
+      }
+
+      .vcard:hover {
+         border-color: var(--uv);
+         transform: translateY(-3px)
+      }
+
+      .vthumb {
+         position: relative;
+         aspect-ratio: 16/9;
+         background: linear-gradient(155deg, #221a33, #0d0d12 70%);
+         cursor: pointer;
+         border: 0;
+         padding: 0;
+         width: 100%;
+         display: block
+      }
+
+      .vthumb img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover
+      }
+
+      .vthumb::after {
+         content: "";
+         position: absolute;
+         inset: 0;
+         background: linear-gradient(to top, rgba(10, 10, 11, .55), transparent 55%)
+      }
+
+      .vplay {
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         width: 58px;
+         height: 58px;
+         border-radius: 50%;
+         background: rgba(10, 10, 11, .62);
+         border: 1px solid var(--line-2);
+         display: grid;
+         place-items: center;
+         z-index: 2;
+         transition: background .15s, transform .15s
+      }
+
+      .vcard:hover .vplay {
+         background: var(--uv);
+         transform: translate(-50%, -50%) scale(1.06)
+      }
+
+      .vplay svg {
+         fill: var(--white);
+         margin-left: 3px
+      }
+
+      .vbadge {
+         position: absolute;
+         top: 12px;
+         left: 12px;
+         z-index: 2;
+         font-family: var(--font-m);
+         font-size: 10px;
+         letter-spacing: .12em;
+         text-transform: uppercase;
+         background: rgba(10, 10, 11, .7);
+         border: 1px solid var(--line-2);
+         color: var(--chrome-hi);
+         padding: 5px 9px;
+         border-radius: 2px
+      }
+
+      .vbadge.uv {
+         background: rgba(139, 61, 255, .85);
+         border-color: transparent;
+         color: #fff
+      }
+
+      .vbody {
+         padding: 14px 16px 16px
+      }
+
+      .vtitle {
+         font-family: var(--font-d);
+         font-weight: 700;
+         color: var(--white);
+         font-size: 16px;
+         line-height: 1.2
+      }
+
+      .vactions {
+         display: flex;
+         gap: 10px;
+         margin-top: 12px;
+         flex-wrap: wrap
+      }
+
+      .chip {
+         font-family: var(--font-m);
+         font-size: 11px;
+         letter-spacing: .06em;
+         text-transform: uppercase;
+         text-decoration: none;
+         padding: 8px 12px;
+         border-radius: 2px;
+         border: 1px solid var(--line-2);
+         color: var(--chrome-hi);
+         transition: border-color .15s, color .15s
+      }
+
+      .chip:hover {
+         border-color: var(--uv);
+         color: #fff
+      }
+
+      .chip.sp {
+         color: var(--uv-soft)
+      }
+
+      .chip[aria-disabled="true"] {
+         opacity: .4;
+         pointer-events: none
+      }
+
+      .vcard.open .vthumb {
+         display: none
+      }
+
+      .vframe {
+         display: none;
+         aspect-ratio: 16/9
+      }
+
+      .vcard.open .vframe {
+         display: block
+      }
+
+      .vframe iframe {
+         width: 100%;
+         height: 100%;
+         border: 0
+      }
+
+      /* CARRUSEL TikTok */
+      .rail {
+         display: flex;
+         gap: 16px;
+         overflow-x: auto;
+         scroll-snap-type: x mandatory;
+         padding-bottom: 12px;
+         -webkit-overflow-scrolling: touch
+      }
+
+      .rail::-webkit-scrollbar {
+         height: 8px
+      }
+
+      .rail::-webkit-scrollbar-thumb {
+         background: var(--line-2);
+         border-radius: 4px
+      }
+
+      /* .tk (celda del carrusel TikTok anterior) eliminado: ahora se usa .tkc */
+      .tk blockquote {
+         margin: 0
+      }
+
+      .placeholder-note {
+         border: 1px solid var(--line);
+         border-radius: 8px;
+         padding: 20px 22px;
+         color: var(--smoke);
+         font-family: var(--font-m);
+         font-size: 13px;
+         line-height: 1.6;
+         background: var(--ink-3)
+      }
+
+      .placeholder-note b {
+         color: var(--chrome-hi);
+         font-weight: 400
+      }
+
+      /* GALERIA IG */
+      .ggrid {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+         gap: 12px
+      }
+
+      .gcell {
+         aspect-ratio: 1;
+         border: 1px solid var(--line);
+         border-radius: 6px;
+         overflow: hidden;
+         background: var(--ink-3)
+      }
+
+      .gcell img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+         transition: transform .3s
+      }
+
+      .gcell:hover img {
+         transform: scale(1.05)
+      }
+
+      /* ZONA MIEMBROS (maquetas) */
+      .members {
+         background: radial-gradient(70% 120% at 100% 0%, rgba(139, 61, 255, .18), transparent 60%), var(--ink-2);
+         border: 1px solid var(--line-2);
+         border-radius: 16px;
+         padding: clamp(28px, 5vw, 52px);
+         text-align: center;
+         position: relative;
+         overflow: hidden;
+         overflow: clip
+      }
+
+      /* clip y no solo hidden: hidden crea un contenedor de scroll, y un foco
+     dentro lo desplaza programaticamente dejando la seccion corrida. */
+      .lock {
+         font-size: 34px;
+         margin-bottom: 10px
+      }
+
+      .members h2 {
+         font-size: clamp(26px, 4vw, 40px);
+         margin-bottom: 12px
+      }
+
+      /* En dos columnas la cabecera ya no puede comerse media pantalla: el objetivo
      del rediseno es ver disco y lista a la vez. Se compacta, no se esconde. */
-  @media (min-width:980px){
-    #members-content .lock{display:none}
-    #members-content h2{font-size:30px;margin-bottom:6px}
-    /* margin:0 auto, no margin:0. `.members p` centra su caja de 56ch con
+      @media (min-width:980px) {
+         #members-content .lock {
+            display: none
+         }
+
+         #members-content h2 {
+            font-size: 30px;
+            margin-bottom: 6px
+         }
+
+         /* margin:0 auto, no margin:0. `.members p` centra su caja de 56ch con
        `auto`; poner `margin:0 0 4px` mataba ese auto y el parrafo quedaba
        pegado a la izquierda bajo un titulo centrado. */
-    #members-content > p{margin:0 auto 4px;font-size:14px}
-    #members-content > p.muted{margin:0 auto 14px}
-  }
-  .members p{max-width:56ch;margin:0 auto 8px;color:var(--chrome)}
-  .members .btn-primary{margin-top:22px}
-  .members .fineprint{font-family:var(--font-m);font-size:11px;color:var(--smoke);margin-top:18px}
-  .members-login{max-width:400px;margin:22px auto 0;text-align:left}
-  .members-login .field{margin-bottom:14px}
-  .members-login label{display:block;font-family:var(--font-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--smoke);margin-bottom:6px}
-  .members-login input[type="email"]{width:100%;padding:12px 14px;border-radius:6px;border:1px solid var(--line-2);background:var(--ink);color:var(--chrome-hi);font-family:var(--font-b);font-size:15px}
-  .members-login input[type="email"]:focus{outline:none;border-color:var(--uv-soft);box-shadow:0 0 0 3px rgba(139,61,255,.18)}
-  .members-login .submit{width:100%;padding:14px;border:none;border-radius:8px;background:var(--uv);color:var(--white);font-family:var(--font-d);font-weight:700;font-size:15px;cursor:pointer;transition:transform .15s,box-shadow .15s}
-  .members-login .submit:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(139,61,255,.35)}
-  .members-login .submit:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-  .members-login .login-note{font-family:var(--font-m);font-size:12px;line-height:1.5;padding:10px 14px;border-radius:4px;margin-top:12px;display:none}
-  .members-login .login-note.ok{display:block;background:rgba(199,204,209,.10);border:1px solid var(--chrome);color:var(--chrome-hi)}
-  .members-login .login-note.err{display:block;background:rgba(199,204,209,.06);border:1px dashed var(--line-2);color:var(--chrome)}
-  .members-content{display:none}
-  .members-content.visible{display:block}
-  /* ===== Reproductor de maquetas (zona miembros) ===== */
-  .track-player{margin:24px auto 0;max-width:1180px;text-align:left}
-  /* Dos columnas. MEDIA QUERY, no @container: el bloque @container zp se borro
+         #members-content>p {
+            margin: 0 auto 4px;
+            font-size: 14px
+         }
+
+         #members-content>p.muted {
+            margin: 0 auto 14px
+         }
+      }
+
+      .members p {
+         max-width: 56ch;
+         margin: 0 auto 8px;
+         color: var(--chrome)
+      }
+
+      .members .btn-primary {
+         margin-top: 22px
+      }
+
+      .members .fineprint {
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--smoke);
+         margin-top: 18px
+      }
+
+      .members-login {
+         max-width: 400px;
+         margin: 22px auto 0;
+         text-align: left
+      }
+
+      .members-login .field {
+         margin-bottom: 14px
+      }
+
+      .members-login label {
+         display: block;
+         font-family: var(--font-m);
+         font-size: 11px;
+         letter-spacing: .1em;
+         text-transform: uppercase;
+         color: var(--smoke);
+         margin-bottom: 6px
+      }
+
+      .members-login input[type="email"] {
+         width: 100%;
+         padding: 12px 14px;
+         border-radius: 6px;
+         border: 1px solid var(--line-2);
+         background: var(--ink);
+         color: var(--chrome-hi);
+         font-family: var(--font-b);
+         font-size: 15px
+      }
+
+      .members-login input[type="email"]:focus {
+         outline: none;
+         border-color: var(--uv-soft);
+         box-shadow: 0 0 0 3px rgba(139, 61, 255, .18)
+      }
+
+      .members-login .submit {
+         width: 100%;
+         padding: 14px;
+         border: none;
+         border-radius: 8px;
+         background: var(--uv);
+         color: var(--white);
+         font-family: var(--font-d);
+         font-weight: 700;
+         font-size: 15px;
+         cursor: pointer;
+         transition: transform .15s, box-shadow .15s
+      }
+
+      .members-login .submit:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 10px 30px rgba(139, 61, 255, .35)
+      }
+
+      .members-login .submit:disabled {
+         opacity: .5;
+         cursor: not-allowed;
+         transform: none;
+         box-shadow: none
+      }
+
+      .members-login .login-note {
+         font-family: var(--font-m);
+         font-size: 12px;
+         line-height: 1.5;
+         padding: 10px 14px;
+         border-radius: 4px;
+         margin-top: 12px;
+         display: none
+      }
+
+      .members-login .login-note.ok {
+         display: block;
+         background: rgba(199, 204, 209, .10);
+         border: 1px solid var(--chrome);
+         color: var(--chrome-hi)
+      }
+
+      .members-login .login-note.err {
+         display: block;
+         background: rgba(199, 204, 209, .06);
+         border: 1px dashed var(--line-2);
+         color: var(--chrome)
+      }
+
+      .members-content {
+         display: none
+      }
+
+      .members-content.visible {
+         display: block
+      }
+
+      /* ===== Reproductor de maquetas (zona miembros) ===== */
+      .track-player {
+         margin: 24px auto 0;
+         max-width: 1180px;
+         text-align: left
+      }
+
+      /* Dos columnas. MEDIA QUERY, no @container: el bloque @container zp se borro
      porque con .track-player a 1180px la consulta disparaba DENTRO de .zp-izq y
      partia el disco en dos columnas propias encima de la rejilla nueva. */
-  .zp-cols{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
-  /* iOS: la franja fija era el unico sitio con safe-area. Se replica aqui. */
-  .zp-izq{min-width:0;
-     padding-left:env(safe-area-inset-left,0px);
-     padding-right:env(safe-area-inset-right,0px);
-     padding-bottom:env(safe-area-inset-bottom,0px)}
-  .zp-der{min-width:0;display:flex;flex-direction:column;min-height:0}
-  /* La tarjeta ocupa la altura disponible y reparte: letra fija arriba,
+      .zp-cols {
+         display: grid;
+         grid-template-columns: minmax(0, 1fr);
+         gap: 24px;
+         align-items: start
+      }
+
+      /* iOS: la franja fija era el unico sitio con safe-area. Se replica aqui. */
+      .zp-izq {
+         min-width: 0;
+         padding-left: env(safe-area-inset-left, 0px);
+         padding-right: env(safe-area-inset-right, 0px);
+         padding-bottom: env(safe-area-inset-bottom, 0px)
+      }
+
+      .zp-der {
+         min-width: 0;
+         display: flex;
+         flex-direction: column;
+         min-height: 0
+      }
+
+      /* La tarjeta ocupa la altura disponible y reparte: letra fija arriba,
      lista elastica abajo con su propio scroll. */
-  .zp-der > .zp-lf{display:flex;flex-direction:column;min-height:0;flex:1 1 auto;margin-bottom:0}
-  .zp-vent{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
-     scrollbar-width:thin;scrollbar-color:rgba(166,107,255,.35) transparent}
-  .zp-vent::-webkit-scrollbar{width:6px}
-  .zp-vent::-webkit-scrollbar-thumb{background:rgba(166,107,255,.35);border-radius:3px}
-  .zp-izq{display:flex;flex-direction:column;min-height:0}
-  @media (min-width:980px){
-    /* align-items:stretch, no start: con start la tarjeta de la derecha
+      .zp-der>.zp-lf {
+         display: flex;
+         flex-direction: column;
+         min-height: 0;
+         flex: 1 1 auto;
+         margin-bottom: 0
+      }
+
+      .zp-vent {
+         flex: 1 1 auto;
+         min-height: 0;
+         overflow-y: auto;
+         overscroll-behavior: contain;
+         scrollbar-width: thin;
+         scrollbar-color: rgba(166, 107, 255, .35) transparent
+      }
+
+      .zp-vent::-webkit-scrollbar {
+         width: 6px
+      }
+
+      .zp-vent::-webkit-scrollbar-thumb {
+         background: rgba(166, 107, 255, .35);
+         border-radius: 3px
+      }
+
+      .zp-izq {
+         display: flex;
+         flex-direction: column;
+         min-height: 0
+      }
+
+      @media (min-width:980px) {
+
+         /* align-items:stretch, no start: con start la tarjeta de la derecha
        terminaba a media altura de la izquierda y quedaba un hueco enorme.
        Y max-height acota el modulo a la pantalla: lo que no cabe scrollea
        DENTRO de la lista, no empujando la pagina.
@@ -232,54 +868,158 @@
        El respaldo es 'none' a proposito: si app.js llega viejo o falla, el
        modulo queda largo (como antes del cambio) en vez de recortado por un
        numero fijo que no corresponde a esta pantalla. */
-    .zp-cols{grid-template-columns:448px minmax(0,1fr);gap:36px;
-       grid-template-rows:minmax(0,1fr);
-       align-items:stretch;max-height:var(--zp-tope,none)}
-    /* El sticky SOLO pega porque .members paso a overflow:clip: un
-       overflow:hidden es contenedor de scroll y anclaba .zp-izq a un elemento
-       que no scrollea nunca. */
-    .zp-izq{position:sticky;top:76px}
-  }
-  /* Pantalla baja: pegado tapa la lista y deja controles fuera de vista. */
-  @media (max-height:700px){
-    .zp-izq{position:static}
-  }
-  .tp-state{font-family:var(--font-m);font-size:12px;letter-spacing:.06em;color:var(--smoke);text-align:center;padding:18px 0;margin:0}
-  .tp-item{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
-  .tp-item:last-of-type{border-bottom:none}
-  /* 40x40 visibles, 44x44 tocables. El area la da el ::before, igual que en
+         .zp-cols {
+            grid-template-columns: 448px minmax(0, 1fr);
+            gap: 36px;
+            grid-template-rows: minmax(0, 1fr);
+            align-items: stretch;
+            max-height: var(--zp-tope, none)
+         }
+      }
+
+      .tp-state {
+         font-family: var(--font-m);
+         font-size: 12px;
+         letter-spacing: .06em;
+         color: var(--smoke);
+         text-align: center;
+         padding: 18px 0;
+         margin: 0
+      }
+
+      .tp-item {
+         display: flex;
+         align-items: center;
+         gap: 14px;
+         padding: 13px 0;
+         border-bottom: 1px solid var(--line)
+      }
+
+      .tp-item:last-of-type {
+         border-bottom: none
+      }
+
+      /* 40x40 visibles, 44x44 tocables. El area la da el ::before, igual que en
      .zp-b: agrandar el circulo a 44 desequilibra la fila. Incumplia WCAG 2.5.8
      desde antes de este cambio. */
-  .tp-play::before{content:'';position:absolute;top:50%;left:50%;width:44px;height:44px;
-     transform:translate(-50%,-50%);border-radius:50%}
-  .tp-play{position:relative;width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:transparent;color:var(--uv-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;transition:background .15s ease,border-color .15s ease,color .15s ease}
-  .tp-play:hover:not(:disabled){background:rgba(139,61,255,.12);border-color:var(--uv);color:var(--uv-soft)}
-  .tp-play:disabled{opacity:.4;cursor:default}
-  .tp-play.is-playing{background:var(--uv);border-color:var(--uv);color:var(--white)}
-  .tp-play svg{width:15px;height:15px;fill:currentColor;pointer-events:none}
-  .tp-info{flex:1;min-width:0}
-  .tp-title{font-family:var(--font-d);color:var(--white);font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  /* UNA linea. Con 6 temas y descripciones de 3-4 lineas la lista medía ~900px
+      .tp-play::before {
+         content: '';
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         width: 44px;
+         height: 44px;
+         transform: translate(-50%, -50%);
+         border-radius: 50%
+      }
+
+      .tp-play {
+         position: relative;
+         width: 40px;
+         height: 40px;
+         border-radius: 50%;
+         border: 1px solid var(--line-2);
+         background: transparent;
+         color: var(--uv-soft);
+         cursor: pointer;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         flex-shrink: 0;
+         padding: 0;
+         transition: background .15s ease, border-color .15s ease, color .15s ease
+      }
+
+      .tp-play:hover:not(:disabled) {
+         background: rgba(139, 61, 255, .12);
+         border-color: var(--uv);
+         color: var(--uv-soft)
+      }
+
+      .tp-play:disabled {
+         opacity: .4;
+         cursor: default
+      }
+
+      .tp-play.is-playing {
+         background: var(--uv);
+         border-color: var(--uv);
+         color: var(--white)
+      }
+
+      .tp-play svg {
+         width: 15px;
+         height: 15px;
+         fill: currentColor;
+         pointer-events: none
+      }
+
+      .tp-info {
+         flex: 1;
+         min-width: 0
+      }
+
+      .tp-title {
+         font-family: var(--font-d);
+         color: var(--white);
+         font-size: 15px;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap
+      }
+
+      /* UNA linea. Con 6 temas y descripciones de 3-4 lineas la lista medía ~900px
      y empujaba el disco fuera de la pantalla: ese era el problema original.
      La descripcion completa sigue estando junto al disco. */
-  .tp-desc{font-family:var(--font-m);font-size:11px;color:var(--smoke);letter-spacing:.04em;margin-top:2px;
-     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tp-dur{font-family:var(--font-m);font-size:11px;color:var(--smoke);flex-shrink:0;font-variant-numeric:tabular-nums}
-  /* ====== EL DISCO · reproductor propio ==================================
+      .tp-desc {
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--smoke);
+         letter-spacing: .04em;
+         margin-top: 2px;
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis
+      }
+
+      .tp-dur {
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--smoke);
+         flex-shrink: 0;
+         font-variant-numeric: tabular-nums
+      }
+
+      /* ====== EL DISCO · reproductor propio ==================================
      Oro sobre negro. El disco es un OBJETO, no una certificacion: aqui no se
      usa esa expresion de certificacion ni ningun sello. Ver
      PROMPT_MAESTRO_DISCO_Y_LETRAS.md §0.2.
      ====================================================================== */
-  /* En la rejilla de dos columnas ese margen superior es lo unico que
+      /* En la rejilla de dos columnas ese margen superior es lo unico que
      desalineaba las dos tarjetas: la izquierda arrancaba 20px mas abajo que
      el cuadro de la letra. El margen viene del diseno anterior, cuando .zp era
      un bloque suelto bajo el titulo de la seccion. */
-  .zp-izq > .zp{margin-top:0}
-  .zp{margin-top:20px;border:1px solid var(--line);border-radius:6px;
-      background:linear-gradient(180deg,var(--ink-2),var(--ink));padding:22px;display:none}
-  .zp.visible{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:20px}
+      .zp-izq>.zp {
+         margin-top: 0
+      }
 
-  /* ---- Escena 3D ----------------------------------------------------
+      .zp {
+         margin-top: 20px;
+         border: 1px solid var(--line);
+         border-radius: 6px;
+         background: linear-gradient(180deg, var(--ink-2), var(--ink));
+         padding: 22px;
+         display: none
+      }
+
+      .zp.visible {
+         display: grid;
+         grid-template-columns: minmax(0, 1fr);
+         justify-items: center;
+         gap: 20px
+      }
+
+      /* ---- Escena 3D ----------------------------------------------------
      Tres transformaciones SEPARADAS, y el orden importa:
        .zp-zona    perspective (la camara)
        .zp-escena  vaiven lento  -- inclinacion que respira
@@ -288,684 +1028,2409 @@
      Si la inclinacion viviera en el mismo elemento que el giro, el disco
      daria tumbos como una moneda en vez de girar sobre su eje.
      ------------------------------------------------------------------- */
-  .zp-zona{position:relative;display:grid;place-items:center;flex-shrink:0;
-     perspective:760px;perspective-origin:50% 38%;padding:8px 0 22px}
-  .zp-escena{transform-style:preserve-3d;
-     animation:zp-vaiven 11s ease-in-out infinite}
-  .zp-par{transform-style:preserve-3d;transition:transform .32s ease-out;
-     position:relative}
-  @keyframes zp-vaiven{
-    0%,100%{transform:rotateX(25deg) rotateY(-7deg)}
-    50%    {transform:rotateX(30deg) rotateY(7deg)}
-  }
+      .zp-zona {
+         position: relative;
+         display: grid;
+         place-items: center;
+         flex-shrink: 0;
+         perspective: 760px;
+         perspective-origin: 50% 38%;
+         padding: 8px 0 22px
+      }
 
-  /* El alto manda tanto como el ancho: en un portatil de 768px de alto un
+      .zp-escena {
+         transform-style: preserve-3d;
+         animation: zp-vaiven 11s ease-in-out infinite
+      }
+
+      .zp-par {
+         transform-style: preserve-3d;
+         transition: transform .32s ease-out;
+         position: relative
+      }
+
+      @keyframes zp-vaiven {
+
+         0%,
+         100% {
+            transform: rotateX(25deg) rotateY(-7deg)
+         }
+
+         50% {
+            transform: rotateX(30deg) rotateY(7deg)
+         }
+      }
+
+      /* El alto manda tanto como el ancho: en un portatil de 768px de alto un
      disco de 230px deja la lista fuera de pantalla. */
-  .zp-disco{--d:min(58vw,26vh,230px);width:var(--d);height:var(--d);border-radius:50%;position:relative;
-     transform-style:preserve-3d;
-     background:
-       repeating-radial-gradient(circle at 50% 50%,rgba(0,0,0,.34) 0 1px,rgba(0,0,0,0) 1px 3px),
-       conic-gradient(from 0deg,#7a5210,#e8c169,#fff4cd,#d9a63f,#8a5f14,#f2d391,#b8862c,#e8c169,#7a5210);
-     animation:zp-girar 1.8s linear infinite;animation-play-state:paused}
-  .zp-disco.suena{animation-play-state:running}
+      .zp-disco {
+         --d: min(58vw, 26vh, 230px);
+         width: var(--d);
+         height: var(--d);
+         border-radius: 50%;
+         position: relative;
+         transform-style: preserve-3d;
+         background:
+            repeating-radial-gradient(circle at 50% 50%, rgba(0, 0, 0, .34) 0 1px, rgba(0, 0, 0, 0) 1px 3px),
+            conic-gradient(from 0deg, #7a5210, #e8c169, #fff4cd, #d9a63f, #8a5f14, #f2d391, #b8862c, #e8c169, #7a5210);
+         animation: zp-girar 1.8s linear infinite;
+         animation-play-state: paused
+      }
 
-  /* Canto: dos capas hundidas en Z. El ojo lee la diferencia de luminancia
+      .zp-disco.suena {
+         animation-play-state: running
+      }
+
+      /* Canto: dos capas hundidas en Z. El ojo lee la diferencia de luminancia
      entre ellas como grosor. Mas capas no aportan y cuestan composicion. */
-  .zp-canto,.zp-canto2{position:absolute;inset:0;border-radius:50%;pointer-events:none;
-     background:conic-gradient(from 0deg,#3a2708,#8a6420,#c9a35a,#6b4a12,#2e1f06,#a8823a,#5c400f,#3a2708)}
-  .zp-canto {transform:translateZ(-4px)  scale(1.018);filter:brightness(.62)}
-  .zp-canto2{transform:translateZ(-8px)  scale(1.028);filter:brightness(.30)}
+      .zp-canto,
+      .zp-canto2 {
+         position: absolute;
+         inset: 0;
+         border-radius: 50%;
+         pointer-events: none;
+         background: conic-gradient(from 0deg, #3a2708, #8a6420, #c9a35a, #6b4a12, #2e1f06, #a8823a, #5c400f, #3a2708)
+      }
 
-  /* Segunda capa girando a OTRA velocidad y en sentido inverso. Un solo
+      .zp-canto {
+         transform: translateZ(-4px) scale(1.018);
+         filter: brightness(.62)
+      }
+
+      .zp-canto2 {
+         transform: translateZ(-8px) scale(1.028);
+         filter: brightness(.30)
+      }
+
+      /* Segunda capa girando a OTRA velocidad y en sentido inverso. Un solo
      elemento girando entero se ve plano; la diferencia de velocidad es lo que
      produce la difraccion. */
-  .zp-iris{position:absolute;inset:0;border-radius:50%;mix-blend-mode:overlay;
-     background:repeating-conic-gradient(from 0deg,
-       rgba(255,40,90,.13) 0deg 5deg,rgba(255,196,0,.13) 5deg 10deg,
-       rgba(60,255,170,.13) 10deg 15deg,rgba(0,150,255,.13) 15deg 20deg,
-       rgba(170,60,255,.13) 20deg 25deg,rgba(255,255,255,.05) 25deg 30deg);
-     animation:zp-girar 6.4s linear infinite reverse;animation-play-state:paused}
-  .zp-disco.suena .zp-iris{animation-play-state:running}
+      .zp-iris {
+         position: absolute;
+         inset: 0;
+         border-radius: 50%;
+         mix-blend-mode: overlay;
+         background: repeating-conic-gradient(from 0deg,
+               rgba(255, 40, 90, .13) 0deg 5deg, rgba(255, 196, 0, .13) 5deg 10deg,
+               rgba(60, 255, 170, .13) 10deg 15deg, rgba(0, 150, 255, .13) 15deg 20deg,
+               rgba(170, 60, 255, .13) 20deg 25deg, rgba(255, 255, 255, .05) 25deg 30deg);
+         animation: zp-girar 6.4s linear infinite reverse;
+         animation-play-state: paused
+      }
 
-  /* El reflejo NO gira pero SI se inclina: pertenece a la sala, proyectado
+      .zp-disco.suena .zp-iris {
+         animation-play-state: running
+      }
+
+      /* El reflejo NO gira pero SI se inclina: pertenece a la sala, proyectado
      sobre un disco inclinado. Por eso vive en .zp-par y no en .zp-disco. */
-  .zp-par::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
-     transform:translateZ(1px);
-     background:linear-gradient(112deg,
-                rgba(255,255,255,0) 6%,  rgba(255,255,255,.62) 17%, rgba(255,255,255,.10) 27%,
-                rgba(255,255,255,0) 40%, rgba(0,0,0,.30) 56%,
-                rgba(255,255,255,0) 70%, rgba(255,255,255,.34) 82%, rgba(255,255,255,0) 92%);
-     mix-blend-mode:overlay}
-  /* Borde iluminado: separa el disco del fondo negro y remata el canto. */
-  .zp-par::before{content:'';position:absolute;inset:-1px;border-radius:50%;pointer-events:none;
-     transform:translateZ(2px);
-     box-shadow:inset 0 1px 1px rgba(255,255,255,.45), inset 0 -2px 3px rgba(0,0,0,.6),
-                0 0 0 1px rgba(255,214,128,.30)}
+      .zp-par::after {
+         content: '';
+         position: absolute;
+         inset: 0;
+         border-radius: 50%;
+         pointer-events: none;
+         transform: translateZ(1px);
+         background: linear-gradient(112deg,
+               rgba(255, 255, 255, 0) 6%, rgba(255, 255, 255, .62) 17%, rgba(255, 255, 255, .10) 27%,
+               rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, .30) 56%,
+               rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, .34) 82%, rgba(255, 255, 255, 0) 92%);
+         mix-blend-mode: overlay
+      }
 
-  /* Sombra de contacto: sin ella el disco flota sobre la nada y el 3D no
+      /* Borde iluminado: separa el disco del fondo negro y remata el canto. */
+      .zp-par::before {
+         content: '';
+         position: absolute;
+         inset: -1px;
+         border-radius: 50%;
+         pointer-events: none;
+         transform: translateZ(2px);
+         box-shadow: inset 0 1px 1px rgba(255, 255, 255, .45), inset 0 -2px 3px rgba(0, 0, 0, .6),
+            0 0 0 1px rgba(255, 214, 128, .30)
+      }
+
+      /* Sombra de contacto: sin ella el disco flota sobre la nada y el 3D no
      termina de cerrar. Va en la zona, fuera de la escena, sin perspectiva. */
-  .zp-sombra{position:absolute;left:50%;bottom:2px;width:64%;height:16px;
-     transform:translateX(-50%);border-radius:50%;pointer-events:none;
-     background:radial-gradient(ellipse at center,rgba(0,0,0,.72),rgba(0,0,0,0) 72%);
-     filter:blur(6px);animation:zp-sombra 11s ease-in-out infinite}
-  @keyframes zp-sombra{
-    0%,100%{transform:translateX(-50%) scaleX(1) ;opacity:.85}
-    50%    {transform:translateX(-50%) scaleX(.92);opacity:.70}
-  }
+      .zp-sombra {
+         position: absolute;
+         left: 50%;
+         bottom: 2px;
+         width: 64%;
+         height: 16px;
+         transform: translateX(-50%);
+         border-radius: 50%;
+         pointer-events: none;
+         background: radial-gradient(ellipse at center, rgba(0, 0, 0, .72), rgba(0, 0, 0, 0) 72%);
+         filter: blur(6px);
+         animation: zp-sombra 11s ease-in-out infinite
+      }
 
-  /* Etiqueta y orificio: van 1px por delante de la cara para que el
+      @keyframes zp-sombra {
+
+         0%,
+         100% {
+            transform: translateX(-50%) scaleX(1);
+            opacity: .85
+         }
+
+         50% {
+            transform: translateX(-50%) scaleX(.92);
+            opacity: .70
+         }
+      }
+
+      /* Etiqueta y orificio: van 1px por delante de la cara para que el
      preserve-3d no los reordene detras del disco. */
-  .zp-label{position:absolute;inset:31%;border-radius:50%;display:grid;
-     align-items:end;justify-items:center;text-align:center;
-     padding:0 8% 15%;overflow:hidden;transform:translateZ(1px);
-     background:radial-gradient(circle at 50% 42%,#1a1a20,#0b0b0f 74%);
-     box-shadow:inset 0 0 0 1px rgba(255,214,128,.34),0 0 16px rgba(0,0,0,.6)}
-  /* Dos lineas como maximo y recortado en JS: el texto de una etiqueta vive
+      .zp-label {
+         position: absolute;
+         inset: 31%;
+         border-radius: 50%;
+         display: grid;
+         align-items: end;
+         justify-items: center;
+         text-align: center;
+         padding: 0 8% 15%;
+         overflow: hidden;
+         transform: translateZ(1px);
+         background: radial-gradient(circle at 50% 42%, #1a1a20, #0b0b0f 74%);
+         box-shadow: inset 0 0 0 1px rgba(255, 214, 128, .34), 0 0 16px rgba(0, 0, 0, .6)
+      }
+
+      /* Dos lineas como maximo y recortado en JS: el texto de una etiqueta vive
      dentro de un CIRCULO, no de la caja cuadrada que lo contiene. */
-  .zp-label span{font-family:var(--font-m);font-size:8px;letter-spacing:.30em;
-     text-transform:uppercase;color:rgba(255,214,128,.85);line-height:1.4;
-     white-space:nowrap;overflow:hidden;max-width:100%}
-  .zp-hoyo{position:absolute;inset:46.5%;border-radius:50%;background:var(--ink);
-     transform:translateZ(2px);
-     box-shadow:inset 0 0 0 1px rgba(255,214,128,.28),0 0 6px rgba(0,0,0,.8)}
+      .zp-label span {
+         font-family: var(--font-m);
+         font-size: 8px;
+         letter-spacing: .30em;
+         text-transform: uppercase;
+         color: rgba(255, 214, 128, .85);
+         line-height: 1.4;
+         white-space: nowrap;
+         overflow: hidden;
+         max-width: 100%
+      }
 
-  @keyframes zp-girar{to{transform:rotate(360deg)}}
+      .zp-hoyo {
+         position: absolute;
+         inset: 46.5%;
+         border-radius: 50%;
+         background: var(--ink);
+         transform: translateZ(2px);
+         box-shadow: inset 0 0 0 1px rgba(255, 214, 128, .28), 0 0 6px rgba(0, 0, 0, .8)
+      }
 
-  .zp-panel{min-width:0}
-  .zp-eyebrow{font-family:var(--font-m);font-size:10px;letter-spacing:.28em;text-transform:uppercase;
-     color:rgba(255,214,128,.72)}
-  .zp-title{font-family:var(--font-d);color:var(--white);font-size:21px;margin:5px 0 0;
-     overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-     overflow-wrap:anywhere}
-  /* 2 lineas: la descripcion completa medía 4 y empujaba el transporte fuera
+      @keyframes zp-girar {
+         to {
+            transform: rotate(360deg)
+         }
+      }
+
+      .zp-panel {
+         min-width: 0
+      }
+
+      .zp-eyebrow {
+         font-family: var(--font-m);
+         font-size: 10px;
+         letter-spacing: .28em;
+         text-transform: uppercase;
+         color: rgba(255, 214, 128, .72)
+      }
+
+      .zp-title {
+         font-family: var(--font-d);
+         color: var(--white);
+         font-size: 21px;
+         margin: 5px 0 0;
+         overflow: hidden;
+         display: -webkit-box;
+         -webkit-line-clamp: 2;
+         -webkit-box-orient: vertical;
+         overflow-wrap: anywhere
+      }
+
+      /* 2 lineas: la descripcion completa medía 4 y empujaba el transporte fuera
      de la pantalla en portatiles. */
-  .zp-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-     font-family:var(--font-m);font-size:11px;letter-spacing:.05em;color:var(--smoke);
-     margin:5px 0 0}
+      .zp-desc {
+         display: -webkit-box;
+         -webkit-line-clamp: 2;
+         -webkit-box-orient: vertical;
+         overflow: hidden;
+         font-family: var(--font-m);
+         font-size: 11px;
+         letter-spacing: .05em;
+         color: var(--smoke);
+         margin: 5px 0 0
+      }
 
-  /* ---- Letra permanente (columna derecha, siempre visible) ---- */
-  /* Maqueta A, no los tokens grises del sitio: tarjeta violeta tenue, esquinas
+      /* ---- Letra permanente (columna derecha, siempre visible) ---- */
+      /* Maqueta A, no los tokens grises del sitio: tarjeta violeta tenue, esquinas
      de 18 y la marca de tiempo SIEMPRE visible en su propia columna. La version
      anterior escondia el tiempo salvo en la linea activa, y con el audio sin
      arrancar no habia linea activa: se leia como un volcado de texto plano. */
-  .zp-lf{border:1px solid rgba(166,107,255,.22);border-radius:18px;
-     background:linear-gradient(180deg,rgba(166,107,255,.10),rgba(166,107,255,.03));
-     padding:18px 22px 20px;margin:0 0 18px}
-  .zp-lf[hidden]{display:none}
-  .zp-lf-cab{font-family:var(--font-m);font-size:10px;letter-spacing:.20em;
-     text-transform:uppercase;color:var(--uv-soft);margin:0 0 13px}
-  .zp-lf-lin{display:block}
-  .zp-l{display:flex;gap:14px;align-items:baseline;
-     font-family:var(--font-d);font-size:15.5px;line-height:1.34;color:#b3a9c9;opacity:1;
-     overflow-wrap:anywhere;padding:3px 0;margin:0;
-     transition:color .25s ease,font-size .2s ease}
-  .zp-l.on{color:var(--white);font-size:20px;font-weight:600;line-height:1.3}
-  .zp-l.ya{color:#6f6689}
-  .zp-l-t{flex-shrink:0;width:38px;font-family:var(--font-m);font-size:10.5px;letter-spacing:.06em;
-     color:#5d5575;font-variant-numeric:tabular-nums;display:inline-block}
-  .zp-l.on .zp-l-t{color:var(--uv-soft)}
-  .zp-lf-sep{height:1px;background:rgba(199,204,209,.12);margin:16px 0 13px}
-  .zp-lf-sig .zp-l{font-size:14px;color:#7b7194;padding:2px 0;font-weight:400}
-  .zp-lf-sig .zp-l-t{color:#4b4460}
-  .zp-lf-sig[hidden],.zp-lf-sep[hidden]{display:none}
-  /* .zp-lf-lin trae display:block propio, que gana al [hidden] del navegador:
+      .zp-lf {
+         border: 1px solid rgba(166, 107, 255, .22);
+         border-radius: 18px;
+         background: linear-gradient(180deg, rgba(166, 107, 255, .10), rgba(166, 107, 255, .03));
+         padding: 18px 22px 20px;
+         margin: 0 0 18px
+      }
+
+      .zp-lf[hidden] {
+         display: none
+      }
+
+      .zp-lf-cab {
+         font-family: var(--font-m);
+         font-size: 10px;
+         letter-spacing: .20em;
+         text-transform: uppercase;
+         color: var(--uv-soft);
+         margin: 0 0 13px
+      }
+
+      .zp-lf-lin {
+         display: block
+      }
+
+      .zp-l {
+         display: flex;
+         gap: 14px;
+         align-items: baseline;
+         font-family: var(--font-d);
+         font-size: 15.5px;
+         line-height: 1.34;
+         color: #b3a9c9;
+         opacity: 1;
+         overflow-wrap: anywhere;
+         padding: 3px 0;
+         margin: 0;
+         transition: color .25s ease, font-size .2s ease
+      }
+
+      .zp-l.on {
+         color: var(--white);
+         font-size: 20px;
+         font-weight: 600;
+         line-height: 1.3
+      }
+
+      .zp-l.ya {
+         color: #6f6689
+      }
+
+      .zp-l-t {
+         flex-shrink: 0;
+         width: 38px;
+         font-family: var(--font-m);
+         font-size: 10.5px;
+         letter-spacing: .06em;
+         color: #5d5575;
+         font-variant-numeric: tabular-nums;
+         display: inline-block
+      }
+
+      .zp-l.on .zp-l-t {
+         color: var(--uv-soft)
+      }
+
+      .zp-lf-sep {
+         height: 1px;
+         background: rgba(199, 204, 209, .12);
+         margin: 16px 0 13px
+      }
+
+      .zp-lf-sig .zp-l {
+         font-size: 14px;
+         color: #7b7194;
+         padding: 2px 0;
+         font-weight: 400
+      }
+
+      .zp-lf-sig .zp-l-t {
+         color: #4b4460
+      }
+
+      .zp-lf-sig[hidden],
+      .zp-lf-sep[hidden] {
+         display: none
+      }
+
+      /* .zp-lf-lin trae display:block propio, que gana al [hidden] del navegador:
      sin esta regla el bloque de la letra seguia ocupando sitio (vacio) en los
      temas sin letra. */
-  .zp-lf-lin[hidden],.zp-lf-cab[hidden]{display:none}
-  .zp-plana{font-family:var(--font-b);font-size:14px;color:var(--chrome);white-space:pre-wrap;
-     overflow-wrap:anywhere;
-     max-height:200px;overflow-y:auto;margin:0}
-  .zp-plana[hidden]{display:none}
-  .zp-lista{min-width:0}
+      .zp-lf-lin[hidden],
+      .zp-lf-cab[hidden] {
+         display: none
+      }
 
-  /* ===== Reposo: carrusel horizontal a todo el ancho =====
+      .zp-plana {
+         font-family: var(--font-b);
+         font-size: 14px;
+         color: var(--chrome);
+         white-space: pre-wrap;
+         overflow-wrap: anywhere;
+         max-height: 200px;
+         overflow-y: auto;
+         margin: 0
+      }
+
+      .zp-plana[hidden] {
+         display: none
+      }
+
+      .zp-lista {
+         min-width: 0
+      }
+
+      /* ===== Reposo: carrusel horizontal a todo el ancho =====
      Mientras no suena nada, las dos columnas no tienen nada que mostrar: el
      disco esta apagado y la letra vacia. Los temas se recorren de lado. */
-  .zp-carrusel{display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;
-     padding:4px 2px 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
-     scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
-  .zp-carrusel::-webkit-scrollbar{height:6px}
-  .zp-carrusel::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:3px}
-  .zp-card{flex:0 0 250px;scroll-snap-align:start}
-  .zp-card-btn{display:flex;flex-direction:column;gap:8px;width:100%;min-height:150px;
-     text-align:left;padding:16px;border:1px solid var(--line);border-radius:14px;
-     background:linear-gradient(180deg,var(--ink-2),var(--ink));color:inherit;cursor:pointer;
-     transition:border-color .18s ease,transform .18s ease}
-  .zp-card-btn:hover:not(:disabled){border-color:var(--uv);transform:translateY(-2px)}
-  .zp-card-btn:disabled{opacity:.45;cursor:default}
-  .zp-card-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
-     justify-content:center;background:rgba(139,61,255,.14);color:var(--uv-soft)}
-  .zp-card-ico svg{width:13px;height:13px;fill:currentColor}
-  .zp-card-t{font-family:var(--font-d);font-size:14px;color:var(--white);line-height:1.25;
-     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .zp-card-d{font-family:var(--font-m);font-size:11px;color:var(--smoke);line-height:1.4;
-     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .zp-card-dur{font-family:var(--font-m);font-size:11px;color:var(--smoke);margin-top:auto}
+      .zp-carrusel {
+         display: flex;
+         gap: 14px;
+         overflow-x: auto;
+         overflow-y: hidden;
+         padding: 4px 2px 14px;
+         scroll-snap-type: x mandatory;
+         -webkit-overflow-scrolling: touch;
+         scrollbar-width: thin;
+         scrollbar-color: var(--line-2) transparent
+      }
 
-  /* Reposo manda el carrusel; al sonar, las columnas. */
-  #track-player .zp-cols{display:none}
-  #track-player.suena .zp-carrusel{display:none}
-  #track-player.suena .zp-cols{display:grid}
+      .zp-carrusel::-webkit-scrollbar {
+         height: 6px
+      }
 
-  /* ===== Ventana de 3 temas, DENTRO del cuadro de la letra ===== */
-  .zp-vent{display:block}
-  .zp-vent[hidden]{display:none}
-  .zp-vt-b{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;
-     padding:7px 0;background:none;border:0;cursor:pointer;text-align:left;color:inherit}
-  .zp-vt-b:disabled{opacity:.45;cursor:default}
-  .zp-vt-t{flex:1;min-width:0;font-family:var(--font-d);font-size:13.5px;color:#7b7194;
-     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s ease}
-  .zp-vt-d{flex-shrink:0;font-family:var(--font-m);font-size:11px;color:#5d5575;
-     font-variant-numeric:tabular-nums}
-  .zp-vt.on .zp-vt-t{color:var(--white);font-weight:600}
-  .zp-vt.on .zp-vt-d{color:var(--uv-soft)}
-  .zp-vt.on .zp-vt-b::before{content:'';width:3px;height:16px;border-radius:2px;
-     background:var(--uv-soft);flex-shrink:0;margin-left:-11px;margin-right:8px}
+      .zp-carrusel::-webkit-scrollbar-thumb {
+         background: var(--line-2);
+         border-radius: 3px
+      }
 
-  /* ---- Transporte ---- */
-  .zp-tr{display:flex;flex-direction:column;gap:11px}
-  .zp-linea{display:flex;align-items:center;gap:10px;width:100%}
-  .zp-btns{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap}
-  .zp-b{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-2);background:transparent;
-     color:var(--chrome);cursor:pointer;display:grid;place-items:center;padding:0;flex-shrink:0;
-     transition:background .15s ease,border-color .15s ease,color .15s ease}
-  .zp-b:hover:not(:disabled){border-color:rgba(255,214,128,.6);color:rgba(255,222,150,1)}
-  .zp-b:disabled{opacity:.35;cursor:default}
-  .zp-b svg{width:13px;height:13px;fill:currentColor;pointer-events:none}
-  /* El area de golpeo llega a 44x44 aunque el circulo visible sea menor.
+      .zp-card {
+         flex: 0 0 250px;
+         scroll-snap-align: start
+      }
+
+      .zp-card-btn {
+         display: flex;
+         flex-direction: column;
+         gap: 8px;
+         width: 100%;
+         min-height: 150px;
+         text-align: left;
+         padding: 16px;
+         border: 1px solid var(--line);
+         border-radius: 14px;
+         background: linear-gradient(180deg, var(--ink-2), var(--ink));
+         color: inherit;
+         cursor: pointer;
+         transition: border-color .18s ease, transform .18s ease
+      }
+
+      .zp-card-btn:hover:not(:disabled) {
+         border-color: var(--uv);
+         transform: translateY(-2px)
+      }
+
+      .zp-card-btn:disabled {
+         opacity: .45;
+         cursor: default
+      }
+
+      .zp-card-ico {
+         width: 36px;
+         height: 36px;
+         border-radius: 50%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         background: rgba(139, 61, 255, .14);
+         color: var(--uv-soft)
+      }
+
+      .zp-card-ico svg {
+         width: 13px;
+         height: 13px;
+         fill: currentColor
+      }
+
+      .zp-card-t {
+         font-family: var(--font-d);
+         font-size: 14px;
+         color: var(--white);
+         line-height: 1.25;
+         display: -webkit-box;
+         -webkit-line-clamp: 2;
+         -webkit-box-orient: vertical;
+         overflow: hidden
+      }
+
+      .zp-card-d {
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--smoke);
+         line-height: 1.4;
+         display: -webkit-box;
+         -webkit-line-clamp: 2;
+         -webkit-box-orient: vertical;
+         overflow: hidden
+      }
+
+      .zp-card-dur {
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--smoke);
+         margin-top: auto
+      }
+
+      /* Reposo manda el carrusel; al sonar, las columnas. */
+      #track-player .zp-cols {
+         display: none
+      }
+
+      #track-player.suena .zp-carrusel {
+         display: none
+      }
+
+      #track-player.suena .zp-cols {
+         display: grid
+      }
+
+      /* ===== Ventana de 3 temas, DENTRO del cuadro de la letra ===== */
+      .zp-vent {
+         display: block
+      }
+
+      .zp-vent[hidden] {
+         display: none
+      }
+
+      .zp-vt-b {
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         width: 100%;
+         min-height: 44px;
+         padding: 7px 0;
+         background: none;
+         border: 0;
+         cursor: pointer;
+         text-align: left;
+         color: inherit
+      }
+
+      .zp-vt-b:disabled {
+         opacity: .45;
+         cursor: default
+      }
+
+      .zp-vt-t {
+         flex: 1;
+         min-width: 0;
+         font-family: var(--font-d);
+         font-size: 13.5px;
+         color: #7b7194;
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         transition: color .2s ease
+      }
+
+      .zp-vt-d {
+         flex-shrink: 0;
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: #5d5575;
+         font-variant-numeric: tabular-nums
+      }
+
+      .zp-vt.on .zp-vt-t {
+         color: var(--white);
+         font-weight: 600
+      }
+
+      .zp-vt.on .zp-vt-d {
+         color: var(--uv-soft)
+      }
+
+      .zp-vt.on .zp-vt-b::before {
+         content: '';
+         width: 3px;
+         height: 16px;
+         border-radius: 2px;
+         background: var(--uv-soft);
+         flex-shrink: 0;
+         margin-left: -11px;
+         margin-right: 8px
+      }
+
+      /* ---- Transporte ---- */
+      .zp-tr {
+         display: flex;
+         flex-direction: column;
+         gap: 11px
+      }
+
+      .zp-linea {
+         display: flex;
+         align-items: center;
+         gap: 10px;
+         width: 100%
+      }
+
+      .zp-btns {
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         justify-content: center;
+         flex-wrap: wrap
+      }
+
+      .zp-b {
+         width: 34px;
+         height: 34px;
+         border-radius: 50%;
+         border: 1px solid var(--line-2);
+         background: transparent;
+         color: var(--chrome);
+         cursor: pointer;
+         display: grid;
+         place-items: center;
+         padding: 0;
+         flex-shrink: 0;
+         transition: background .15s ease, border-color .15s ease, color .15s ease
+      }
+
+      .zp-b:hover:not(:disabled) {
+         border-color: rgba(255, 214, 128, .6);
+         color: rgba(255, 222, 150, 1)
+      }
+
+      .zp-b:disabled {
+         opacity: .35;
+         cursor: default
+      }
+
+      .zp-b svg {
+         width: 13px;
+         height: 13px;
+         fill: currentColor;
+         pointer-events: none
+      }
+
+      /* El area de golpeo llega a 44x44 aunque el circulo visible sea menor.
      Sin esto, 6 de los 7 controles del reproductor quedaban por debajo del
      minimo tactil. */
-  .zp-b{position:relative}
-  .zp-b::before{content:'';position:absolute;
-     top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%}
-  .zp-b.zp-grande{width:44px;height:44px;background:rgba(255,214,128,.12);
-     border-color:rgba(255,214,128,.45);color:rgba(255,226,160,1)}
-  .zp-b.zp-grande svg{width:16px;height:16px}
-  /* Estado activo de repetir y de silencio. El color no puede ser el unico
-     indicador: va con punto. Estaba solo en la franja, que ya no existe. */
-  .zp-b.on{color:#f2d391;border-color:rgba(255,214,128,.6)}
-  .zp-b.on::after{content:'';position:absolute;bottom:2px;left:50%;
-     transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#f2d391}
-  .zp-t{font-family:var(--font-m);font-size:11px;color:var(--smoke);font-variant-numeric:tabular-nums;
-     flex-shrink:0;min-width:36px}
-  /* La onda sustituye a la barra: mismo rol de slider, mismo scrub, mismo
-     teclado. Venia de la franja y se movio aqui entera. */
-  .zp-onda{flex:1;min-width:0;height:44px;position:relative;cursor:pointer;touch-action:none}
-  .zp-onda:focus-visible{outline:2px solid rgba(255,214,128,.7);outline-offset:3px;border-radius:3px}
-  .zp-onda canvas{display:block;width:100%;height:100%}
-  .zp-estado{font-family:var(--font-m);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
-     color:var(--smoke);margin-top:9px;min-height:13px}
+      .zp-b {
+         position: relative
+      }
 
-  .zp-panel{width:100%}
-  @media (max-width:480px){ .zp{padding:16px} }
-  @media (max-width:420px){ .zp-btns{gap:8px} }
-  @media (max-width:360px){ .zp-btns{gap:6px} }
-  /* Una columna (movil y tablet vertical): sin rejilla que la acote, la lista
+      .zp-b::before {
+         content: '';
+         position: absolute;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         width: 44px;
+         height: 44px;
+         border-radius: 50%
+      }
+
+      .zp-b.zp-grande {
+         width: 44px;
+         height: 44px;
+         background: rgba(255, 214, 128, .12);
+         border-color: rgba(255, 214, 128, .45);
+         color: rgba(255, 226, 160, 1)
+      }
+
+      .zp-b.zp-grande svg {
+         width: 16px;
+         height: 16px
+      }
+
+      /* Estado activo de repetir y de silencio. El color no puede ser el unico
+     indicador: va con punto. Estaba solo en la franja, que ya no existe. */
+      .zp-b.on {
+         color: #f2d391;
+         border-color: rgba(255, 214, 128, .6)
+      }
+
+      .zp-b.on::after {
+         content: '';
+         position: absolute;
+         bottom: 2px;
+         left: 50%;
+         transform: translateX(-50%);
+         width: 4px;
+         height: 4px;
+         border-radius: 50%;
+         background: #f2d391
+      }
+
+      .zp-t {
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--smoke);
+         font-variant-numeric: tabular-nums;
+         flex-shrink: 0;
+         min-width: 36px
+      }
+
+      /* La onda sustituye a la barra: mismo rol de slider, mismo scrub, mismo
+     teclado. Venia de la franja y se movio aqui entera. */
+      .zp-onda {
+         flex: 1;
+         min-width: 0;
+         height: 44px;
+         position: relative;
+         cursor: pointer;
+         touch-action: none
+      }
+
+      .zp-onda:focus-visible {
+         outline: 2px solid rgba(255, 214, 128, .7);
+         outline-offset: 3px;
+         border-radius: 3px
+      }
+
+      .zp-onda canvas {
+         display: block;
+         width: 100%;
+         height: 100%
+      }
+
+      .zp-estado {
+         font-family: var(--font-m);
+         font-size: 10px;
+         letter-spacing: .1em;
+         text-transform: uppercase;
+         color: var(--smoke);
+         margin-top: 9px;
+         min-height: 13px
+      }
+
+      .zp-panel {
+         width: 100%
+      }
+
+      @media (max-width:480px) {
+         .zp {
+            padding: 16px
+         }
+      }
+
+      @media (max-width:420px) {
+         .zp-btns {
+            gap: 8px
+         }
+      }
+
+      @media (max-width:360px) {
+         .zp-btns {
+            gap: 6px
+         }
+      }
+
+      /* Una columna (movil y tablet vertical): sin rejilla que la acote, la lista
      crecia con los seis temas y el modulo pasaba de 1300px. Aqui la lista
      lleva su propio tope y scrollea dentro. */
-  @media (max-width:979px){
-    /* Misma idea que en escritorio: el modulo se acota a la pantalla y lo que
+      @media (max-width:979px) {
+
+         /* Misma idea que en escritorio: el modulo se acota a la pantalla y lo que
        sobra scrollea dentro de la lista. La fila de arriba (disco y mandos)
        toma lo suyo; la de abajo se queda con el resto y nunca menos de 180px. */
-    /* align-items:stretch es imprescindible: con el 'start' de la regla base
+         /* align-items:stretch es imprescindible: con el 'start' de la regla base
        el bloque de la derecha se dimensiona a su contenido y se salta la
        altura de la fila, asi que el tope del modulo no lo tocaba. */
-    .zp-cols{max-height:var(--zp-tope,none);grid-template-rows:auto minmax(200px,1fr);
-       gap:16px;align-items:stretch}
-    /* El disco es lo unico que se puede encoger sin romper nada: los mandos
+         .zp-cols {
+            max-height: var(--zp-tope, none);
+            grid-template-rows: auto minmax(200px, 1fr);
+            gap: 16px;
+            align-items: stretch
+         }
+
+         /* El disco es lo unico que se puede encoger sin romper nada: los mandos
        no bajan de 44px (WCAG 2.5.8) y la letra ya scrollea. */
-    .zp-disco{--d:min(34vw,16vh,130px)}
-    /* La descripcion vive en la ficha de la lista; arriba solo duplicaba. */
-    .zp-izq .zp-desc{display:none}
-    #zp-lf-lin{flex:1 1 auto;min-height:56px;overflow-y:auto;
-       scrollbar-width:thin;scrollbar-color:rgba(166,107,255,.35) transparent}
-    .zp-vent{flex:1 1 auto;min-height:96px}
-  }
-  /* No es un detalle opcional: para parte del publico una rotacion continua
+         .zp-disco {
+            --d: min(34vw, 16vh, 130px)
+         }
+
+         /* La descripcion vive en la ficha de la lista; arriba solo duplicaba. */
+         .zp-izq .zp-desc {
+            display: none
+         }
+
+         #zp-lf-lin {
+            flex: 1 1 auto;
+            min-height: 56px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(166, 107, 255, .35) transparent
+         }
+
+         .zp-vent {
+            flex: 1 1 auto;
+            min-height: 96px
+         }
+      }
+
+      /* vh mide el viewport GRANDE: en movil, con la barra del navegador desplegada,
+     26vh es mas alto que lo que se ve y el disco empuja los mandos fuera de
+     pantalla. svh mide el viewport chico (barra visible), que es el caso malo.
+     Va despues del bloque de una columna para ganar por orden, y dentro de
+     @supports para que Safari 15 y anteriores conserven vh. */
+      @supports (height:1svh) {
+         .zp-disco {
+            --d: min(58vw, 26svh, 230px)
+         }
+
+         @media (max-width:979px) {
+            .zp-disco {
+               --d: min(34vw, 16svh, 130px)
+            }
+         }
+      }
+
+      /* No es un detalle opcional: para parte del publico una rotacion continua
      produce malestar fisico. */
-  @media (prefers-reduced-motion: reduce){
-    .zp-disco,.zp-iris,.zp-sombra{animation:none}
-    .zp-escena{animation:none;transform:rotateX(26deg)}
-    .zp-par{transition:none}
-    .zp-l{transition:none}
-  }
+      @media (prefers-reduced-motion: reduce) {
 
-  /* El foco no puede quedar bajo la cabecera fija. */
-  html{scroll-padding-top:72px}
+         .zp-disco,
+         .zp-iris,
+         .zp-sombra {
+            animation: none
+         }
 
-  /* Apaisado corto (telefono girado): con 360px de alto, menos la cabecera
+         .zp-escena {
+            animation: none;
+            transform: rotateX(26deg)
+         }
+
+         .zp-par {
+            transition: none
+         }
+
+         .zp-l {
+            transition: none
+         }
+      }
+
+      /* El foco no puede quedar bajo la cabecera fija. */
+      html {
+         scroll-padding-top: 72px
+      }
+
+      /* Apaisado corto (telefono girado): con 360px de alto, menos la cabecera
      y la franja, quedan ~214px utiles. El reproductor en vertical ocupaba
      mas de tres pantallas. Aqui pasa a dos columnas y encoge. */
-  @media (orientation:landscape) and (max-height:520px){
-    .nav .wrap{height:48px}
-    .zp{padding:14px}
-    .zp.visible{grid-template-columns:auto minmax(0,1fr);justify-items:stretch;
-                align-items:center;gap:16px}
-    .zp-disco{--d:min(30vw,112px)}
-    .zp-zona{padding:4px 0 12px}
-    .zp-lf{padding:10px 12px;margin-bottom:12px}
-    .zp-plana{max-height:62px}
-    .zp-title{font-size:17px;-webkit-line-clamp:1}
-    .zp-sombra{height:9px}
-    .zp-onda{height:34px}
-  }
+      @media (orientation:landscape) and (max-height:520px) {
+         .nav .wrap {
+            height: 48px
+         }
 
-  .tp-now{margin-top:18px;padding:14px;border:1px solid var(--line);border-radius:4px;background:var(--ink-2);display:none}
-  .tp-now.visible{display:block}
-  .tp-now-title{font-family:var(--font-m);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--uv-soft);margin-bottom:9px}
-  .tp-audio{width:100%;height:34px}
-  audio.tp-audio::-webkit-media-controls-enclosure{overflow:hidden}
-  .members-content .logout-link{font-family:var(--font-m);font-size:11px;color:var(--smoke);text-decoration:underline;cursor:pointer;margin-top:18px;display:inline-block}
-  .members-content .logout-link:hover{color:var(--uv-soft)}
+         .zp {
+            padding: 14px
+         }
 
-  /* CAPTURA */
-  .capture{background:radial-gradient(70% 120% at 100% 0%,rgba(139,61,255,.16),transparent 60%),var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:clamp(28px,5vw,52px)}
-  .capture-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:44px;align-items:center}
-  .capture h2{font-size:clamp(26px,4.4vw,40px);font-weight:700;margin-bottom:14px}
-  .capture p{margin:0 0 6px;color:var(--chrome)}
-  form{display:flex;flex-direction:column;gap:14px;margin-top:8px}
-  .field label{display:block;font-family:var(--font-m);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--smoke);margin-bottom:7px}
-  .field .hint{text-transform:none;letter-spacing:0;color:var(--uv-soft)}
-  .field input{width:100%;background:var(--ink);border:1px solid var(--line-2);color:var(--white);font-family:var(--font-b);font-size:16px;padding:14px 16px;border-radius:4px}
-  .field input:focus{outline:none;border-color:var(--uv);box-shadow:0 0 0 3px rgba(139,61,255,.22)}
-  .consent{display:flex;gap:11px;align-items:flex-start;font-size:14px;color:var(--smoke);line-height:1.45}
-  .consent input{margin-top:3px;accent-color:var(--uv);width:17px;height:17px;flex:none}
-  .consent a{color:var(--uv-soft)}
-  .submit{font-family:var(--font-m);font-size:13px;letter-spacing:.1em;text-transform:uppercase;background:var(--uv);color:var(--white);border:0;padding:16px;border-radius:3px;cursor:pointer;transition:transform .15s}
-  .submit:hover{transform:translateY(-2px)}
-  .submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
-  .form-note{font-family:var(--font-m);font-size:12px;line-height:1.5;padding:12px 14px;border-radius:4px;display:none}
-  .form-note.warn{display:block;background:rgba(139,61,255,.1);border:1px solid var(--line-2);color:var(--uv-soft)}
-  .form-note.ok{display:block;background:rgba(199,204,209,.10);border:1px solid var(--chrome);color:var(--chrome-hi)}
-  .form-note.err{display:block;background:rgba(199,204,209,.06);border:1px dashed var(--line-2);color:var(--chrome)}
-  .form-note.dev{display:block;background:var(--ink-3);border:1px solid var(--line);color:var(--smoke)}
+         .zp.visible {
+            grid-template-columns: auto minmax(0, 1fr);
+            justify-items: stretch;
+            align-items: center;
+            gap: 16px
+         }
 
-  footer{border-top:1px solid var(--line);padding:52px 0 40px;margin-top:20px}
-  .foot-top{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center;margin-bottom:34px;padding-bottom:30px;border-bottom:1px solid var(--line)}
-  .foot-top p{margin:0;font-family:var(--font-d);color:var(--white);font-size:clamp(20px,3vw,28px);font-weight:700;max-width:20ch}
-  .foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
-  .social{display:flex;gap:10px;flex-wrap:wrap}
-  .social a{font-family:var(--font-m);font-size:12px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--chrome);border:1px solid var(--line-2);padding:10px 15px;border-radius:2px;transition:border-color .15s,color .15s}
-  .social a:hover{border-color:var(--uv);color:var(--white)}
-  .foot-legal{font-family:var(--font-m);font-size:11px;color:var(--smoke);line-height:1.7;max-width:46ch}
-  .foot-legal a{color:var(--uv-soft)}
+         .zp-disco {
+            --d: min(30vw, 112px)
+         }
 
-  @media (max-width:720px){
-    .capture-grid{grid-template-columns:1fr;gap:26px}
-    .hero{padding:60px 0 44px}
-    section{padding:52px 0}
-    .foot-top{flex-direction:column;align-items:flex-start}
-    .sec-head{flex-direction:column;align-items:flex-start;gap:6px}
-    .sec-head .eyebrow{white-space:normal}
-  }
-  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+         .zp-zona {
+            padding: 4px 0 12px
+         }
+
+         .zp-lf {
+            padding: 10px 12px;
+            margin-bottom: 12px
+         }
+
+         .zp-plana {
+            max-height: 62px
+         }
+
+         .zp-title {
+            font-size: 17px;
+            -webkit-line-clamp: 1
+         }
+
+         .zp-sombra {
+            height: 9px
+         }
+
+         .zp-onda {
+            height: 34px
+         }
+      }
+
+      .tp-now {
+         margin-top: 18px;
+         padding: 14px;
+         border: 1px solid var(--line);
+         border-radius: 4px;
+         background: var(--ink-2);
+         display: none
+      }
+
+      .tp-now.visible {
+         display: block
+      }
+
+      .tp-now-title {
+         font-family: var(--font-m);
+         font-size: 11px;
+         letter-spacing: .12em;
+         text-transform: uppercase;
+         color: var(--uv-soft);
+         margin-bottom: 9px
+      }
+
+      .tp-audio {
+         width: 100%;
+         height: 34px
+      }
+
+      audio.tp-audio::-webkit-media-controls-enclosure {
+         overflow: hidden
+      }
+
+      .members-content .logout-link {
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--smoke);
+         text-decoration: underline;
+         cursor: pointer;
+         margin-top: 18px;
+         display: inline-block
+      }
+
+      .members-content .logout-link:hover {
+         color: var(--uv-soft)
+      }
+
+      /* CAPTURA */
+      .capture {
+         background: radial-gradient(70% 120% at 100% 0%, rgba(139, 61, 255, .16), transparent 60%), var(--ink-2);
+         border: 1px solid var(--line);
+         border-radius: 16px;
+         padding: clamp(28px, 5vw, 52px)
+      }
+
+      .capture-grid {
+         display: grid;
+         grid-template-columns: 1.1fr 1fr;
+         gap: 44px;
+         align-items: center
+      }
+
+      .capture h2 {
+         font-size: clamp(26px, 4.4vw, 40px);
+         font-weight: 700;
+         margin-bottom: 14px
+      }
+
+      .capture p {
+         margin: 0 0 6px;
+         color: var(--chrome)
+      }
+
+      form {
+         display: flex;
+         flex-direction: column;
+         gap: 14px;
+         margin-top: 8px
+      }
+
+      .field label {
+         display: block;
+         font-family: var(--font-m);
+         font-size: 11px;
+         letter-spacing: .16em;
+         text-transform: uppercase;
+         color: var(--smoke);
+         margin-bottom: 7px
+      }
+
+      .field .hint {
+         text-transform: none;
+         letter-spacing: 0;
+         color: var(--uv-soft)
+      }
+
+      .field input {
+         width: 100%;
+         background: var(--ink);
+         border: 1px solid var(--line-2);
+         color: var(--white);
+         font-family: var(--font-b);
+         font-size: 16px;
+         padding: 14px 16px;
+         border-radius: 4px
+      }
+
+      .field input:focus {
+         outline: none;
+         border-color: var(--uv);
+         box-shadow: 0 0 0 3px rgba(139, 61, 255, .22)
+      }
+
+      .consent {
+         display: flex;
+         gap: 11px;
+         align-items: flex-start;
+         font-size: 14px;
+         color: var(--smoke);
+         line-height: 1.45
+      }
+
+      .consent input {
+         margin-top: 3px;
+         accent-color: var(--uv);
+         width: 17px;
+         height: 17px;
+         flex: none
+      }
+
+      .consent a {
+         color: var(--uv-soft)
+      }
+
+      .submit {
+         font-family: var(--font-m);
+         font-size: 13px;
+         letter-spacing: .1em;
+         text-transform: uppercase;
+         background: var(--uv);
+         color: var(--white);
+         border: 0;
+         padding: 16px;
+         border-radius: 3px;
+         cursor: pointer;
+         transition: transform .15s
+      }
+
+      .submit:hover {
+         transform: translateY(-2px)
+      }
+
+      .submit:disabled {
+         opacity: .55;
+         cursor: not-allowed;
+         transform: none
+      }
+
+      .form-note {
+         font-family: var(--font-m);
+         font-size: 12px;
+         line-height: 1.5;
+         padding: 12px 14px;
+         border-radius: 4px;
+         display: none
+      }
+
+      .form-note.warn {
+         display: block;
+         background: rgba(139, 61, 255, .1);
+         border: 1px solid var(--line-2);
+         color: var(--uv-soft)
+      }
+
+      .form-note.ok {
+         display: block;
+         background: rgba(199, 204, 209, .10);
+         border: 1px solid var(--chrome);
+         color: var(--chrome-hi)
+      }
+
+      .form-note.err {
+         display: block;
+         background: rgba(199, 204, 209, .06);
+         border: 1px dashed var(--line-2);
+         color: var(--chrome)
+      }
+
+      .form-note.dev {
+         display: block;
+         background: var(--ink-3);
+         border: 1px solid var(--line);
+         color: var(--smoke)
+      }
+
+      footer {
+         border-top: 1px solid var(--line);
+         padding: 52px 0 40px;
+         margin-top: 20px
+      }
+
+      .foot-top {
+         display: flex;
+         justify-content: space-between;
+         gap: 24px;
+         flex-wrap: wrap;
+         align-items: center;
+         margin-bottom: 34px;
+         padding-bottom: 30px;
+         border-bottom: 1px solid var(--line)
+      }
+
+      .foot-top p {
+         margin: 0;
+         font-family: var(--font-d);
+         color: var(--white);
+         font-size: clamp(20px, 3vw, 28px);
+         font-weight: 700;
+         max-width: 20ch
+      }
+
+      .foot-grid {
+         display: flex;
+         justify-content: space-between;
+         gap: 24px;
+         flex-wrap: wrap;
+         align-items: flex-start
+      }
+
+      .social {
+         display: flex;
+         gap: 10px;
+         flex-wrap: wrap
+      }
+
+      .social a {
+         font-family: var(--font-m);
+         font-size: 12px;
+         letter-spacing: .08em;
+         text-transform: uppercase;
+         text-decoration: none;
+         color: var(--chrome);
+         border: 1px solid var(--line-2);
+         padding: 10px 15px;
+         border-radius: 2px;
+         transition: border-color .15s, color .15s
+      }
+
+      .social a:hover {
+         border-color: var(--uv);
+         color: var(--white)
+      }
+
+      .foot-legal {
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--smoke);
+         line-height: 1.7;
+         max-width: 46ch
+      }
+
+      .foot-legal a {
+         color: var(--uv-soft)
+      }
+
+      @media (max-width:720px) {
+         .capture-grid {
+            grid-template-columns: 1fr;
+            gap: 26px
+         }
+
+         .hero {
+            padding: 60px 0 44px
+         }
+
+         section {
+            padding: 52px 0
+         }
+
+         .foot-top {
+            flex-direction: column;
+            align-items: flex-start
+         }
+
+         .sec-head {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px
+         }
+
+         .sec-head .eyebrow {
+            white-space: normal
+         }
+      }
+
+      @media (prefers-reduced-motion:reduce) {
+         * {
+            transition: none !important;
+            scroll-behavior: auto
+         }
+      }
 
 
-  /* Próximo estreno (vistas del video) */
-  #estreno .estreno-frame{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#000}
-  .estreno-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .estreno-over{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(20px,4vw,44px);background:linear-gradient(to top,rgba(10,10,11,.94),rgba(10,10,11,.2) 55%,transparent)}
-  .estreno-kicker{font-family:var(--font-m);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--uv-soft)}
-  .estreno-title{font-size:clamp(28px,5vw,52px);margin:8px 0 6px}
-  .estreno-lead{max-width:46ch;color:var(--chrome);margin:0 0 18px}
-  .estreno-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
-  .estreno-strip img{width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid var(--line);border-radius:6px}
-  @media(max-width:720px){.estreno-strip{grid-template-columns:1fr 1fr}}
+      /* Próximo estreno (vistas del video) */
+      #estreno .estreno-frame {
+         position: relative;
+         border: 1px solid var(--line);
+         border-radius: 12px;
+         overflow: hidden;
+         aspect-ratio: 16/9;
+         background: #000
+      }
 
-  /* Carrusel próximos estrenos */
-  #estreno .carousel{position:relative}
-  #estreno .viewport{overflow:hidden;border-radius:12px}
-  #estreno .track{display:flex;transition:transform .5s cubic-bezier(.22,.61,.36,1)}
-  #estreno .slide{min-width:100%}
-  .estreno-feat{font-family:var(--font-m);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome);margin:0 0 12px}
-  .estreno-feat .st{color:var(--smoke)}
-  #estreno .arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(10,10,11,.6);color:var(--chrome-hi);font-size:18px;cursor:pointer;display:grid;place-items:center;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:.2s}
-  #estreno .arrow:hover{background:var(--uv);border-color:var(--uv)}
-  #estreno .arrow.prev{left:14px}#estreno .arrow.next{right:14px}
-  #estreno .dots{display:flex;gap:10px;justify-content:center;margin-top:18px}
-  #estreno .dot{width:9px;height:9px;border-radius:50%;border:0;background:var(--line);cursor:pointer;padding:0;transition:.2s}
-  #estreno .dot.is-active{background:var(--uv);width:26px;border-radius:6px}
-  #estreno .count{font-family:var(--font-m);font-size:11px;color:var(--smoke);letter-spacing:.15em;text-align:center;margin-top:10px}
-  @media(prefers-reduced-motion:reduce){#estreno .track{transition:none}}
+      .estreno-vid {
+         position: absolute;
+         inset: 0;
+         width: 100%;
+         height: 100%;
+         object-fit: cover
+      }
 
-  /* Follow CTAs (YouTube / TikTok) */
-  .follow-cta{display:inline-flex;flex:0 0 auto;align-self:flex-start;align-items:center;gap:8px;font-family:var(--font-m);font-size:12px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--chrome-hi);border:1px solid var(--line-2);border-radius:999px;padding:9px 16px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0));transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
-  .follow-cta:hover{transform:translateY(-2px);border-color:var(--uv)}
-  .follow-cta .fic{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;color:#fff;font-size:12px;line-height:1}
-  .follow-cta .farr{color:var(--uv-soft)}
-  .follow-cta.yt .fic{background:#FF0000}
-  .follow-cta.yt:hover{border-color:#ff4d4d;box-shadow:0 8px 22px rgba(255,0,0,.20)}
-  .follow-cta.tk .fic{background:linear-gradient(135deg,#25F4EE 0%,#111 45%,#FE2C55 100%)}
-  .follow-cta.tk:hover{border-color:#25F4EE;box-shadow:0 8px 22px rgba(37,244,238,.18)}
-  /* Video card: branded fallback + volver */
-  .vfallback{position:absolute;inset:0;z-index:1;display:none;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:4px;padding:16px}
-  .vthumb-fallback .vimg{display:none}
-  .vthumb-fallback .vfallback{display:flex}
-  .vfb-mark{font-family:var(--font-m);font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--uv-soft)}
-  .vfb-title{font-family:var(--font-d);font-weight:700;color:var(--white);font-size:18px;line-height:1.15;max-width:94%}
-  .vframe{position:relative}
-  .vclose{position:absolute;top:8px;right:8px;z-index:6;display:none;font-family:var(--font-m);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--chrome-hi);background:rgba(10,10,11,.72);border:1px solid var(--line-2);border-radius:999px;padding:6px 12px;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .vcard.open .vclose{display:inline-block}
-  .vclose:hover{background:var(--uv);border-color:var(--uv);color:#fff}
+      .estreno-over {
+         position: absolute;
+         inset: 0;
+         display: flex;
+         flex-direction: column;
+         justify-content: flex-end;
+         padding: clamp(20px, 4vw, 44px);
+         background: linear-gradient(to top, rgba(10, 10, 11, .94), rgba(10, 10, 11, .2) 55%, transparent)
+      }
 
-  /* Spotify follow accent */
-  .follow-cta.sp .fic{background:#1DB954}
-  .follow-cta.sp:hover{border-color:#1DB954;box-shadow:0 8px 22px rgba(29,185,84,.20)}
-  /* Ya disponibles (Spotify) */
-  #musica .cf-wrap{position:relative}
-  #musica .cf-track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 12px;scrollbar-width:none}
-  #musica .cf-track::-webkit-scrollbar{display:none}
-  #musica .release{flex:0 0 200px;scroll-snap-align:start}
-  #musica .rcover{position:relative;aspect-ratio:1;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:radial-gradient(120% 120% at 30% 20%,rgba(139,61,255,.28),#0d0d12 72%)}
-  #musica .rcover.nocover .cover{display:none}
-  #musica .cover{width:100%;height:100%;object-fit:cover;display:block}
-  #musica .rplay{position:absolute;right:12px;bottom:12px;width:46px;height:46px;border-radius:50%;border:0;background:var(--uv);color:#fff;font-size:16px;cursor:pointer;display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.45);transition:.2s}
-  #musica .rplay:hover{background:var(--uv-soft)}
-  #musica .rplay.playing{background:var(--chrome-hi);color:var(--ink)}
-  #musica .rmeta{padding:12px 2px 0}
-  #musica .rmeta h4{font-family:var(--font-d);font-weight:700;color:var(--white);margin:0 0 2px;font-size:16px}
-  #musica .rmeta span{display:block;color:var(--smoke);font-size:13px;margin-bottom:6px}
-  #musica .rfull{font-family:var(--font-m);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--uv-soft);text-decoration:none}
-  #musica .cf-arrow{position:absolute;top:34%;transform:translateY(-50%);z-index:5;width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:rgba(10,10,11,.7);color:var(--chrome-hi);font-size:18px;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  #musica .cf-arrow:hover{background:var(--uv);border-color:var(--uv)}
-  #musica .cf-prev{left:-6px}#musica .cf-next{right:-6px}
-  #musica .sp-wrap{margin-top:18px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--ink-3)}
-  #musica .sp-lbl{font-family:var(--font-m);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--uv-soft);margin-bottom:8px}
-  /* TikTok facade cards */
-  #tiktok .rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 14px;scrollbar-width:none}
-  #tiktok .rail::-webkit-scrollbar{display:none}
-  #tiktok .tkc{flex:0 0 220px;scroll-snap-align:start;text-decoration:none;display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line);transition:transform .18s ease,border-color .18s ease}
-  #tiktok .tkc:hover{border-color:var(--uv);transform:translateY(-3px)}
-  #tiktok .tkc-cover{position:relative;aspect-ratio:9/16;background:radial-gradient(120% 90% at 30% 15%,rgba(139,61,255,.30),#0d0d12 72%);display:flex;flex-direction:column;justify-content:flex-end;gap:2px;padding:14px}
-  #tiktok .tkc-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,11,.6),transparent 55%)}
-  #tiktok .tkc-badge{position:absolute;top:12px;left:12px;z-index:2;font-family:var(--font-m);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:rgba(10,10,11,.7);border:1px solid var(--line-2);color:var(--chrome-hi);padding:5px 9px;border-radius:2px}
-  #tiktok .tkc-play{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);z-index:2;width:56px;height:56px;border-radius:50%;background:rgba(10,10,11,.6);border:1px solid var(--line-2);display:grid;place-items:center;transition:.15s}
-  #tiktok .tkc:hover .tkc-play{background:var(--uv);border-color:transparent}
-  #tiktok .tkc-play svg{fill:#fff;margin-left:3px}
-  #tiktok .tkc-title{position:relative;z-index:2;font-family:var(--font-d);font-weight:700;color:#fff;font-size:15px;line-height:1.2}
-  #tiktok .tkc-handle{position:relative;z-index:2;font-family:var(--font-m);font-size:11px;color:var(--uv-soft)}
+      .estreno-kicker {
+         font-family: var(--font-m);
+         font-size: 11px;
+         letter-spacing: .2em;
+         text-transform: uppercase;
+         color: var(--uv-soft)
+      }
 
-  /* === MOBILE: carrusel de estrenos legible (video arriba, texto abajo) === */
-  @media(max-width:640px){
-    #estreno .estreno-frame{aspect-ratio:auto;display:flex;flex-direction:column}
-    #estreno .estreno-vid{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:16/9}
-    #estreno .estreno-over{position:relative;inset:auto;background:var(--ink-2,#141419);padding:16px 16px 18px}
-    #estreno .estreno-title{font-size:30px}
-    #estreno .estreno-lead{font-size:14px;margin-bottom:14px}
-    #estreno .arrow{display:none}
-    #estreno .btn-primary{display:block;text-align:center}
-  }
+      .estreno-title {
+         font-size: clamp(28px, 5vw, 52px);
+         margin: 8px 0 6px
+      }
 
-  #tiktok .tkc-frame{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3}
-  #tiktok .tkc-close{position:absolute;top:8px;right:8px;z-index:5;width:30px;height:30px;border-radius:50%;background:rgba(10,10,11,.72);border:1px solid var(--line-2);color:#fff;cursor:pointer;display:grid;place-items:center;font-size:12px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  #tiktok .tkc-close:hover{background:var(--uv);border-color:var(--uv)}
-  #tiktok .tkc-play{cursor:pointer;padding:0}
-  #tiktok .tkc-handle{text-decoration:none;cursor:pointer}
-  #tiktok .tkc.playing{transform:none}
-  #tiktok .tkc.playing:hover{transform:none}
+      .estreno-lead {
+         max-width: 46ch;
+         color: var(--chrome);
+         margin: 0 0 18px
+      }
 
-  .follow-cta.ig .fic{background:linear-gradient(135deg,#f58529 0%,#dd2a7b 45%,#8134af 75%,#515bd4 100%)}
-  .follow-cta.ig:hover{border-color:#dd2a7b;box-shadow:0 8px 22px rgba(221,42,123,.20)}
-  #galeria .rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 14px;scrollbar-width:none}
-  #galeria .rail::-webkit-scrollbar{display:none}
-  #galeria .igc{flex:0 0 220px;scroll-snap-align:start;border-radius:12px;overflow:hidden;border:1px solid var(--line);transition:transform .18s ease,border-color .18s ease}
-  #galeria .igc:hover{border-color:var(--uv);transform:translateY(-3px)}
-  #galeria .igc.playing{flex:0 0 320px;transform:none}
-  #galeria .igc.playing:hover{transform:none}
-  #galeria .igc-cover{position:relative;aspect-ratio:9/16;background:radial-gradient(120% 90% at 30% 15%,rgba(139,61,255,.30),#0d0d12 72%);display:flex;flex-direction:column;justify-content:flex-end;gap:2px;padding:14px}
-  #galeria .igc.playing .igc-cover{aspect-ratio:auto;height:560px;background:#000}
-  #galeria .igc-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,11,.6),transparent 55%)}
-  #galeria .igc.playing .igc-cover::after{display:none}
-  #galeria .igc-badge{position:absolute;top:12px;left:12px;z-index:2;font-family:var(--font-m);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:rgba(10,10,11,.7);border:1px solid var(--line-2);color:var(--chrome-hi);padding:5px 9px;border-radius:2px}
-  #galeria .igc-play{position:absolute;top:46%;left:50%;transform:translate(-50%,-50%);z-index:2;width:56px;height:56px;border-radius:50%;background:rgba(10,10,11,.6);border:1px solid var(--line-2);display:grid;place-items:center;cursor:pointer;padding:0;transition:.15s}
-  #galeria .igc:hover .igc-play{background:var(--uv);border-color:transparent}
-  #galeria .igc-play svg{fill:#fff;margin-left:3px}
-  #galeria .igc-title{position:relative;z-index:2;font-family:var(--font-d);font-weight:700;color:#fff;font-size:15px;line-height:1.2}
-  #galeria .igc-handle{position:relative;z-index:2;font-family:var(--font-m);font-size:11px;color:var(--uv-soft);text-decoration:none;cursor:pointer}
-  #galeria .igc-frame{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:3;background:#000}
-  #galeria .igc-close{position:absolute;top:8px;right:8px;z-index:5;width:30px;height:30px;border-radius:50%;background:rgba(10,10,11,.72);border:1px solid var(--line-2);color:#fff;cursor:pointer;display:grid;place-items:center;font-size:12px}
-  #galeria .igc-close:hover{background:var(--uv);border-color:var(--uv)}
-</style>
+      .estreno-strip {
+         display: grid;
+         grid-template-columns: repeat(4, 1fr);
+         gap: 12px;
+         margin-top: 14px
+      }
+
+      .estreno-strip img {
+         width: 100%;
+         aspect-ratio: 16/9;
+         object-fit: cover;
+         border: 1px solid var(--line);
+         border-radius: 6px
+      }
+
+      @media(max-width:720px) {
+         .estreno-strip {
+            grid-template-columns: 1fr 1fr
+         }
+      }
+
+      /* Carrusel próximos estrenos */
+      #estreno .carousel {
+         position: relative
+      }
+
+      #estreno .viewport {
+         overflow: hidden;
+         border-radius: 12px
+      }
+
+      #estreno .track {
+         display: flex;
+         transition: transform .5s cubic-bezier(.22, .61, .36, 1)
+      }
+
+      #estreno .slide {
+         min-width: 100%
+      }
+
+      .estreno-feat {
+         font-family: var(--font-m);
+         font-size: 12px;
+         letter-spacing: .08em;
+         text-transform: uppercase;
+         color: var(--chrome);
+         margin: 0 0 12px
+      }
+
+      .estreno-feat .st {
+         color: var(--smoke)
+      }
+
+      #estreno .arrow {
+         position: absolute;
+         top: 50%;
+         transform: translateY(-50%);
+         z-index: 5;
+         width: 44px;
+         height: 44px;
+         border-radius: 50%;
+         border: 1px solid var(--line);
+         background: rgba(10, 10, 11, .6);
+         color: var(--chrome-hi);
+         font-size: 18px;
+         cursor: pointer;
+         display: grid;
+         place-items: center;
+         -webkit-backdrop-filter: blur(6px);
+         backdrop-filter: blur(6px);
+         transition: .2s
+      }
+
+      #estreno .arrow:hover {
+         background: var(--uv);
+         border-color: var(--uv)
+      }
+
+      #estreno .arrow.prev {
+         left: 14px
+      }
+
+      #estreno .arrow.next {
+         right: 14px
+      }
+
+      #estreno .dots {
+         display: flex;
+         gap: 10px;
+         justify-content: center;
+         margin-top: 18px
+      }
+
+      #estreno .dot {
+         width: 9px;
+         height: 9px;
+         border-radius: 50%;
+         border: 0;
+         background: var(--line);
+         cursor: pointer;
+         padding: 0;
+         transition: .2s
+      }
+
+      #estreno .dot.is-active {
+         background: var(--uv);
+         width: 26px;
+         border-radius: 6px
+      }
+
+      #estreno .count {
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--smoke);
+         letter-spacing: .15em;
+         text-align: center;
+         margin-top: 10px
+      }
+
+      @media(prefers-reduced-motion:reduce) {
+         #estreno .track {
+            transition: none
+         }
+      }
+
+      /* Follow CTAs (YouTube / TikTok) */
+      .follow-cta {
+         display: inline-flex;
+         flex: 0 0 auto;
+         align-self: flex-start;
+         align-items: center;
+         gap: 8px;
+         font-family: var(--font-m);
+         font-size: 12px;
+         letter-spacing: .06em;
+         text-transform: uppercase;
+         text-decoration: none;
+         color: var(--chrome-hi);
+         border: 1px solid var(--line-2);
+         border-radius: 999px;
+         padding: 9px 16px;
+         background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, 0));
+         transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease
+      }
+
+      .follow-cta:hover {
+         transform: translateY(-2px);
+         border-color: var(--uv)
+      }
+
+      .follow-cta .fic {
+         display: inline-grid;
+         place-items: center;
+         width: 22px;
+         height: 22px;
+         border-radius: 6px;
+         color: #fff;
+         font-size: 12px;
+         line-height: 1
+      }
+
+      .follow-cta .farr {
+         color: var(--uv-soft)
+      }
+
+      .follow-cta.yt .fic {
+         background: #FF0000
+      }
+
+      .follow-cta.yt:hover {
+         border-color: #ff4d4d;
+         box-shadow: 0 8px 22px rgba(255, 0, 0, .20)
+      }
+
+      .follow-cta.tk .fic {
+         background: linear-gradient(135deg, #25F4EE 0%, #111 45%, #FE2C55 100%)
+      }
+
+      .follow-cta.tk:hover {
+         border-color: #25F4EE;
+         box-shadow: 0 8px 22px rgba(37, 244, 238, .18)
+      }
+
+      /* Video card: branded fallback + volver */
+      .vfallback {
+         position: absolute;
+         inset: 0;
+         z-index: 1;
+         display: none;
+         flex-direction: column;
+         justify-content: flex-end;
+         align-items: flex-start;
+         gap: 4px;
+         padding: 16px
+      }
+
+      .vthumb-fallback .vimg {
+         display: none
+      }
+
+      .vthumb-fallback .vfallback {
+         display: flex
+      }
+
+      .vfb-mark {
+         font-family: var(--font-m);
+         font-size: 10px;
+         letter-spacing: .28em;
+         text-transform: uppercase;
+         color: var(--uv-soft)
+      }
+
+      .vfb-title {
+         font-family: var(--font-d);
+         font-weight: 700;
+         color: var(--white);
+         font-size: 18px;
+         line-height: 1.15;
+         max-width: 94%
+      }
+
+      .vframe {
+         position: relative
+      }
+
+      .vclose {
+         position: absolute;
+         top: 8px;
+         right: 8px;
+         z-index: 6;
+         display: none;
+         font-family: var(--font-m);
+         font-size: 11px;
+         letter-spacing: .06em;
+         text-transform: uppercase;
+         color: var(--chrome-hi);
+         background: rgba(10, 10, 11, .72);
+         border: 1px solid var(--line-2);
+         border-radius: 999px;
+         padding: 6px 12px;
+         cursor: pointer;
+         -webkit-backdrop-filter: blur(6px);
+         backdrop-filter: blur(6px)
+      }
+
+      .vcard.open .vclose {
+         display: inline-block
+      }
+
+      .vclose:hover {
+         background: var(--uv);
+         border-color: var(--uv);
+         color: #fff
+      }
+
+      /* Spotify follow accent */
+      .follow-cta.sp .fic {
+         background: #1DB954
+      }
+
+      .follow-cta.sp:hover {
+         border-color: #1DB954;
+         box-shadow: 0 8px 22px rgba(29, 185, 84, .20)
+      }
+
+      /* Ya disponibles (Spotify) */
+      #musica .cf-wrap {
+         position: relative
+      }
+
+      #musica .cf-track {
+         display: flex;
+         gap: 16px;
+         overflow-x: auto;
+         scroll-snap-type: x mandatory;
+         padding: 4px 2px 12px;
+         scrollbar-width: none
+      }
+
+      #musica .cf-track::-webkit-scrollbar {
+         display: none
+      }
+
+      #musica .release {
+         flex: 0 0 200px;
+         scroll-snap-align: start
+      }
+
+      #musica .rcover {
+         position: relative;
+         aspect-ratio: 1;
+         border: 1px solid var(--line);
+         border-radius: 10px;
+         overflow: hidden;
+         background: radial-gradient(120% 120% at 30% 20%, rgba(139, 61, 255, .28), #0d0d12 72%)
+      }
+
+      #musica .rcover.nocover .cover {
+         display: none
+      }
+
+      #musica .cover {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+         display: block
+      }
+
+      #musica .rplay {
+         position: absolute;
+         right: 12px;
+         bottom: 12px;
+         width: 46px;
+         height: 46px;
+         border-radius: 50%;
+         border: 0;
+         background: var(--uv);
+         color: #fff;
+         font-size: 16px;
+         cursor: pointer;
+         display: grid;
+         place-items: center;
+         box-shadow: 0 6px 20px rgba(0, 0, 0, .45);
+         transition: .2s
+      }
+
+      #musica .rplay:hover {
+         background: var(--uv-soft)
+      }
+
+      #musica .rplay.playing {
+         background: var(--chrome-hi);
+         color: var(--ink)
+      }
+
+      #musica .rmeta {
+         padding: 12px 2px 0
+      }
+
+      #musica .rmeta h4 {
+         font-family: var(--font-d);
+         font-weight: 700;
+         color: var(--white);
+         margin: 0 0 2px;
+         font-size: 16px
+      }
+
+      #musica .rmeta span {
+         display: block;
+         color: var(--smoke);
+         font-size: 13px;
+         margin-bottom: 6px
+      }
+
+      #musica .rfull {
+         font-family: var(--font-m);
+         font-size: 11px;
+         letter-spacing: .06em;
+         text-transform: uppercase;
+         color: var(--uv-soft);
+         text-decoration: none
+      }
+
+      #musica .cf-arrow {
+         position: absolute;
+         top: 34%;
+         transform: translateY(-50%);
+         z-index: 5;
+         width: 40px;
+         height: 40px;
+         border-radius: 50%;
+         border: 1px solid var(--line-2);
+         background: rgba(10, 10, 11, .7);
+         color: var(--chrome-hi);
+         font-size: 18px;
+         cursor: pointer;
+         -webkit-backdrop-filter: blur(6px);
+         backdrop-filter: blur(6px)
+      }
+
+      #musica .cf-arrow:hover {
+         background: var(--uv);
+         border-color: var(--uv)
+      }
+
+      #musica .cf-prev {
+         left: -6px
+      }
+
+      #musica .cf-next {
+         right: -6px
+      }
+
+      #musica .sp-wrap {
+         margin-top: 18px;
+         border: 1px solid var(--line);
+         border-radius: 10px;
+         padding: 12px;
+         background: var(--ink-3)
+      }
+
+      #musica .sp-lbl {
+         font-family: var(--font-m);
+         font-size: 11px;
+         letter-spacing: .2em;
+         text-transform: uppercase;
+         color: var(--uv-soft);
+         margin-bottom: 8px
+      }
+
+      /* TikTok facade cards */
+      #tiktok .rail {
+         display: flex;
+         gap: 16px;
+         overflow-x: auto;
+         scroll-snap-type: x mandatory;
+         padding: 4px 2px 14px;
+         scrollbar-width: none
+      }
+
+      #tiktok .rail::-webkit-scrollbar {
+         display: none
+      }
+
+      #tiktok .tkc {
+         flex: 0 0 220px;
+         scroll-snap-align: start;
+         text-decoration: none;
+         display: block;
+         border-radius: 12px;
+         overflow: hidden;
+         border: 1px solid var(--line);
+         transition: transform .18s ease, border-color .18s ease
+      }
+
+      #tiktok .tkc:hover {
+         border-color: var(--uv);
+         transform: translateY(-3px)
+      }
+
+      #tiktok .tkc-cover {
+         position: relative;
+         aspect-ratio: 9/16;
+         background: radial-gradient(120% 90% at 30% 15%, rgba(139, 61, 255, .30), #0d0d12 72%);
+         display: flex;
+         flex-direction: column;
+         justify-content: flex-end;
+         gap: 2px;
+         padding: 14px
+      }
+
+      #tiktok .tkc-cover::after {
+         content: "";
+         position: absolute;
+         inset: 0;
+         background: linear-gradient(to top, rgba(10, 10, 11, .6), transparent 55%)
+      }
+
+      #tiktok .tkc-badge {
+         position: absolute;
+         top: 12px;
+         left: 12px;
+         z-index: 2;
+         font-family: var(--font-m);
+         font-size: 10px;
+         letter-spacing: .12em;
+         text-transform: uppercase;
+         background: rgba(10, 10, 11, .7);
+         border: 1px solid var(--line-2);
+         color: var(--chrome-hi);
+         padding: 5px 9px;
+         border-radius: 2px
+      }
+
+      #tiktok .tkc-play {
+         position: absolute;
+         top: 46%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         z-index: 2;
+         width: 56px;
+         height: 56px;
+         border-radius: 50%;
+         background: rgba(10, 10, 11, .6);
+         border: 1px solid var(--line-2);
+         display: grid;
+         place-items: center;
+         transition: .15s
+      }
+
+      #tiktok .tkc:hover .tkc-play {
+         background: var(--uv);
+         border-color: transparent
+      }
+
+      #tiktok .tkc-play svg {
+         fill: #fff;
+         margin-left: 3px
+      }
+
+      #tiktok .tkc-title {
+         position: relative;
+         z-index: 2;
+         font-family: var(--font-d);
+         font-weight: 700;
+         color: #fff;
+         font-size: 15px;
+         line-height: 1.2
+      }
+
+      #tiktok .tkc-handle {
+         position: relative;
+         z-index: 2;
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--uv-soft)
+      }
+
+      /* === MOBILE: carrusel de estrenos legible (video arriba, texto abajo) === */
+      @media(max-width:640px) {
+         #estreno .estreno-frame {
+            aspect-ratio: auto;
+            display: flex;
+            flex-direction: column
+         }
+
+         #estreno .estreno-vid {
+            position: relative;
+            inset: auto;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9
+         }
+
+         #estreno .estreno-over {
+            position: relative;
+            inset: auto;
+            background: var(--ink-2, #141419);
+            padding: 16px 16px 18px
+         }
+
+         #estreno .estreno-title {
+            font-size: 30px
+         }
+
+         #estreno .estreno-lead {
+            font-size: 14px;
+            margin-bottom: 14px
+         }
+
+         #estreno .arrow {
+            display: none
+         }
+
+         #estreno .btn-primary {
+            display: block;
+            text-align: center
+         }
+      }
+
+      #tiktok .tkc-frame {
+         position: absolute;
+         inset: 0;
+         width: 100%;
+         height: 100%;
+         border: 0;
+         z-index: 3
+      }
+
+      #tiktok .tkc-close {
+         position: absolute;
+         top: 8px;
+         right: 8px;
+         z-index: 5;
+         width: 30px;
+         height: 30px;
+         border-radius: 50%;
+         background: rgba(10, 10, 11, .72);
+         border: 1px solid var(--line-2);
+         color: #fff;
+         cursor: pointer;
+         display: grid;
+         place-items: center;
+         font-size: 12px;
+         -webkit-backdrop-filter: blur(6px);
+         backdrop-filter: blur(6px)
+      }
+
+      #tiktok .tkc-close:hover {
+         background: var(--uv);
+         border-color: var(--uv)
+      }
+
+      #tiktok .tkc-play {
+         cursor: pointer;
+         padding: 0
+      }
+
+      #tiktok .tkc-handle {
+         text-decoration: none;
+         cursor: pointer
+      }
+
+      #tiktok .tkc.playing {
+         transform: none
+      }
+
+      #tiktok .tkc.playing:hover {
+         transform: none
+      }
+
+      .follow-cta.ig .fic {
+         background: linear-gradient(135deg, #f58529 0%, #dd2a7b 45%, #8134af 75%, #515bd4 100%)
+      }
+
+      .follow-cta.ig:hover {
+         border-color: #dd2a7b;
+         box-shadow: 0 8px 22px rgba(221, 42, 123, .20)
+      }
+
+      #galeria .rail {
+         display: flex;
+         gap: 16px;
+         overflow-x: auto;
+         scroll-snap-type: x mandatory;
+         padding: 4px 2px 14px;
+         scrollbar-width: none
+      }
+
+      #galeria .rail::-webkit-scrollbar {
+         display: none
+      }
+
+      #galeria .igc {
+         flex: 0 0 220px;
+         scroll-snap-align: start;
+         border-radius: 12px;
+         overflow: hidden;
+         border: 1px solid var(--line);
+         transition: transform .18s ease, border-color .18s ease
+      }
+
+      #galeria .igc:hover {
+         border-color: var(--uv);
+         transform: translateY(-3px)
+      }
+
+      #galeria .igc.playing {
+         flex: 0 0 320px;
+         transform: none
+      }
+
+      #galeria .igc.playing:hover {
+         transform: none
+      }
+
+      #galeria .igc-cover {
+         position: relative;
+         aspect-ratio: 9/16;
+         background: radial-gradient(120% 90% at 30% 15%, rgba(139, 61, 255, .30), #0d0d12 72%);
+         display: flex;
+         flex-direction: column;
+         justify-content: flex-end;
+         gap: 2px;
+         padding: 14px
+      }
+
+      #galeria .igc.playing .igc-cover {
+         aspect-ratio: auto;
+         height: 560px;
+         background: #000
+      }
+
+      #galeria .igc-cover::after {
+         content: "";
+         position: absolute;
+         inset: 0;
+         background: linear-gradient(to top, rgba(10, 10, 11, .6), transparent 55%)
+      }
+
+      #galeria .igc.playing .igc-cover::after {
+         display: none
+      }
+
+      #galeria .igc-badge {
+         position: absolute;
+         top: 12px;
+         left: 12px;
+         z-index: 2;
+         font-family: var(--font-m);
+         font-size: 10px;
+         letter-spacing: .12em;
+         text-transform: uppercase;
+         background: rgba(10, 10, 11, .7);
+         border: 1px solid var(--line-2);
+         color: var(--chrome-hi);
+         padding: 5px 9px;
+         border-radius: 2px
+      }
+
+      #galeria .igc-play {
+         position: absolute;
+         top: 46%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         z-index: 2;
+         width: 56px;
+         height: 56px;
+         border-radius: 50%;
+         background: rgba(10, 10, 11, .6);
+         border: 1px solid var(--line-2);
+         display: grid;
+         place-items: center;
+         cursor: pointer;
+         padding: 0;
+         transition: .15s
+      }
+
+      #galeria .igc:hover .igc-play {
+         background: var(--uv);
+         border-color: transparent
+      }
+
+      #galeria .igc-play svg {
+         fill: #fff;
+         margin-left: 3px
+      }
+
+      #galeria .igc-title {
+         position: relative;
+         z-index: 2;
+         font-family: var(--font-d);
+         font-weight: 700;
+         color: #fff;
+         font-size: 15px;
+         line-height: 1.2
+      }
+
+      #galeria .igc-handle {
+         position: relative;
+         z-index: 2;
+         font-family: var(--font-m);
+         font-size: 11px;
+         color: var(--uv-soft);
+         text-decoration: none;
+         cursor: pointer
+      }
+
+      #galeria .igc-frame {
+         position: absolute;
+         inset: 0;
+         width: 100%;
+         height: 100%;
+         border: 0;
+         z-index: 3;
+         background: #000
+      }
+
+      #galeria .igc-close {
+         position: absolute;
+         top: 8px;
+         right: 8px;
+         z-index: 5;
+         width: 30px;
+         height: 30px;
+         border-radius: 50%;
+         background: rgba(10, 10, 11, .72);
+         border: 1px solid var(--line-2);
+         color: #fff;
+         cursor: pointer;
+         display: grid;
+         place-items: center;
+         font-size: 12px
+      }
+
+      #galeria .igc-close:hover {
+         background: var(--uv);
+         border-color: var(--uv)
+      }
+   </style>
 </head>
+
 <body>
-<header class="nav">
-  <div class="wrap">
-    <a class="brandmark" href="#top">ZIGNA<span>LEZ</span></a>
-    <nav class="nav-links">
-      <a href="#videos">Videos</a>
-      <a href="#tiktok">TikTok</a>
-      <a href="#miembros">Miembros</a>
-      <a class="nav-cta" href="#lista">Entra a la lista</a>
-    </nav>
-  </div>
-</header>
-
-<main id="top">
-  <!-- HERO -->
-  <section class="hero">
-    <canvas class="hero-bg" id="herobg" aria-hidden="true"></canvas>
-    <div class="wrap">
-      <div class="eyebrow">Urbano · Freestyle · Santiago, Chile</div>
-      <h1 class="display">ZIGNA<span class="uv">LEZ</span></h1>
-      <p class="sub">El Zigg Ziggy</p>
-      <p class="tagline">El algoritmo decide a quién le muestra la música — esta lista, no. Mira los videos, escucha, y entra para lo que todavía no sale.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="#lista">Entra a la lista</a>
-        <a class="btn btn-ghost" href="#videos">▶ Ver los videos</a>
-        <a class="link-inline" href="https://open.spotify.com/artist/0M4ZFfQbpLYiLksk0QyOph" target="_blank" rel="noopener">Seguir en Spotify ↗</a>
+   <header class="nav">
+      <div class="wrap">
+         <a class="brandmark" href="#top">ZIGNA<span>LEZ</span></a>
+         <nav class="nav-links">
+            <a href="#videos">Videos</a>
+            <a href="#tiktok">TikTok</a>
+            <a href="#miembros">Miembros</a>
+            <a class="nav-cta" href="#lista">Entra a la lista</a>
+         </nav>
       </div>
-      <div class="hero-meta">
-        <span>En edición · <b>HAYABUSA</b> (con Flacko Loyal)</span>
-        <span>Distribuido por <b>División Rec</b></span>
-        <span><b>@zignalez</b> · verificado</span>
-      </div>
-    </div>
-  </section>
+   </header>
 
-  <!-- PRÓXIMO ESTRENO -->
-  <!-- PRÓXIMOS ESTRENOS (carrusel) -->
-  <section id="estreno">
-    <div class="wrap">
-      <div class="sec-head"><h2>Próximos estrenos</h2><span class="eyebrow">Adelantos · la lista los ve primero</span></div>
-      <div class="carousel" id="estrenoCar">
-        <button class="arrow prev" aria-label="Anterior">‹</button>
-        <button class="arrow next" aria-label="Siguiente">›</button>
-        <div class="viewport"><div class="track">
-          <article class="slide is-active" data-idx="0" aria-hidden="false">
-            <div class="estreno-frame">
-              <video class="estreno-vid" muted loop playsinline autoplay preload="metadata" poster="assets/poster-13587d37.jpg">
-                <source src="assets/lucebien.mp4" type="video/mp4"></video>
-              <div class="estreno-over">
-                <div class="estreno-kicker">Se viene · todavía sin audio</div>
-                <h3 class="estreno-title">LUCE BIEN</h3>
-                <p class="estreno-feat">con Fox y Acheh · <span class="st">GRABADO · EN EDICIÓN</span></p>
-                <p class="estreno-lead">Crudo, desde el set. La lista lo escucha primero.</p>
-                <a class="btn btn-primary" href="#lista">Escúchalo antes</a>
-              </div>
+   <main id="top">
+      <!-- HERO -->
+      <section class="hero">
+         <canvas class="hero-bg" id="herobg" aria-hidden="true"></canvas>
+         <div class="wrap">
+            <div class="eyebrow">Urbano · Freestyle · Santiago, Chile</div>
+            <h1 class="display">ZIGNA<span class="uv">LEZ</span></h1>
+            <p class="sub">El Zigg Ziggy</p>
+            <p class="tagline">El algoritmo decide a quién le muestra la música — esta lista, no. Mira los videos,
+               escucha, y entra para lo que todavía no sale.</p>
+            <div class="hero-actions">
+               <a class="btn btn-primary" href="#lista">Entra a la lista</a>
+               <a class="btn btn-ghost" href="#videos">▶ Ver los videos</a>
+               <a class="link-inline" href="https://open.spotify.com/artist/0M4ZFfQbpLYiLksk0QyOph" target="_blank"
+                  rel="noopener">Seguir en Spotify ↗</a>
             </div>
-          </article>
-          <article class="slide" data-idx="1" aria-hidden="true">
-            <div class="estreno-frame">
-              <video class="estreno-vid" muted loop playsinline preload="metadata" poster="assets/poster-8384ca14.jpg">
-                <source src="assets/hayabusa.mp4" type="video/mp4"></video>
-              <div class="estreno-over">
-                <div class="estreno-kicker">Grabado · falta soltarlo</div>
-                <h3 class="estreno-title">HAYABUSA</h3>
-                <p class="estreno-feat">con Flacko Loyal · <span class="st">GRABADO · EN EDICIÓN</span></p>
-                <p class="estreno-lead">El de Flacko. Todavía sin audio — lo completo llega primero acá.</p>
-                <a class="btn btn-primary" href="#lista">Escúchalo antes</a>
-              </div>
+            <div class="hero-meta">
+               <span>En edición · <b>HAYABUSA</b> (con Flacko Loyal)</span>
+               <span>Distribuido por <b>División Rec</b></span>
+               <span><b>@zignalez</b> · verificado</span>
             </div>
-          </article>
-        </div></div>
-        <div class="dots">
-          <button class="dot is-active" data-go="0" aria-label="Estreno 1"></button>
-          <button class="dot" data-go="1" aria-label="Estreno 2"></button>
-        </div>
-        <div class="count"><span id="cNow">1</span> / <span id="cTot">2</span></div>
-      </div>
-    </div>
-  </section>
+         </div>
+      </section>
 
-  <!-- VIDEOS: portadas YouTube maxres -> YouTube + Spotify -->
-  <section id="videos">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2>Videos</h2>
-        <a class="follow-cta yt" href="https://www.youtube.com/@Zignalez?sub_confirmation=1" target="_blank" rel="noopener"><span class="fic" aria-hidden="true">▶</span> Suscríbete en YouTube <span class="farr">↗</span></a>
-      </div>
-      <div class="vgrid" id="vgrid"></div>
-    </div>
-  </section>
+      <!-- PRÓXIMO ESTRENO -->
+      <!-- PRÓXIMOS ESTRENOS (carrusel) -->
+      <section id="estreno">
+         <div class="wrap">
+            <div class="sec-head">
+               <h2>Próximos estrenos</h2><span class="eyebrow">Adelantos · la lista los ve primero</span>
+            </div>
+            <div class="carousel" id="estrenoCar">
+               <button class="arrow prev" aria-label="Anterior">‹</button>
+               <button class="arrow next" aria-label="Siguiente">›</button>
+               <div class="viewport">
+                  <div class="track">
+                     <article class="slide is-active" data-idx="0" aria-hidden="false">
+                        <div class="estreno-frame">
+                           <video class="estreno-vid" muted loop playsinline autoplay preload="metadata"
+                              poster="assets/poster-13587d37.jpg">
+                              <source src="assets/lucebien.mp4" type="video/mp4">
+                           </video>
+                           <div class="estreno-over">
+                              <div class="estreno-kicker">Se viene · todavía sin audio</div>
+                              <h3 class="estreno-title">LUCE BIEN</h3>
+                              <p class="estreno-feat">con Fox y Acheh · <span class="st">GRABADO · EN EDICIÓN</span></p>
+                              <p class="estreno-lead">Crudo, desde el set. La lista lo escucha primero.</p>
+                              <a class="btn btn-primary" href="#lista">Escúchalo antes</a>
+                           </div>
+                        </div>
+                     </article>
+                     <article class="slide" data-idx="1" aria-hidden="true">
+                        <div class="estreno-frame">
+                           <video class="estreno-vid" muted loop playsinline preload="metadata"
+                              poster="assets/poster-8384ca14.jpg">
+                              <source src="assets/hayabusa.mp4" type="video/mp4">
+                           </video>
+                           <div class="estreno-over">
+                              <div class="estreno-kicker">Grabado · falta soltarlo</div>
+                              <h3 class="estreno-title">HAYABUSA</h3>
+                              <p class="estreno-feat">con Flacko Loyal · <span class="st">GRABADO · EN EDICIÓN</span>
+                              </p>
+                              <p class="estreno-lead">El de Flacko. Todavía sin audio — lo completo llega primero acá.
+                              </p>
+                              <a class="btn btn-primary" href="#lista">Escúchalo antes</a>
+                           </div>
+                        </div>
+                     </article>
+                  </div>
+               </div>
+               <div class="dots">
+                  <button class="dot is-active" data-go="0" aria-label="Estreno 1"></button>
+                  <button class="dot" data-go="1" aria-label="Estreno 2"></button>
+               </div>
+               <div class="count"><span id="cNow">1</span> / <span id="cTot">2</span></div>
+            </div>
+         </div>
+      </section>
 
-  <!-- TikTok carrusel -->
-  <!-- YA DISPONIBLES (Spotify inline, patrón División Rec) -->
-  <section id="musica">
-    <div class="wrap">
-      <div class="sec-head"><h2>Ya disponibles</h2>
-        <a class="follow-cta sp" href="https://open.spotify.com/artist/0M4ZFfQbpLYiLksk0QyOph" target="_blank" rel="noopener"><span class="fic" aria-hidden="true">●</span> Seguir en Spotify <span class="farr">↗</span></a>
-      </div>
-      <div class="cf-wrap">
-        <button class="cf-arrow cf-prev" aria-label="Anterior">‹</button>
-        <div class="cf-track" id="cfMusica"><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02420ee9d6da8ebb06cdc7d440" alt="TNT" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:39z3F5qQ0FSMplPiZ3Sq45" aria-label="Reproducir TNT" aria-pressed="false">▶</button></div><div class="rmeta"><h4>TNT</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/39z3F5qQ0FSMplPiZ3Sq45" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0296d44c13ebca923afd0754ee" alt="LA SANTA" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:0b5TZ1rYIs7RWYpkK1syKZ" aria-label="Reproducir LA SANTA" aria-pressed="false">▶</button></div><div class="rmeta"><h4>LA SANTA</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/0b5TZ1rYIs7RWYpkK1syKZ" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e025ed203bcc99e34608e1fef52" alt="RXRX" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:2UvTtatmyZtAaiUCbilwfi" aria-label="Reproducir RXRX" aria-pressed="false">▶</button></div><div class="rmeta"><h4>RXRX</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/2UvTtatmyZtAaiUCbilwfi" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02d6ff8a5a45139ba6aa971a6d" alt="Gatas & Gangster&#39;s · Remix" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:1cEzQt1h3qLLsg0mAbc0Pe" aria-label="Reproducir Gatas & Gangster&#39;s · Remix" aria-pressed="false">▶</button></div><div class="rmeta"><h4>Gatas & Gangster's · Remix</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/1cEzQt1h3qLLsg0mAbc0Pe" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02019fe976623e657e4ddffb04" alt="Uoh Uoh Oh" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:5hwVnDSDqxKYXjISWiLHxA" aria-label="Reproducir Uoh Uoh Oh" aria-pressed="false">▶</button></div><div class="rmeta"><h4>Uoh Uoh Oh</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/5hwVnDSDqxKYXjISWiLHxA" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e024c5c0cc6cf0bd04057180f1a" alt="XTUBIEN" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:6oXEgq1ONokai4NJfMGZ50" aria-label="Reproducir XTUBIEN" aria-pressed="false">▶</button></div><div class="rmeta"><h4>XTUBIEN</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/6oXEgq1ONokai4NJfMGZ50" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02950b77a833e3b1bad4439aab" alt="TU CUERPO" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:2b8QPcCxlVcshzY2wkjQv1" aria-label="Reproducir TU CUERPO" aria-pressed="false">▶</button></div><div class="rmeta"><h4>TU CUERPO</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/2b8QPcCxlVcshzY2wkjQv1" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02fea183596c12a1163191a90d" alt="Noche De San Juan" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:01xXdyNaoQrYXWdf0fDWUN" aria-label="Reproducir Noche De San Juan" aria-pressed="false">▶</button></div><div class="rmeta"><h4>Noche De San Juan</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/01xXdyNaoQrYXWdf0fDWUN" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02f6af7e9ab827986fe88ea18a" alt="Puesta Pa&#39; Mí" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:4rkR31X7T4lPKUMfgf2T7k" aria-label="Reproducir Puesta Pa&#39; Mí" aria-pressed="false">▶</button></div><div class="rmeta"><h4>Puesta Pa' Mí</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/4rkR31X7T4lPKUMfgf2T7k" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e023860d911fae909161962dc66" alt="ALTA GAMA" loading="lazy"><button class="rplay" type="button" data-uri="spotify:album:7N2R96fWEwgVT0PLRfSs0I" aria-label="Reproducir ALTA GAMA" aria-pressed="false">▶</button></div><div class="rmeta"><h4>ALTA GAMA</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/album/7N2R96fWEwgVT0PLRfSs0I" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02a6f2f221b9dea83ed9d881b2" alt="Gatas & Gangster&#39;s" loading="lazy"><button class="rplay" type="button" data-uri="spotify:track:6AOWWE9WOoxC4C3e8J7Mfj" aria-label="Reproducir Gatas & Gangster&#39;s" aria-pressed="false">▶</button></div><div class="rmeta"><h4>Gatas & Gangster's</h4><span>Zignalez</span><a class="rfull" href="https://open.spotify.com/track/6AOWWE9WOoxC4C3e8J7Mfj" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02f6af7e9ab827986fe88ea18a" alt="Destellos del Ayer" loading="lazy"><button class="rplay" type="button" data-uri="spotify:album:1Sautb9bg1gTplWi2lWIcJ" aria-label="Reproducir Destellos del Ayer" aria-pressed="false">▶</button></div><div class="rmeta"><h4>Destellos del Ayer</h4><span>Zignalez · EP</span><a class="rfull" href="https://open.spotify.com/album/1Sautb9bg1gTplWi2lWIcJ" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div><div class="release"><div class="rcover"><img class="cover" src="https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da84d7c57c21e35e08b782826518" alt="This Is Zignalez" loading="lazy"><button class="rplay" type="button" data-uri="spotify:playlist:154wSLjcWlNuN9jkAiE2OH" aria-label="Reproducir This Is Zignalez" aria-pressed="false">▶</button></div><div class="rmeta"><h4>This Is Zignalez</h4><span>Playlist · remixes</span><a class="rfull" href="https://open.spotify.com/playlist/154wSLjcWlNuN9jkAiE2OH" target="_blank" rel="noopener">Escuchar en Spotify ↗</a></div></div></div>
-        <button class="cf-arrow cf-next" aria-label="Siguiente">›</button>
-      </div>
-      <div id="spWrap" class="sp-wrap" hidden><div class="sp-lbl">Escucha un pedazo</div><div id="spPlayer"></div></div>
-    </div>
-  </section>
+      <!-- VIDEOS: portadas YouTube maxres -> YouTube + Spotify -->
+      <section id="videos">
+         <div class="wrap">
+            <div class="sec-head">
+               <h2>Videos</h2>
+               <a class="follow-cta yt" href="https://www.youtube.com/@Zignalez?sub_confirmation=1" target="_blank"
+                  rel="noopener"><span class="fic" aria-hidden="true">▶</span> Suscríbete en YouTube <span
+                     class="farr">↗</span></a>
+            </div>
+            <div class="vgrid" id="vgrid"></div>
+         </div>
+      </section>
 
-  <section id="tiktok">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2>En TikTok</h2>
-        <a class="follow-cta tk" href="https://www.tiktok.com/@zignalez" target="_blank" rel="noopener"><span class="fic" aria-hidden="true">♪</span> Seguir en TikTok <span class="farr">↗</span></a>
-      </div>
-      <div id="tk-mount"></div>
-    </div>
-  </section>
+      <!-- TikTok carrusel -->
+      <!-- YA DISPONIBLES (Spotify inline, patrón División Rec) -->
+      <section id="musica">
+         <div class="wrap">
+            <div class="sec-head">
+               <h2>Ya disponibles</h2>
+               <a class="follow-cta sp" href="https://open.spotify.com/artist/0M4ZFfQbpLYiLksk0QyOph" target="_blank"
+                  rel="noopener"><span class="fic" aria-hidden="true">●</span> Seguir en Spotify <span
+                     class="farr">↗</span></a>
+            </div>
+            <div class="cf-wrap">
+               <button class="cf-arrow cf-prev" aria-label="Anterior">‹</button>
+               <div class="cf-track" id="cfMusica">
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02420ee9d6da8ebb06cdc7d440"
+                           alt="TNT" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:39z3F5qQ0FSMplPiZ3Sq45" aria-label="Reproducir TNT"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>TNT</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/39z3F5qQ0FSMplPiZ3Sq45" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0296d44c13ebca923afd0754ee"
+                           alt="LA SANTA" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:0b5TZ1rYIs7RWYpkK1syKZ" aria-label="Reproducir LA SANTA"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>LA SANTA</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/0b5TZ1rYIs7RWYpkK1syKZ" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e025ed203bcc99e34608e1fef52"
+                           alt="RXRX" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:2UvTtatmyZtAaiUCbilwfi" aria-label="Reproducir RXRX"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>RXRX</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/2UvTtatmyZtAaiUCbilwfi" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02d6ff8a5a45139ba6aa971a6d"
+                           alt="Gatas & Gangster&#39;s · Remix" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:1cEzQt1h3qLLsg0mAbc0Pe"
+                           aria-label="Reproducir Gatas & Gangster&#39;s · Remix" aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>Gatas & Gangster's · Remix</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/1cEzQt1h3qLLsg0mAbc0Pe" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02019fe976623e657e4ddffb04"
+                           alt="Uoh Uoh Oh" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:5hwVnDSDqxKYXjISWiLHxA" aria-label="Reproducir Uoh Uoh Oh"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>Uoh Uoh Oh</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/5hwVnDSDqxKYXjISWiLHxA" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e024c5c0cc6cf0bd04057180f1a"
+                           alt="XTUBIEN" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:6oXEgq1ONokai4NJfMGZ50" aria-label="Reproducir XTUBIEN"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>XTUBIEN</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/6oXEgq1ONokai4NJfMGZ50" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02950b77a833e3b1bad4439aab"
+                           alt="TU CUERPO" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:2b8QPcCxlVcshzY2wkjQv1" aria-label="Reproducir TU CUERPO"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>TU CUERPO</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/2b8QPcCxlVcshzY2wkjQv1" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02fea183596c12a1163191a90d"
+                           alt="Noche De San Juan" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:01xXdyNaoQrYXWdf0fDWUN" aria-label="Reproducir Noche De San Juan"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>Noche De San Juan</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/01xXdyNaoQrYXWdf0fDWUN" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02f6af7e9ab827986fe88ea18a"
+                           alt="Puesta Pa&#39; Mí" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:4rkR31X7T4lPKUMfgf2T7k" aria-label="Reproducir Puesta Pa&#39; Mí"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>Puesta Pa' Mí</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/4rkR31X7T4lPKUMfgf2T7k" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e023860d911fae909161962dc66"
+                           alt="ALTA GAMA" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:album:7N2R96fWEwgVT0PLRfSs0I" aria-label="Reproducir ALTA GAMA"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>ALTA GAMA</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/album/7N2R96fWEwgVT0PLRfSs0I" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02a6f2f221b9dea83ed9d881b2"
+                           alt="Gatas & Gangster&#39;s" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:track:6AOWWE9WOoxC4C3e8J7Mfj"
+                           aria-label="Reproducir Gatas & Gangster&#39;s" aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>Gatas & Gangster's</h4><span>Zignalez</span><a class="rfull"
+                           href="https://open.spotify.com/track/6AOWWE9WOoxC4C3e8J7Mfj" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02f6af7e9ab827986fe88ea18a"
+                           alt="Destellos del Ayer" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:album:1Sautb9bg1gTplWi2lWIcJ" aria-label="Reproducir Destellos del Ayer"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>Destellos del Ayer</h4><span>Zignalez · EP</span><a class="rfull"
+                           href="https://open.spotify.com/album/1Sautb9bg1gTplWi2lWIcJ" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+                  <div class="release">
+                     <div class="rcover"><img class="cover"
+                           src="https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da84d7c57c21e35e08b782826518"
+                           alt="This Is Zignalez" loading="lazy"><button class="rplay" type="button"
+                           data-uri="spotify:playlist:154wSLjcWlNuN9jkAiE2OH" aria-label="Reproducir This Is Zignalez"
+                           aria-pressed="false">▶</button></div>
+                     <div class="rmeta">
+                        <h4>This Is Zignalez</h4><span>Playlist · remixes</span><a class="rfull"
+                           href="https://open.spotify.com/playlist/154wSLjcWlNuN9jkAiE2OH" target="_blank"
+                           rel="noopener">Escuchar en Spotify ↗</a>
+                     </div>
+                  </div>
+               </div>
+               <button class="cf-arrow cf-next" aria-label="Siguiente">›</button>
+            </div>
+            <div id="spWrap" class="sp-wrap" hidden>
+               <div class="sp-lbl">Escucha un pedazo</div>
+               <div id="spPlayer"></div>
+            </div>
+         </div>
+      </section>
 
-  <!-- ZONA MIEMBROS: maquetas inéditas (Supabase Auth) -->
-  <!-- data-clarity-mask: la zona privada NO se graba. El modo Balanced de Clarity ya
+      <section id="tiktok">
+         <div class="wrap">
+            <div class="sec-head">
+               <h2>En TikTok</h2>
+               <a class="follow-cta tk" href="https://www.tiktok.com/@zignalez" target="_blank" rel="noopener"><span
+                     class="fic" aria-hidden="true">♪</span> Seguir en TikTok <span class="farr">↗</span></a>
+            </div>
+            <div id="tk-mount"></div>
+         </div>
+      </section>
+
+      <!-- ZONA MIEMBROS: maquetas inéditas (Supabase Auth) -->
+      <!-- data-clarity-mask: la zona privada NO se graba. El modo Balanced de Clarity ya
      enmascara correos y numeros, pero aqui se fuerza explicitamente: dentro hay
      maquetas ineditas y datos de fans. Este atributo manda sobre el panel de Clarity. -->
-  <section id="miembros" data-clarity-mask="True">
-    <div class="wrap">
-      <div class="members">
-        <!-- Estado: no autenticado -->
-        <div id="members-gate">
-          <div class="lock">🔒</div>
-          <h2>Maquetas inéditas · solo miembros</h2>
-          <p>Maquetas que no están en ninguna plataforma. HAYABUSA, LUCE BIEN y lo que viene — primero acá, para los que están en la lista.</p>
-          <p class="muted" style="font-size:14px">Entras con tu correo. Sin contraseñas que memorizar.</p>
-          <div class="members-login">
-            <form id="login-form" novalidate>
-              <div class="field">
-                <label for="login-email">El correo con que te inscribiste</label>
-                <input type="email" id="login-email" placeholder="tu@correo.com" required autocomplete="email">
-              </div>
-              <button type="submit" class="submit" id="login-submit">Mándame el enlace</button>
-              <div class="login-note" id="login-note" role="status" aria-live="polite"></div>
-            </form>
-          </div>
-          <p class="fineprint">Te llega un enlace. Lo abres y entras. Eso es todo.</p>
-        </div>
-        <!-- Estado: autenticado -->
-        <div id="members-content" class="members-content">
-          <div class="lock">🎧</div>
-          <h2>Maquetas inéditas</h2>
-          <p id="members-welcome">Ya estás dentro.</p>
-          <p class="muted" style="font-size:14px">Suena acá y en ningún otro lado. Se escucha, no se descarga.</p>
-          <div id="track-player" class="track-player">
-            <p class="tp-state">Buscando lo que hay…</p>
-          </div>
-          <span class="logout-link" id="logout-btn">Salir</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- GALERIA Instagram -->
-  <section id="galeria">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2>En Instagram</h2>
-        <a class="follow-cta ig" href="https://instagram.com/zignalez" target="_blank" rel="noopener"><span class="fic" aria-hidden="true">◎</span> Seguir en Instagram <span class="farr">↗</span></a>
-      </div>
-      <div id="ig-mount"></div>
-    </div>
-  </section>
-
-  <!-- CAPTURA -->
-  <section id="lista" data-clarity-mask="True">
-    <div class="wrap">
-      <div class="capture">
-        <div class="capture-grid">
-          <div>
-            <div class="eyebrow" style="margin-bottom:16px">La lista</div>
-            <h2>Lo nuevo te llega a ti, no al algoritmo</h2>
-            <p>Deja tu contacto y te aviso yo — antes que nadie — cuando salga un tema o abra las maquetas.</p>
-            <p class="muted" style="font-size:14px;margin-top:10px">Nada de spam. Solo música, fechas y accesos. Te puedes salir cuando quieras.</p>
-          </div>
-          <form id="capture-form" novalidate>
-            <div class="field">
-              <label for="email">Correo</label>
-              <input type="email" id="email" name="email" placeholder="tu@correo.com" required autocomplete="email">
+      <section id="miembros" data-clarity-mask="True">
+         <div class="wrap">
+            <div class="members">
+               <!-- Estado: no autenticado -->
+               <div id="members-gate">
+                  <div class="lock">🔒</div>
+                  <h2>Maquetas inéditas · solo miembros</h2>
+                  <p>Maquetas que no están en ninguna plataforma. HAYABUSA, LUCE BIEN y lo que viene — primero acá, para
+                     los que están en la lista.</p>
+                  <p class="muted" style="font-size:14px">Entras con tu correo. Sin contraseñas que memorizar.</p>
+                  <div class="members-login">
+                     <form id="login-form" novalidate>
+                        <div class="field">
+                           <label for="login-email">El correo con que te inscribiste</label>
+                           <input type="email" id="login-email" placeholder="tu@correo.com" required
+                              autocomplete="email">
+                        </div>
+                        <button type="submit" class="submit" id="login-submit">Mándame el enlace</button>
+                        <div class="login-note" id="login-note" role="status" aria-live="polite"></div>
+                     </form>
+                  </div>
+                  <p class="fineprint">Te llega un enlace. Lo abres y entras. Eso es todo.</p>
+               </div>
+               <!-- Estado: autenticado -->
+               <div id="members-content" class="members-content">
+                  <div class="lock">🎧</div>
+                  <h2>Maquetas inéditas</h2>
+                  <p id="members-welcome">Ya estás dentro.</p>
+                  <p class="muted" style="font-size:14px">Suena acá y en ningún otro lado. Se escucha, no se descarga.
+                  </p>
+                  <div id="track-player" class="track-player">
+                     <p class="tp-state">Buscando lo que hay…</p>
+                  </div>
+                  <span class="logout-link" id="logout-btn">Salir</span>
+               </div>
             </div>
-            <div class="field">
-              <label for="wsp">WhatsApp <span class="hint">(opcional — te escribo el día del drop)</span></label>
-              <input type="tel" id="wsp" name="whatsapp" placeholder="+56 9 ..." autocomplete="tel">
+         </div>
+      </section>
+
+      <!-- GALERIA Instagram -->
+      <section id="galeria">
+         <div class="wrap">
+            <div class="sec-head">
+               <h2>En Instagram</h2>
+               <a class="follow-cta ig" href="https://instagram.com/zignalez" target="_blank" rel="noopener"><span
+                     class="fic" aria-hidden="true">◎</span> Seguir en Instagram <span class="farr">↗</span></a>
             </div>
-            <label class="consent">
-              <input type="checkbox" id="consent" required>
-              <span>Quiero que Zignalez me escriba sobre lanzamientos y accesos. Me puedo salir cuando quiera, y así lo dice la <a href="/privacidad.html" target="_blank" rel="noopener">política de privacidad</a>.</span>
-            </label>
-            <button type="submit" class="submit" id="submit">Quiero entrar</button>
-            <div class="form-note" id="note" role="status" aria-live="polite"></div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
+            <div id="ig-mount"></div>
+         </div>
+      </section>
 
-<footer>
-  <div class="wrap">
-    <div class="foot-top">
-      <p>No dependas del algoritmo para escucharlo.</p>
-      <a class="btn btn-primary" href="#lista">Entra a la lista</a>
-    </div>
-    <div class="foot-grid">
-      <div>
-        <a class="brandmark" href="#top" style="font-size:24px">ZIGNA<span>LEZ</span></a>
-        <p class="foot-legal" style="margin-top:14px">© 2026 Zignalez. Distribuido por División Rec, Santiago, Chile.<br>
-        <a href="/privacidad.html">Política de privacidad</a> · Al dejar tu contacto la aceptas.</p>
-      </div>
-      <div class="social">
-        <a href="https://open.spotify.com/artist/0M4ZFfQbpLYiLksk0QyOph" target="_blank" rel="noopener">Spotify</a>
-        <a href="https://www.youtube.com/@Zignalez" target="_blank" rel="noopener">YouTube</a>
-        <a href="https://www.tiktok.com/@zignalez" target="_blank" rel="noopener">TikTok</a>
-        <a href="https://instagram.com/zignalez" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://www.threads.com/@zignalez" target="_blank" rel="noopener">Threads</a>
-      </div>
-    </div>
-  </div>
-</footer>
+      <!-- CAPTURA -->
+      <section id="lista" data-clarity-mask="True">
+         <div class="wrap">
+            <div class="capture">
+               <div class="capture-grid">
+                  <div>
+                     <div class="eyebrow" style="margin-bottom:16px">La lista</div>
+                     <h2>Lo nuevo te llega a ti, no al algoritmo</h2>
+                     <p>Deja tu contacto y te aviso yo — antes que nadie — cuando salga un tema o abra las maquetas.</p>
+                     <p class="muted" style="font-size:14px;margin-top:10px">Nada de spam. Solo música, fechas y
+                        accesos. Te puedes salir cuando quieras.</p>
+                  </div>
+                  <form id="capture-form" novalidate>
+                     <div class="field">
+                        <label for="email">Correo</label>
+                        <input type="email" id="email" name="email" placeholder="tu@correo.com" required
+                           autocomplete="email">
+                     </div>
+                     <div class="field">
+                        <label for="wsp">WhatsApp <span class="hint">(opcional — te escribo el día del
+                              drop)</span></label>
+                        <input type="tel" id="wsp" name="whatsapp" placeholder="+56 9 ..." autocomplete="tel">
+                     </div>
+                     <label class="consent">
+                        <input type="checkbox" id="consent" required>
+                        <span>Quiero que Zignalez me escriba sobre lanzamientos y accesos. Me puedo salir cuando quiera,
+                           y así lo dice la <a href="/privacidad.html" target="_blank" rel="noopener">política de
+                              privacidad</a>.</span>
+                     </label>
+                     <button type="submit" class="submit" id="submit">Quiero entrar</button>
+                     <div class="form-note" id="note" role="status" aria-live="polite"></div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </section>
+   </main>
 
-<!-- SRI: si jsDelivr sirve un archivo distinto, el navegador NO lo ejecuta.
+   <footer>
+      <div class="wrap">
+         <div class="foot-top">
+            <p>No dependas del algoritmo para escucharlo.</p>
+            <a class="btn btn-primary" href="#lista">Entra a la lista</a>
+         </div>
+         <div class="foot-grid">
+            <div>
+               <a class="brandmark" href="#top" style="font-size:24px">ZIGNA<span>LEZ</span></a>
+               <p class="foot-legal" style="margin-top:14px">© 2026 Zignalez. Distribuido por División Rec, Santiago,
+                  Chile.<br>
+                  <a href="/privacidad.html">Política de privacidad</a> · Al dejar tu contacto la aceptas.
+               </p>
+            </div>
+            <div class="social">
+               <a href="https://open.spotify.com/artist/0M4ZFfQbpLYiLksk0QyOph" target="_blank"
+                  rel="noopener">Spotify</a>
+               <a href="https://www.youtube.com/@Zignalez" target="_blank" rel="noopener">YouTube</a>
+               <a href="https://www.tiktok.com/@zignalez" target="_blank" rel="noopener">TikTok</a>
+               <a href="https://instagram.com/zignalez" target="_blank" rel="noopener">Instagram</a>
+               <a href="https://www.threads.com/@zignalez" target="_blank" rel="noopener">Threads</a>
+            </div>
+         </div>
+      </div>
+   </footer>
+
+   <!-- SRI: si jsDelivr sirve un archivo distinto, el navegador NO lo ejecuta.
      Al subir de version hay que recalcular:
      curl -sS <url> | openssl dgst -sha384 -binary | openssl base64 -A -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"
-        integrity="sha384-JBR+x8blGwjDRO63aHCGiZMD4VNiTR4ZUGA+N6ZKLf3zNt1fK8IBpcgPaMrxqWBp"
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"></script>
-<script src="assets/boot.js"></script>
-<script src="assets/app.js"></script>
-<script src="assets/senal.js"></script>
-<script src="assets/carrusel.js"></script>
-<script src="assets/spotify.js"></script>
-<script src="assets/apps-nativas.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"
+      integrity="sha384-JBR+x8blGwjDRO63aHCGiZMD4VNiTR4ZUGA+N6ZKLf3zNt1fK8IBpcgPaMrxqWBp" crossorigin="anonymous"
+      referrerpolicy="no-referrer"></script>
+   <script src="assets/boot.js"></script>
+   <script src="assets/app.js"></script>
+   <script src="assets/senal.js"></script>
+   <script src="assets/carrusel.js"></script>
+   <script src="assets/spotify.js"></script>
+   <script src="assets/apps-nativas.js"></script>
 
-<!-- ══════════════════════════════════════════════════════════════════
+   <!-- ══════════════════════════════════════════════════════════════════
      Microsoft Clarity · proyecto yjfaswea7d
      QUE HACE: graba sesiones (movimiento, clics, scroll), mapas de calor.
      NO es un contador de visitas anonimo.
@@ -976,6 +3441,7 @@
      NO se instala en admin.html a proposito: grabar el panel del artista no
      aporta nada y expone la gestion del catalogo.
      ══════════════════════════════════════════════════════════════════ -->
-<script src="assets/clarity.js"></script>
+   <script src="assets/clarity.js"></script>
 </body>
+
 </html>
