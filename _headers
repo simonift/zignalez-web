@@ -28,7 +28,7 @@
 # error de consola y la analitica de Cloudflare esta muerta sin avisar.
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://open.spotify.com https://*.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.spotifycdn.com https://i.ytimg.com https://fdahfltjaqzdgmsgedcp.supabase.co https://*.clarity.ms https://c.bing.com; media-src 'self' blob: https://fdahfltjaqzdgmsgedcp.supabase.co; connect-src 'self' https://fdahfltjaqzdgmsgedcp.supabase.co https://*.clarity.ms https://c.bing.com; frame-src https://open.spotify.com https://www.youtube-nocookie.com https://www.tiktok.com https://www.instagram.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://open.spotify.com https://*.clarity.ms; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https://*.spotifycdn.com https://i.ytimg.com https://fdahfltjaqzdgmsgedcp.supabase.co https://*.clarity.ms https://c.bing.com; media-src 'self' blob: https://fdahfltjaqzdgmsgedcp.supabase.co; connect-src 'self' https://fdahfltjaqzdgmsgedcp.supabase.co https://*.clarity.ms https://c.bing.com; frame-src https://open.spotify.com https://www.youtube-nocookie.com https://www.tiktok.com https://www.instagram.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
