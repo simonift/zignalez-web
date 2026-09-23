@@ -87,7 +87,7 @@
   .muted{color:var(--smoke)}
   img{max-width:100%;display:block}
 
-  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:linear-gradient(to bottom,rgba(10,10,11,.9),rgba(10,10,11,.55));border-bottom:1px solid var(--line)}
+  header.nav{position:sticky;top:0;z-index:50;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);background:linear-gradient(to bottom,rgba(10,10,11,.9),rgba(10,10,11,.55));border-bottom:1px solid var(--line)}
   .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
   .brandmark{font-family:var(--font-d);font-weight:800;font-size:20px;color:var(--white);letter-spacing:.02em;text-decoration:none}
   .brandmark span{color:var(--uv)}
@@ -172,6 +172,8 @@
 
   /* ZONA MIEMBROS (maquetas) */
   .members{background:radial-gradient(70% 120% at 100% 0%,rgba(139,61,255,.18),transparent 60%),var(--ink-2);border:1px solid var(--line-2);border-radius:16px;padding:clamp(28px,5vw,52px);text-align:center;position:relative;overflow:hidden;overflow:clip}
+  /* clip y no solo hidden: hidden crea un contenedor de scroll, y un foco
+     dentro lo desplaza programaticamente dejando la seccion corrida. */
   .lock{font-size:34px;margin-bottom:10px}
   .members h2{font-size:clamp(26px,4vw,40px);margin-bottom:12px}
   /* En dos columnas la cabecera ya no puede comerse media pantalla: el objetivo
@@ -235,14 +237,6 @@
     .zp-cols{grid-template-columns:448px minmax(0,1fr);gap:36px;
        grid-template-rows:minmax(0,1fr);
        align-items:stretch;max-height:var(--zp-tope,none)}
-    /* El sticky SOLO pega porque .members paso a overflow:clip: un
-       overflow:hidden es contenedor de scroll y anclaba .zp-izq a un elemento
-       que no scrollea nunca. */
-    .zp-izq{position:sticky;top:76px}
-  }
-  /* Pantalla baja: pegado tapa la lista y deja controles fuera de vista. */
-  @media (max-height:700px){
-    .zp-izq{position:static}
   }
   .tp-state{font-family:var(--font-m);font-size:12px;letter-spacing:.06em;color:var(--smoke);text-align:center;padding:18px 0;margin:0}
   .tp-item{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
@@ -520,6 +514,17 @@
     #zp-lf-lin{flex:1 1 auto;min-height:56px;overflow-y:auto;
        scrollbar-width:thin;scrollbar-color:rgba(166,107,255,.35) transparent}
     .zp-vent{flex:1 1 auto;min-height:96px}
+  }
+  /* vh mide el viewport GRANDE: en movil, con la barra del navegador desplegada,
+     26vh es mas alto que lo que se ve y el disco empuja los mandos fuera de
+     pantalla. svh mide el viewport chico (barra visible), que es el caso malo.
+     Va despues del bloque de una columna para ganar por orden, y dentro de
+     @supports para que Safari 15 y anteriores conserven vh. */
+  @supports (height:1svh){
+    .zp-disco{--d:min(58vw,26svh,230px)}
+    @media (max-width:979px){
+      .zp-disco{--d:min(34vw,16svh,130px)}
+    }
   }
   /* No es un detalle opcional: para parte del publico una rotacion continua
      produce malestar fisico. */

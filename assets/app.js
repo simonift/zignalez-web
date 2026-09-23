@@ -12,7 +12,7 @@
     {yt:"sf9pJw4ww8w", t:"HAYABUSA (Live)", badge:"con Flacko Loyal", uv:true, sp:ARTIST_SPOTIFY},
     {yt:"_nAUBog0kzk", t:"ALTA GAMA (ft Migue Ramos)", badge:"Video Lyrics", sp:"https://open.spotify.com/track/7N2R96fWEwgVT0PLRfSs0I"},
     {yt:"JGGHQ7kpn_Q", t:"GATAS & GANGSTERS", badge:"Video", sp:"https://open.spotify.com/album/0H5aw80rGzBj0G5HlNMXvY"},
-    {yt:"tHt8pvWICdc", t:"Puesta Pa' Mí (ft Brignacio)", badge:"Show", sp:ARTIST_SPOTIFY},
+    {yt:"tHt8pvWICdc", t:"Puesta Pa' Mí (ft Brignacio)", badge:"Show", sp:ARTIST_SPOTIFY, th:"hqdefault"},
     {yt:"auU93djdz84", t:"No Te Vuelvo A Ver (Brignacio ft Zignalez)", badge:"Video", sp:ARTIST_SPOTIFY},
     {yt:"D-GV3pneZGQ", t:"Sola llega, sola se va · #Hayabusa", badge:"Preview", sp:ARTIST_SPOTIFY, fb:true},
     {yt:"qSOU03PgyZY", t:"LA DATA · en el estudio", badge:"Behind", sp:"https://open.spotify.com/album/4F6wmBGKWZx3Xr5yyu1WO0"},
@@ -58,7 +58,10 @@
     var img = card.querySelector('.vimg');
     if(v.fb){ card.classList.add('vthumb-fallback'); }
     else {
-      var res=['maxresdefault','sddefault','hqdefault','mqdefault'], ri=0;
+      /* th: primera resolucion que SI existe para ese video. Sin esto, videos sin
+         miniatura HD generaban dos 404 en consola por visita (verificado 22-09-2026:
+         tHt8pvWICdc no tiene maxres ni sd). */
+      var res=['maxresdefault','sddefault','hqdefault','mqdefault'], ri=v.th?Math.max(0,res.indexOf(v.th)):0;
       function tryThumb(){ img.src='https://i.ytimg.com/vi/'+v.yt+'/'+res[ri]+'.jpg'; }
       img.addEventListener('error', function(){ ri++; if(ri<res.length) tryThumb(); else card.classList.add('vthumb-fallback'); });
       img.addEventListener('load', function(){ if(img.naturalWidth<=121){ ri++; if(ri<res.length) tryThumb(); else card.classList.add('vthumb-fallback'); } });
@@ -387,6 +390,7 @@
     if(minimo && hueco < minimo) hueco = minimo;
     if(hueco < 260) hueco = 260;
     ZP.cols.style.setProperty('--zp-tope', hueco + 'px');
+    marcarLetraNavegable();
   }
   /* Lo que el cuadro de la derecha no puede ceder: sus partes fijas
      (cabecera, separadores y relleno) mas los minimos de las dos zonas que
@@ -402,6 +406,40 @@
     var mVent = parseFloat(getComputedStyle(ZP.vent).minHeight) || 0;
     var m = Math.ceil(fijo + mLin + mVent);
     return (m > 0 && isFinite(m)) ? m : 200;
+  }
+
+  /* WCAG 2.1.1: en movil el cuadro de la letra tiene scroll propio, y una zona
+     que scrollea y no recibe foco es contenido inalcanzable con teclado --
+     tambien para quien navega con un mando o un conmutador. El tabindex se
+     pone SOLO cuando de verdad desborda: una parada de tabulacion que no
+     scrollea nada es ruido para quien usa lector de pantalla. */
+  function marcarLetraNavegable(){
+    if(!ZP.lfLin) return;
+    var desborda = ZP.lfLin.scrollHeight > ZP.lfLin.clientHeight + 1;
+    if(desborda){
+      if(ZP.lfLin.getAttribute('tabindex') !== '0'){
+        ZP.lfLin.setAttribute('tabindex','0');
+        ZP.lfLin.setAttribute('role','region');
+        ZP.lfLin.setAttribute('aria-label','Letra');
+      }
+    } else if(ZP.lfLin.hasAttribute('tabindex')){
+      /* No se lo quitamos mientras tenga el foco. Medido: con el foco en la
+         letra, pasar de 390 a 1440 de ancho dejaba document.activeElement en
+         BODY -- quien navega con teclado pierde el sitio y vuelve al principio
+         del documento. Esperamos a que salga solo. */
+      if(document.activeElement === ZP.lfLin){
+        if(!ZP.lfLinEsperaBlur){
+          ZP.lfLinEsperaBlur = 1;
+          ZP.lfLin.addEventListener('blur', function(){
+            ZP.lfLinEsperaBlur = 0; marcarLetraNavegable();
+          }, { once:true });
+        }
+        return;
+      }
+      ZP.lfLin.removeAttribute('tabindex');
+      ZP.lfLin.removeAttribute('role');
+      ZP.lfLin.removeAttribute('aria-label');
+    }
   }
 
   function ajustarTopeDiferido(){
@@ -1171,6 +1209,8 @@
           ZP.lfLin.scrollTop = ab2 - ZP.lfLin.clientHeight;
       }
     }
+
+    marcarLetraNavegable();
 
     /* Sin bloque estatico de "lo que viene": esas lineas ya estan en la
        ventana de arriba y se deslizan solas. */
