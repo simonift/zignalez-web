@@ -384,12 +384,31 @@
     /* Se mide con el tope QUITADO: con el tope puesto la columna ya esta
        comprimida y scrollHeight devuelve la caja, no el contenido, asi que el
        minimo salia mas bajo que el contenido real y seguia recortando. */
+    /* 23-09-2026 · Clarity reportaba 25 errores, el 100% "ResizeObserver loop
+       completed with undelivered notifications", y salian de aqui: este bloque
+       quita y vuelve a poner --zp-tope, lo que cambia el alto del subarbol que
+       el propio observador vigila, y el ciclo no alcanza a estabilizarse en el
+       fotograma. El error es benigno -- el navegador entrega lo pendiente en el
+       fotograma siguiente -- pero deja el monitoreo inservible.
+       Dos cortes: se desconecta el observador mientras medimos y escribimos, y
+       se reconecta en el fotograma siguiente; y no se toca el DOM si el valor
+       calculado es el mismo que ya estaba. */
+    if(ZP.obsIzq) ZP.obsIzq.disconnect();
     ZP.cols.style.removeProperty('--zp-tope');
     var minIzq = ZP.izq ? Math.ceil(ZP.izq.getBoundingClientRect().height) : 0;
     var minimo = anchoGrande ? minIzq : (minIzq + 16 + minimoDer());
     if(minimo && hueco < minimo) hueco = minimo;
     if(hueco < 260) hueco = 260;
-    ZP.cols.style.setProperty('--zp-tope', hueco + 'px');
+    var valor = hueco + 'px';
+    if(ZP.cols.style.getPropertyValue('--zp-tope') !== valor){
+      ZP.cols.style.setProperty('--zp-tope', valor);
+    }
+    if(ZP.obsIzq && window.requestAnimationFrame){
+      requestAnimationFrame(function(){
+        var dentro = ZP.izq && ZP.izq.firstElementChild;
+        if(ZP.obsIzq && dentro) ZP.obsIzq.observe(dentro);
+      });
+    }
     marcarLetraNavegable();
   }
   /* Lo que el cuadro de la derecha no puede ceder: sus partes fijas
@@ -1348,6 +1367,10 @@
   function dimensionarOnda(){
     if(!ZP.ctx || !ZP.onda) return;
     var r = ZP.onda.getBoundingClientRect();
+    /* Mismo motivo que en ajustarTope: escribir width/height del lienzo cambia
+       el tamano del elemento que su propio ResizeObserver vigila. Si la caja no
+       cambio, no se toca nada y el ciclo no empieza. */
+    if(ZP.ancho === r.width && ZP.alto === r.height) return;
     var dpr = Math.min(2, window.devicePixelRatio || 1);
     ZP.lienzo.width  = Math.max(1, Math.round(r.width  * dpr));
     ZP.lienzo.height = Math.max(1, Math.round(r.height * dpr));
