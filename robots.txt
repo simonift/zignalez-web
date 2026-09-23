@@ -1,8 +1,22 @@
 # zignalez.cl
 # Este archivo existe de verdad. Antes, /robots.txt devolvia HTTP 200 con el
 # HTML de la home (fallback de Cloudflare Pages): parecia existir y no existia.
+#
+# Content-signal (23-09-2026): declara la preferencia sobre uso de IA.
+#   search=yes     indexacion en buscadores: si
+#   ai-input=yes   motores de respuesta pueden leer y CITAR la pagina: si
+#   ai-train=no    entrenamiento de modelos con este contenido: no
+#   use=reference  se referencia la fuente
+# Es una PREFERENCIA declarada, no un bloqueo tecnico. Quien la ignore, entra
+# igual. El bloqueo real, si alguna vez se quiere, se configura en el panel de
+# Cloudflare (AI Crawl Control), no aqui.
+#
+# NO activar "Managed robots.txt" en Cloudflare: antepone Disallow: / para
+# ClaudeBot, GPTBot, Applebot-Extended, Google-Extended y otros, y eso apagaria
+# justo lo que buscamos (que los motores de respuesta puedan citar el sitio).
 
 User-agent: *
+Content-signal: search=yes, ai-input=yes, ai-train=no, use=reference
 Allow: /
 Disallow: /admin.html
 
