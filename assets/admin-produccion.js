@@ -167,6 +167,11 @@ function estrenoYMD(iso) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 const releaseDe = (trackId) => st.releases[trackId] || null;
+// Decisión 25-09: la fecha de estreno se ofrece cuando el tema tiene material
+// en MASTERING o más (o ya existe un lanzamiento). En IDEA/DEMO/RECORDING/
+// MIXING no tiene sentido hablar de estreno y el bloque no aparece.
+const ETAPAS_ESTRENO = ['MASTERING', 'RELEASE_READY', 'RELEASED'];
+const admiteEstreno = (trackId) => !!releaseDe(trackId) || versionesDe(trackId).some((v) => ETAPAS_ESTRENO.includes(v.stage));
 
 /* ───────────── derivados del estado ───────────── */
 
@@ -376,9 +381,13 @@ function formSubida({ track, version }) {
     el('label', { class: 'lbl', text: 'Fecha de estreno (opcional; editable después)' }), estreno,
     st.falta03 ? el('p', { class: 'zg-nota', text: 'Requiere ejecutar fix-03 y fix-10 en Supabase.' }) :
     rel && rel.status === 'RELEASED' ? el('p', { class: 'zg-nota', text: 'Este tema ya se publicó: la fecha está congelada.' }) : null);
-  const syncEstreno = () => estrenoWrap.classList.toggle('hidden', role.value !== 'MASTER');
+  // Solo con MASTER y solo si la etapa (la elegida para la versión nueva, o la
+  // de la versión existente) está en MASTERING/RELEASE_READY, o ya hay lanzamiento.
+  const etapaOk = () => !!rel || ETAPAS_ESTRENO.includes(version ? version.stage : stage.value);
+  const syncEstreno = () => estrenoWrap.classList.toggle('hidden', role.value !== 'MASTER' || !etapaOk());
   role.addEventListener('change', syncEstreno);
   file.addEventListener('change', syncEstreno);
+  stage.addEventListener('change', syncEstreno);
   syncEstreno();
   if (st.falta03 || (rel && rel.status === 'RELEASED')) estreno.disabled = true;
   const btn = el('button', { class: 'btn primary sm', type: 'button', text: version ? 'Agregar archivo' : 'Subir versión nueva' });
@@ -590,6 +599,10 @@ async function eliminarLanzamiento(rel, out) {
 
 function bloqueLanzamiento(track) {
   const out = status();
+  if (!admiteEstreno(track.id)) {
+    return el('div', { class: 'zg-sub' }, el('p', { class: 'eyebrow', text: 'Lanzamiento' }),
+      el('p', { class: 'zg-nota', text: 'La fecha de estreno se habilita cuando una versión llega a MASTERING o RELEASE_READY.' }));
+  }
   if (st.falta03) {
     return el('div', { class: 'zg-sub' }, el('p', { class: 'eyebrow', text: 'Lanzamiento' }),
       el('p', { class: 'zg-nota', text: 'La fecha de estreno vive en la tabla de lanzamientos (fix-03). Ejecuta fix-03 y fix-10 en Supabase para activarla.' }));
