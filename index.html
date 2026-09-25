@@ -121,6 +121,14 @@
   .btn-sm{padding:11px 18px;font-size:12px}
   .link-inline{font-family:var(--font-m);font-size:12px;letter-spacing:.06em;color:var(--uv-soft);text-decoration:none}
   .link-inline:hover{color:var(--white)}
+  .hero-preview{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:16px}
+  .hero-preview[hidden]{display:none}
+  .hero-preview audio{display:none}
+  .hp-estado{font-family:var(--font-m);font-size:12px;letter-spacing:.06em;color:var(--smoke);flex-basis:100%}
+  .hp-estado:empty{display:none}
+  .tp-item.tp-escuchada .tp-title{color:var(--smoke)}
+  .zp-card.zp-escuchada .zp-card-t,.zp-vt.zp-escuchada{opacity:.55}
+  .tp-cuando{font-family:var(--font-m);font-size:11px;letter-spacing:.08em;color:var(--smoke);margin-top:2px}
   .hero-meta{margin-top:40px;display:flex;flex-wrap:wrap;gap:26px;font-family:var(--font-m);font-size:12px;letter-spacing:.08em;color:var(--smoke);border-top:1px solid var(--line);padding-top:18px}
   .hero-meta b{color:var(--chrome-hi);font-weight:700}
 
@@ -770,6 +778,11 @@
         <a class="btn btn-ghost" href="#videos">▶ Ver los videos</a>
         <a class="btn btn-ghost" href="#lista">Entra a la lista</a>
       </div>
+      <!-- 25-09-2026 · Preview público (fix-11, HdU-27): lo pinta app.js solo si hay
+           un recorte registrado. Un objeto aparte en previews/, nunca la maqueta
+           completa. Sin autoplay. Al terminar, el CTA a la lista aparece aquí,
+           no 6.000 px más abajo: Clarity muestra que el 87% no pasa del 10%. -->
+      <div class="hero-preview" id="heroPreview" hidden></div>
       <div class="hero-meta">
         <span>En edición · <b>HAYABUSA</b> (con Flacko Loyal)</span>
         <span>Distribuido por <b>División Rec</b></span>

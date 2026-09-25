@@ -156,6 +156,13 @@
     auth: { flowType: 'pkce', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true }
   }) : null;
 
+  /* ====== Clarity: eventos personalizados (PROMPT_MAESTRO_ESCUCHA_UNICA §E9) ======
+     window.clarity("event", nombre) — API verificada 25-09-2026. Si Clarity no
+     cargó (CSP, bloqueador), no pasa nada: la analítica nunca rompe el sitio. */
+  function evento(nombre){
+    try { if(typeof window.clarity === 'function') window.clarity('event', nombre); } catch(e){}
+  }
+
   /* ====== Formulario captura: registro con Supabase ====== */
   var form = document.getElementById('capture-form');
   var note = document.getElementById('note');
@@ -186,6 +193,7 @@
       options: { emailRedirectTo: window.location.origin + '/?zona=miembros' }
     }).then(function(res){
       if(res.error) throw res.error;
+      evento('otp_enviado');
       /* 2. Guardar el WhatsApp (opcional). El email/consentimiento los graba
          un trigger en auth.users al confirmar el magic link — no dependemos
          de que este insert funcione. PostgREST resuelve con {data,error} y
@@ -284,6 +292,7 @@
         if(res.error) throw res.error;
         loginNote.className='login-note ok';
         loginNote.textContent='Va en camino. Revisa tu correo — a veces cae en promociones.';
+        evento('otp_enviado');
         loginSubmit.textContent='Listo — revisa tu correo';
       }).catch(function(err){
         loginSubmit.disabled=false;
@@ -530,6 +539,16 @@
           return;
         }
         renderTracks(tracks);
+        /* Con la escucha única encendida, las agotadas se pintan desde el inicio.
+           Sin fix-11, la consulta falla en silencio y no se pinta nada. */
+        sb.from('escuchas').select('track_id,primera_at,expira_at').then(function(r){
+          if(!r || r.error || !r.data) return;
+          r.data.forEach(function(e){
+            if(new Date(e.expira_at) > new Date()) return;
+            var i = tracks.findIndex(function(t){ return t.id === e.track_id; });
+            if(i >= 0) marcarEscuchada(i, e.primera_at);
+          });
+        });
       });
   }
 
@@ -619,6 +638,7 @@
         b.setAttribute('aria-label', (k === i ? 'Sonando: ' : 'Reproducir ') + (t.title || ''));
         if(k === i) b.setAttribute('aria-current','true');
         if(!t.file_path) b.disabled = true;
+        if(ZP.escuchadas && ZP.escuchadas[t.id] && k !== i){ b.disabled = true; f.classList.add('zp-escuchada'); b.title = 'Escuchada el ' + fechaCorta(ZP.escuchadas[t.id]); }
         var tt = el('span','zp-vt-t'); tt.textContent = t.title || '';
         var dd = el('span','zp-vt-d'); dd.textContent = fmtDur(t.duration_seconds);
         b.appendChild(tt); b.appendChild(dd);
@@ -824,6 +844,11 @@
       pintar();
     });
     audioEl.addEventListener('ended', function(){
+      var tEnd = ZP.tracks[ZP.idx];
+      if(tEnd && (ZP.escuchaEstado === 'NUEVA' || ZP.escuchaEstado === 'VIGENTE')){
+        sb.rpc('completar_escucha', { p_track_id: tEnd.id }).then(function(){});
+      }
+      evento('escucha_completa');
       if(ZP.repetir === 2){ audioEl.currentTime = 0; audioEl.play().catch(function(){}); return; }
       if(ZP.repetir === 0 && ZP.idx === ZP.tracks.length - 1){ return; }
       saltar(1);
@@ -1015,7 +1040,61 @@
     temaOnda(t);
     decir('Firmando enlace…');
 
-    /* Signed URL de 300s: el archivo nunca es publico, el link caduca solo. */
+    /* Escucha única (fix-11, HdU-29): la base decide. Apagada → LIBRE. Encendida →
+       NUEVA/VIGENTE abren la ventana; AGOTADA no firma y lo dice con fecha.
+       Si la RPC no existe todavía (fix-11 sin aplicar), se sigue como antes. */
+    ZP.escuchaEstado = null;
+    sb.rpc('pedir_escucha', { p_track_id: t.id }).then(function(pe){
+      var fila = pe && pe.data && pe.data[0];
+      if(pe && pe.error && pe.error.code !== 'PGRST202'){ console.warn('pedir_escucha:', pe.error); }
+      if(fila && fila.estado === 'AGOTADA'){
+        ZP.escuchaEstado = 'AGOTADA';
+        evento('escucha_bloqueada');
+        marcarEscuchada(i, fila.primera_at);
+        decir('La escuchaste el ' + fechaCorta(fila.primera_at) + '. Los inéditos se oyen una vez: ' +
+              (t.estreno_txt || 'el resto, en Spotify cuando salga.'));
+        return;
+      }
+      ZP.escuchaEstado = fila ? fila.estado : 'LIBRE';
+      if(fila && fila.estado === 'NUEVA') evento('escucha_iniciada');
+      firmarYSonar(t);
+    });
+  }
+
+  function fechaCorta(iso){
+    try { return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch(e){ return ''; }
+  }
+  /* Lo que el fan ve es el carrusel (.zp-card) y la ventana (.zp-vt); las filas
+     .tp-item son el molde. Se marcan los tres para que ninguna superficie ofrezca
+     un play que la base va a negar. */
+  function marcarEscuchada(i, cuando){
+    var t = ZP.tracks[i]; if(!t) return;
+    ZP.escuchadas = ZP.escuchadas || {};
+    ZP.escuchadas[t.id] = cuando;
+    var txt = 'Escuchada el ' + fechaCorta(cuando);
+    var row = ZP.filas[i];
+    if(row){
+      row.classList.add('tp-escuchada');
+      var b = row.querySelector('.tp-play');
+      if(b){ b.disabled = true; b.title = txt; }
+      var info = row.querySelector('.tp-info');
+      if(info && !info.querySelector('.tp-cuando')){
+        var c = document.createElement('div'); c.className = 'tp-cuando'; c.textContent = txt; info.appendChild(c);
+      }
+    }
+    var card = ZP.carr && ZP.carr.children[i];
+    if(card){
+      card.classList.add('zp-escuchada');
+      var cb = card.querySelector('.zp-card-btn');
+      if(cb){ cb.disabled = true; cb.title = txt; cb.setAttribute('aria-label', txt + ': ' + (t.title || '')); }
+      var cd = card.querySelector('.zp-card-d');
+      if(cd) cd.textContent = txt;
+    }
+    if(ZP.vent && !ZP.vent.hidden) pintarVentana();
+  }
+
+  function firmarYSonar(t){
+    /* Signed URL: el archivo nunca es publico, el link caduca solo. */
     sb.storage.from('maquetas').createSignedUrl(t.file_path, TTL_FIRMA).then(function(res){
       if(res.error || !res.data || !res.data.signedUrl){
         console.warn('signedUrl:', res.error);
@@ -1492,6 +1571,7 @@
   if(sb){
     sb.auth.onAuthStateChange(function(event, session){
       if(session && session.user){
+        if(!sesionAbierta) evento('sesion_ok');
         sesionAbierta = true;
         if(event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') return;  /* no recargar bajo los pies del usuario */
         showMembers(session.user);
@@ -1531,4 +1611,52 @@
     }
   }
 
+
+  /* ====== Preview público en el hero (fix-11, HdU-27) ======
+     Un objeto distinto (recorte en previews/), nunca el LISTEN completo. Sin
+     recorte registrado no hay botón (M-7). Un solo reproductor mínimo. */
+  (function heroPreview(){
+    var wrap = document.getElementById('heroPreview');
+    if(!wrap || !sb) return;
+    sb.rpc('preview_publico').then(function(r){
+      var p = r && r.data && r.data[0];
+      if(!p || !p.preview_path) return;
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'btn btn-primary hp-btn';
+      btn.textContent = 'Oír ' + p.preview_seconds + ' s de ' + p.titulo;
+      var estado = document.createElement('span'); estado.className = 'hp-estado'; estado.setAttribute('aria-live','polite');
+      var audio = document.createElement('audio'); audio.preload = 'none';
+      var cta = document.createElement('a'); cta.className = 'btn btn-ghost hp-cta'; cta.href = '#lista'; cta.hidden = true;
+      cta.textContent = 'Entra a la lista y escúchala entera';
+      cta.addEventListener('click', function(){
+        evento('cta_lista_click');
+        var em = document.getElementById('email'); if(em) setTimeout(function(){ try{ em.focus(); }catch(e){} }, 400);
+      });
+      wrap.appendChild(btn); wrap.appendChild(estado); wrap.appendChild(cta); wrap.appendChild(audio);
+      wrap.hidden = false;
+      var firmado = false;
+      btn.addEventListener('click', function(){
+        if(!audio.paused){ audio.pause(); btn.textContent = 'Seguir oyendo'; return; }
+        if(firmado){ audio.play().catch(function(){}); btn.textContent = 'Pausa'; return; }
+        btn.disabled = true; estado.textContent = 'Cargando…';
+        sb.storage.from('maquetas').createSignedUrl(p.preview_path, 300).then(function(res){
+          btn.disabled = false;
+          if(res.error || !res.data || !res.data.signedUrl){ estado.textContent = 'No se pudo cargar. Prueba en Spotify.'; return; }
+          firmado = true; audio.src = res.data.signedUrl; estado.textContent = '';
+          audio.play().then(function(){ evento('preview_play'); btn.textContent = 'Pausa'; })
+               .catch(function(){ estado.textContent = 'Toca otra vez para oír.'; });
+        });
+      });
+      audio.addEventListener('ended', function(){
+        evento('preview_end');
+        btn.textContent = 'Oír de nuevo';
+        estado.textContent = 'Eso fueron ' + p.preview_seconds + ' segundos. La versión completa la escucha la lista primero.';
+        cta.hidden = false;
+      });
+      /* Quien toca "Entra a la lista" en el hero también cuenta (HdU-32). */
+      document.querySelectorAll('.hero-actions a[href="#lista"]').forEach(function(a){
+        a.addEventListener('click', function(){ evento('cta_lista_click'); });
+      });
+    });
+  })();
 })();

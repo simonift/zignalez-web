@@ -3,7 +3,8 @@
 // Catálogo con etapas, versiones y sus archivos, colaboradores, shares y
 // bitácora (PROMPT_MAESTRO_HDU_CATALOGO v1.1: HdU-05…08, 12…16), borrado con
 // guardas y lanzamiento mínimo (PROMPT_MAESTRO_HDU_BORRADO_Y_LANZAMIENTO v1.0:
-// HdU-17…25). v1.2 · 25-09-2026.
+// HdU-17…25) y preview público (PROMPT_MAESTRO_ESCUCHA_UNICA v1.0, HdU-28).
+// v1.3 · 25-09-2026.
 //
 // Módulo nuevo junto al admin.js legado (HdU-04, estrangulamiento): no toca su
 // lógica. Se engancha por window.ZignalezAdmin / 'zg-admin-ready'.
@@ -28,7 +29,7 @@ let root = null;
 const st = {
   tracks: [], versions: [], media: [], collabs: [], shares: [], stageLog: [], audit: [],
   releases: {},                 // track_id → release (fix-03 + fix-10)
-  filtro: 'TODAS', abierto: new Set(), falta: null, falta03: false
+  filtro: 'TODAS', abierto: new Set(), falta: null, falta03: false, falta11: false
 };
 
 /* ───────────── helpers ───────────── */
@@ -207,8 +208,8 @@ function pendingViejo(m) {
 
 async function cargar() {
   const sb = ZA.sb;
-  const [tr, sv, vm, co, vs, lg, au, rt] = await Promise.all([
-    sb.from('tracks').select('id,title,slug,visible,file_path,sort_order').order('sort_order').order('created_at'),
+  let [tr, sv, vm, co, vs, lg, au, rt] = await Promise.all([
+    sb.from('tracks').select('id,title,slug,visible,file_path,sort_order,duration_seconds,preview_seconds,preview_start,preview_path').order('sort_order').order('created_at'),
     sb.from('song_versions').select('id,track_id,stage,notes,is_public,created_at').order('created_at', { ascending: false }),
     sb.from('version_media').select('id,version_id,role,file_path,file_name,content_type,size_bytes,duration_seconds,status,created_at,confirmed_at'),
     sb.from('collaborators').select('user_id,display_name,role,active,created_at').order('created_at'),
@@ -220,6 +221,13 @@ async function cargar() {
     sb.from('release_tracks').select('track_id,release:releases(id,title,release_type,status,release_date,platforms)')
   ]);
 
+  // Sin fix-11 no existen las columnas de preview: se vuelve a pedir sin ellas
+  // y el bloque Preview lo dice. La carga del resto no se rompe por eso.
+  st.falta11 = false;
+  if (tr.error && /preview_/.test(tr.error.message || '')) {
+    st.falta11 = true;
+    tr = await sb.from('tracks').select('id,title,slug,visible,file_path,sort_order,duration_seconds').order('sort_order').order('created_at');
+  }
   const base = [tr, sv, vm, co].find((r) => r.error);
   if (base) throw base.error;
   st.falta = [vs, lg, au].some((r) => r.error) ? 'fix-08' : null;
@@ -569,6 +577,69 @@ function bloqueEliminarTema(track, out) {
   return el('div', { class: 'row-actions', style: 'margin-top:16px' }, btn, confirmarInline(btn, q, () => eliminarTema(track, out)));
 }
 
+/* ───────────── preview público (HdU-28) ───────────── */
+
+// El recorte lo hace el artista (DAW o docs/scripts/generar-preview.sh) y lo
+// sube aquí. Se comprueba la duración contra los segundos declarados (±3 s):
+// un "preview de 30 s" de 3 minutos sería la maqueta completa en público.
+async function subirPreview(track, file, seconds, start, out) {
+  const sb = ZA.sb;
+  if (!file) return setStatus(out, 'Elige el recorte (.m4a/.mp3).', 'err');
+  const secs = parseInt(seconds, 10), ini = parseInt(start, 10) || 0;
+  if (!(secs >= 15 && secs <= 60)) return setStatus(out, 'Los segundos van entre 15 y 60.', 'err');
+  setStatus(out, 'Leyendo duración…');
+  const dur = await readDuration(file);
+  if (dur === null) return setStatus(out, 'No se pudo leer la duración del archivo.', 'err');
+  if (Math.abs(dur - secs) > 3) return setStatus(out, `El archivo dura ${fmtDur(dur)} y declaraste ${secs} s. El recorte tiene que medir lo que dice.`, 'err');
+  const ruta = `previews/${track.id}/${Date.now()}.${extOf(file.name)}`;
+  setStatus(out, 'Subiendo recorte…');
+  const up = await sb.storage.from(ZA.bucket).upload(ruta, file, { upsert: false, contentType: file.type || undefined });
+  if (up.error) return setStatus(out, 'No se subió: ' + errText(up.error), 'err');
+  const r = await sb.rpc('registrar_preview', { p_track_id: track.id, p_path: ruta, p_seconds: secs, p_start: ini });
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  const anterior = track.preview_path;
+  if (anterior && anterior !== ruta) await sb.storage.from(ZA.bucket).remove([anterior]);
+  await recargar(`Preview de «${track.title}» publicado: ${secs} s desde ${fmtDur(ini)}.`);
+}
+
+async function quitarPreview(track, out) {
+  const sb = ZA.sb;
+  const r = await sb.from('tracks').update({ preview_path: null }).eq('id', track.id);
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  if (track.preview_path) await sb.storage.from(ZA.bucket).remove([track.preview_path]);
+  await recargar('Preview retirado: el hero deja de anunciarlo.');
+}
+
+function bloquePreview(track) {
+  const out = status();
+  if (st.falta11 || track.preview_seconds === undefined) {
+    return el('div', { class: 'zg-sub' }, el('p', { class: 'eyebrow', text: 'Preview público' }),
+      el('p', { class: 'zg-nota', text: 'Requiere ejecutar fix-11 en Supabase.' }));
+  }
+  const file = el('input', { type: 'file', accept: 'audio/*' });
+  const secs = el('input', { type: 'number', min: '15', max: '60', value: String(track.preview_seconds || 30) });
+  const ini = el('input', { type: 'number', min: '0', max: String(track.duration_seconds || 600), value: String(track.preview_start || 0) });
+  const btn = el('button', { class: 'btn primary sm', type: 'button', text: track.preview_path ? 'Reemplazar recorte' : 'Publicar preview' });
+  btn.addEventListener('click', async () => { btn.disabled = true; await subirPreview(track, file.files[0], secs.value, ini.value, out); btn.disabled = false; });
+  const acc = [btn];
+  if (track.preview_path) {
+    const oir = el('button', { class: 'btn ghost sm', type: 'button', text: 'Oír preview' });
+    oir.addEventListener('click', () => reproducir({ file_path: track.preview_path, role: 'PREVIEW' }, track.title, oir));
+    const quitar = el('button', { class: 'btn danger sm', type: 'button', text: 'Retirar preview' });
+    acc.push(oir, quitar, confirmarInline(quitar, '¿Retirar el preview? El hero deja de ofrecerlo y el recorte se borra del bucket.', () => quitarPreview(track, out)));
+  }
+  return el('div', { class: 'zg-sub' },
+    el('p', { class: 'eyebrow', text: 'Preview público' + (track.preview_path ? ` · publicado (${track.preview_seconds} s desde ${fmtDur(track.preview_start)})` : ' · sin publicar') }),
+    el('p', { class: 'zg-nota', text: track.visible
+      ? 'Lo oye cualquiera desde el hero, sin cuenta. Es un recorte aparte: la maqueta completa sigue siendo solo para la lista. Elige el gancho (el coro), no la intro.'
+      : 'El tema está oculto: el preview no se mostrará hasta que sea visible.' }),
+    el('div', { class: 'grid3' },
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Recorte (.m4a/.mp3, dura lo que declaras)' }), file),
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Segundos (15–60)' }), secs),
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Empieza en el segundo' }), ini)),
+    el('div', { class: 'row-actions' }, acc), out);
+}
+
 /* ───────────── lanzamiento (HdU-20, 21, 22) ───────────── */
 
 async function guardarFecha(rel, ymd, out) {
@@ -683,6 +754,7 @@ function detalleTema(track) {
   if (!publicada && track.file_path && vs.length > 0) {
     nodos.push(el('p', { class: 'zg-nota', text: 'Mientras no publiques una versión, la maqueta sigue sirviendo su archivo legado.' }));
   }
+  nodos.push(bloquePreview(track));
   nodos.push(bloqueLanzamiento(track));
   nodos.push(formSubida({ track, version: null }));
   vs.forEach((v, i) => nodos.push(bloqueVersion(track, v, vs.length - i)));
@@ -731,6 +803,7 @@ function tarjetaCatalogo() {
               el('span', { class: 'pill' + (e ? ' on' : ' off'), text: e || 'SIN VERSIONES · LEGADO' }),
               el('span', { text: `${n} ${n === 1 ? 'versión' : 'versiones'}` }),
               el('span', { class: 'pill' + (t.visible ? ' on' : ' off'), text: t.visible ? 'Visible' : 'Oculta' }),
+              t.preview_path ? el('span', { class: 'pill on', text: `Preview ${t.preview_seconds} s` }) : null,
               (() => { const r = releaseDe(t.id); return r && r.release_date
                 ? el('span', { class: 'pill' + (r.status === 'RELEASED' ? ' on' : ' master'), text: (r.status === 'RELEASED' ? 'Estrenado ' : 'Estreno ') + fmtFecha(r.release_date) })
                 : r ? el('span', { class: 'pill off', text: 'Lanzamiento sin fecha' }) : null; })())),
