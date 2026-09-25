@@ -719,7 +719,7 @@ function bloquePreview(track) {
   return el('div', { class: 'zg-sub' },
     el('p', { class: 'eyebrow', text: 'Preview público' + (track.preview_path ? ` · publicado (${track.preview_seconds} s desde ${fmtDur(track.preview_start)})` : ' · sin publicar') }),
     el('p', { class: 'zg-nota', text: track.visible
-      ? 'Lo oye cualquiera desde el hero, sin cuenta. Es un recorte aparte en MP3: la maqueta completa sigue siendo solo para la lista. Elige el gancho (el coro), pruébalo, y recorta.'
+      ? 'Este recorte es lo que oye la LISTA (con la letra al tiempo) y, si lo eliges como preview del hero, cualquiera sin cuenta. La maqueta completa no la oye ningún fan: solo colaboradores con share. Elige el gancho (el coro), pruébalo, y recorta.'
       : 'El tema está oculto: el preview no se mostrará hasta que sea visible.' }),
     el('div', { class: 'grid3' },
       el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Archivo fuente' }), fuente),

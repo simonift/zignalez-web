@@ -522,8 +522,14 @@
 
     /* RLS filtra por visible=TRUE, pero se filtra igual en el cliente:
        defensa en profundidad, no confianza en una sola capa. */
+    /* 25-09-2026 · DECISIÓN: la lista oye SOLO un extracto de cada maqueta
+       (el recorte en previews/ que el admin publica por tema), nunca el LISTEN
+       completo. Lo completo queda para productor/colaboradores (productor.html)
+       y para el estreno. Se seleccionan los campos del extracto y NO file_path:
+       can_read_maqueta v3 (fix-12) ya no lo firma a un fan, y pedirlo sería
+       enseñar una ruta que no abre. */
     sb.from('tracks')
-      .select('id,title,description,file_path,duration_seconds,sort_order,peaks')
+      .select('id,title,description,preview_path,preview_seconds,preview_start,duration_seconds,sort_order')
       .eq('visible', true)
       .order('sort_order', { ascending: true })
       .then(function(res){
@@ -533,7 +539,16 @@
           tracksLoaded = false;
           return;
         }
-        var tracks = res.data || [];
+        var tracks = (res.data || []).map(function(t){
+          /* El reproductor entero habla de file_path/duration_seconds. Se le da
+             el extracto con esos mismos nombres y no cambia nada más abajo.
+             Sin recorte publicado -> sin archivo: el botón lo dice. */
+          t.file_path        = t.preview_path || null;
+          t.offset           = t.preview_path ? (t.preview_start || 0) : 0;
+          t.duration_seconds = t.preview_path ? (t.preview_seconds || 0) : 0;
+          t.peaks            = null;   /* los picos son del tema entero, no del recorte */
+          return t;
+        });
         if(!tracks.length){
           setState('Las maquetas están en el horno. Te aviso apenas suban.');
           return;
@@ -567,7 +582,7 @@
       btn.className = 'tp-play';
       btn.innerHTML = ICON_PLAY;                       /* SVG fijo, no dato externo */
       btn.setAttribute('aria-label', 'Reproducir ' + (t.title || ''));
-      if(!t.file_path){ btn.disabled = true; btn.title = 'Todavía no lo subo'; }
+      if(!t.file_path){ btn.disabled = true; btn.title = 'Extracto en camino'; }
 
       var info = document.createElement('div');
       info.className = 'tp-info';
@@ -603,7 +618,7 @@
       var cb = document.createElement('button');
       cb.type='button'; cb.className='zp-card-btn';
       cb.setAttribute('aria-label','Reproducir ' + (t.title || ''));
-      if(!t.file_path){ cb.disabled = true; cb.title = 'Todavía no lo subo'; }
+      if(!t.file_path){ cb.disabled = true; cb.title = 'Extracto en camino'; }
       var ct = el('div','zp-card-t'); ct.textContent = t.title || '';
       var cd = el('div','zp-card-d'); cd.textContent = t.description || '';
       var cdur = el('div','zp-card-dur'); cdur.textContent = fmtDur(t.duration_seconds);
@@ -1105,7 +1120,7 @@
       if(ZP.tLento) clearTimeout(ZP.tLento);
       /* Un WAV master pesa decenas de MB. Decirlo es mejor que un spinner eterno. */
       ZP.tLento = setTimeout(function(){
-        if(audioEl.readyState < 3) decir('Este tema esta en calidad master y pesa bastante.');
+        if(audioEl.readyState < 3) decir('Se está cargando el extracto…');
       }, 8000);
       ZP.firmadoEn = Date.now();
       audioEl.src = res.data.signedUrl;
@@ -1388,7 +1403,10 @@
     pintar();
     /* Cada ~15 cuadros basta: buffered avanza a ritmo de red, no de pantalla. */
     if((ZP.cuadro = (ZP.cuadro || 0) + 1) % 15 === 0) pintarBuffer();
-    var i = buscarLinea(audioEl.currentTime);
+    /* La letra está cronometrada sobre el tema entero; el extracto empieza
+       en preview_start. Se suma el desfase para que la línea coincida. */
+    var tCur = ZP.tracks[ZP.idx];
+    var i = buscarLinea(audioEl.currentTime + ((tCur && tCur.offset) || 0));
     if(i !== ZP.iLinea) marcarLinea(i);              /* solo repinta al CAMBIAR */
     ZP.raf = requestAnimationFrame(tic);
   }
@@ -1650,7 +1668,7 @@
       audio.addEventListener('ended', function(){
         evento('preview_end');
         btn.textContent = 'Oír de nuevo';
-        estado.textContent = 'Eso fueron ' + p.preview_seconds + ' segundos. La versión completa la escucha la lista primero.';
+        estado.textContent = 'Eso fueron ' + p.preview_seconds + ' segundos. En la lista oyes un extracto de cada inédito, con su letra.';
         cta.hidden = false;
       });
       /* Quien toca "Entra a la lista" en el hero también cuenta (HdU-32). */
