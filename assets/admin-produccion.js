@@ -1,7 +1,8 @@
-// admin-produccion.js · Zignalez · 24-09-2026
+// admin-produccion.js · Zignalez · 24-09-2026 · v1.1
 //
 // Catálogo con etapas, versiones y sus archivos, colaboradores, shares y
-// bitácora (PROMPT_MAESTRO_HDU_CATALOGO v1.1: HdU-05…08, 12…16).
+// bitácora (PROMPT_MAESTRO_HDU_CATALOGO v1.1: HdU-05…08, 12…16) y borrado con
+// guardas (PROMPT_MAESTRO_HDU_BORRADO_Y_LANZAMIENTO v1.0: HdU-17, 18, 19, 23, 25).
 //
 // Módulo nuevo junto al admin.js legado (HdU-04, estrangulamiento): no toca su
 // lógica. Se engancha por window.ZignalezAdmin / 'zg-admin-ready'.
@@ -99,10 +100,13 @@ function readDuration(file) {
     a.src = url;
   });
 }
+// HdU-25: día LOCAL, no UTC. Con toISOString(), después de las 21:00 en Chile
+// "hoy" ya era mañana y el selector corría un día.
 function hoyMas(dias) {
   const d = new Date();
   d.setDate(d.getDate() + dias);
-  return d.toISOString().slice(0, 10);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 // Fecha elegida (día local) → fin de ese día. Si cae más allá del plazo, la base
 // lo rechaza con SHARE_PLAZO_EXCEDIDO; aquí se recorta para no provocarlo.
@@ -110,6 +114,41 @@ function venceEl(fechaYMD) {
   const d = new Date(fechaYMD + 'T23:59:00');
   const max = new Date(Date.now() + PLAZO_MAX_DIAS * 86400000 - 60000);
   return (d > max ? max : d).toISOString();
+}
+
+// Confirmación inline, mismo patrón que el legado (.confirm + .q + .open).
+// Nunca window.confirm: bloquea el hilo y no se puede probar.
+function confirmarInline(btn, pregunta, onSi) {
+  const conf = el('div', { class: 'confirm' });
+  const si = el('button', { class: 'btn sm danger', type: 'button', text: 'Sí, eliminar' });
+  const no = el('button', { class: 'btn sm ghost', type: 'button', text: 'No' });
+  conf.append(el('span', { class: 'q', text: pregunta }), si, no);
+  btn.addEventListener('click', () => { conf.classList.add('open'); btn.disabled = true; });
+  no.addEventListener('click', () => { conf.classList.remove('open'); btn.disabled = false; });
+  si.addEventListener('click', async () => {
+    si.disabled = true; no.disabled = true;
+    try { await onSi(); } finally { si.disabled = false; no.disabled = false; btn.disabled = false; conf.classList.remove('open'); }
+  });
+  return conf;
+}
+
+// Rol sugerido por tipo de archivo (HdU-18). Sugerencia, no imposición: un
+// MASTER en mp3 es legítimo para una maqueta antigua.
+function rolSugerido(file) {
+  const t = (file.type || '').toLowerCase();
+  const ext = extOf(file.name);
+  if (/wav|flac|aiff|x-aiff|x-wav/.test(t) || ['wav', 'flac', 'aif', 'aiff'].includes(ext)) return 'MASTER';
+  if (/mp4|aac|mpeg|m4a|ogg|opus/.test(t) || ['m4a', 'mp3', 'aac', 'ogg', 'opus'].includes(ext)) return 'LISTEN';
+  return null;
+}
+
+// Tras borrar en la base, limpiar el bucket. Si falla, la fila ya no existe:
+// se avisa y objetos_huerfanos() lo encuentra después (fix-09).
+async function limpiarBucket(rutas) {
+  if (!rutas || rutas.length === 0) return '';
+  const r = await ZA.sb.storage.from(ZA.bucket).remove(rutas);
+  if (r.error) return ` Aviso: ${rutas.length} archivo(s) no se pudieron borrar del bucket (${errText(r.error)}); quedan como huérfanos.`;
+  return ` ${rutas.length} archivo(s) borrados del bucket.`;
 }
 
 /* ───────────── derivados del estado ───────────── */
@@ -221,6 +260,11 @@ async function subirArchivo({ track, version, file, role, stage, notes }, out) {
   setStatus(out, 'Leyendo duración…', null);
   const dur = await readDuration(file);
 
+  // HdU-23: UNIQUE (version_id, role). Una fila FAILED del mismo rol bloquea el
+  // reintento con "duplicate key". Se borra antes; nunca upsert (pisaría un
+  // UPLOADED con la pantalla desactualizada).
+  await sb.from('version_media').delete().eq('version_id', v.id).eq('role', role).eq('status', 'FAILED');
+
   const ins = await sb.from('version_media').insert({
     version_id: v.id,
     role,
@@ -266,6 +310,21 @@ function formSubida({ track, version }) {
 
   const role = el('select', {}, faltantes.map((r) =>
     el('option', { value: r, text: r === 'LISTEN' ? 'LISTEN — escucha (mp3/aac liviano)' : 'MASTER — original (wav/flac)' })));
+  const aviso = el('p', { class: 'zg-nota hidden' });
+  file.addEventListener('change', () => {
+    const f = file.files[0];
+    const sug = f ? rolSugerido(f) : null;
+    if (sug && faltantes.includes(sug)) {
+      role.value = sug;
+      aviso.textContent = sug === 'MASTER'
+        ? 'Un WAV/FLAC es el original: va como MASTER. El LISTEN es el .m4a/.mp3 que oyen los demás.'
+        : 'Archivo liviano: va como LISTEN (lo que se reproduce). El MASTER es el WAV/FLAC original.';
+      aviso.classList.remove('hidden');
+    } else if (sug && !faltantes.includes(sug)) {
+      aviso.textContent = `Por el tipo de archivo parece ${sug}, pero esta versión ya tiene ${sug}. Revisa antes de subir.`;
+      aviso.classList.remove('hidden');
+    } else aviso.classList.add('hidden');
+  });
   const stage = el('select', {}, STAGES.filter((s) => s !== 'RELEASED').map((s) =>
     el('option', { value: s, text: s, selected: s === 'DEMO' })));
   const notes = el('input', { type: 'text', placeholder: 'Notas internas (opcional; el colaborador no las ve)' });
@@ -284,6 +343,7 @@ function formSubida({ track, version }) {
     el('div', { class: 'grid2' },
       el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Archivo' }), file),
       el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Tipo de archivo' }), role)),
+    aviso,
     version ? null : el('div', { class: 'grid2' },
       el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Etapa inicial' }), stage),
       el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Notas' }), notes)),
@@ -304,20 +364,56 @@ async function publicar(v, out) {
   await recargar('Versión publicada: es el archivo que sirve la maqueta. La visibilidad para fans sigue en el listado de arriba.');
 }
 
+// HdU-17. La base decide (song_versions_no_borrar): pública, RELEASED o
+// sosteniendo un lanzamiento programado → mensaje tal cual.
+async function eliminarVersion(v, out) {
+  const r = await ZA.sb.rpc('borrar_version', { p_version_id: v.id });
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  const nota = await limpiarBucket(r.data || []);
+  await recargar('Versión eliminada.' + nota);
+}
+
+// HdU-18. Quitar un archivo o cambiarle el rol. version_media_protege_publico
+// y version_media_protege_master (base) rechazan lo que no corresponde.
+async function eliminarMedio(m, out) {
+  const r = await ZA.sb.from('version_media').delete().eq('id', m.id);
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  const nota = await limpiarBucket([m.file_path]);
+  await recargar(`${m.role} eliminado.` + nota);
+}
+async function cambiarRol(m, nuevo, out) {
+  const r = await ZA.sb.from('version_media').update({ role: nuevo }).eq('id', m.id);
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  await recargar(`Archivo marcado como ${nuevo}.`);
+}
+
+// HdU-19. Todo o nada: si una versión no se puede borrar, no se borra nada.
+async function eliminarTema(track, out) {
+  const r = await ZA.sb.rpc('borrar_tema', { p_track_id: track.id });
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  const nota = await limpiarBucket(r.data || []);
+  st.abierto.delete(track.id);
+  await recargar(`«${track.title}» eliminado con sus versiones.` + nota);
+  // El listado legado no sabe que el tema ya no existe: se le pide recargar.
+  document.dispatchEvent(new CustomEvent('zg-tracks-cambiaron'));
+}
+
 async function marcarFallida(m) {
   const { error } = await ZA.sb.from('version_media').update({ status: 'FAILED' }).eq('id', m.id);
   if (error) return setStatus(root.querySelector('#zg-global'), errText(error), 'err');
   await recargar('Subida incompleta marcada como FAILED.');
 }
 
-function tablaMedia(v, titulo) {
+function tablaMedia(v, titulo, out) {
   const filas = mediaDe(v.id).sort((a, b) => a.role.localeCompare(b.role));
   if (filas.length === 0) return el('p', { class: 'zg-nota', text: 'Esta versión aún no tiene archivos.' });
+  const bloqueada = v.is_public || v.stage === 'RELEASED';
   return el('div', { class: 'zg-scroll' }, el('table', { class: 'zg-tabla' },
     el('thead', {}, el('tr', {}, ['Rol', 'Archivo', 'Formato', 'Tamaño', 'Duración', 'Estado', ''].map((h) => el('th', { text: h })))),
-    el('tbody', {}, filas.map((m) => {
+    el('tbody', {}, filas.flatMap((m) => {
       const viejo = pendingViejo(m);
       const acc = [];
+      const extra = [];
       if (m.status === 'UPLOADED') {
         const b = el('button', { class: 'btn ghost sm', type: 'button', text: 'Oír' });
         b.addEventListener('click', () => reproducir(m, titulo, b));
@@ -328,7 +424,22 @@ function tablaMedia(v, titulo) {
         b.addEventListener('click', () => marcarFallida(m));
         acc.push(b);
       }
-      return el('tr', {},
+      // HdU-18: cambiar rol si el otro está libre; eliminar archivo. Se ocultan
+      // cuando la base los rechazaría (pública / RELEASED): comodidad, no seguridad.
+      const otro = m.role === 'MASTER' ? 'LISTEN' : 'MASTER';
+      const otroLibre = !mediaDe(v.id).some((x) => x.role === otro && x.status !== 'FAILED');
+      if (!bloqueada && otroLibre && m.status === 'UPLOADED') {
+        const b = el('button', { class: 'btn ghost sm', type: 'button', text: `Cambiar a ${otro}` });
+        b.addEventListener('click', () => cambiarRol(m, otro, out));
+        acc.push(b);
+      }
+      if (!bloqueada) {
+        const b = el('button', { class: 'btn danger sm', type: 'button', text: 'Eliminar archivo' });
+        acc.push(b);
+        extra.push(el('tr', {}, el('td', { colspan: '7' },
+          confirmarInline(b, `¿Borrar ${m.file_name} (${fmtBytes(m.size_bytes)})? Se borra del bucket.`, () => eliminarMedio(m, out)))));
+      }
+      return [el('tr', {},
         el('td', {}, el('span', { class: 'pill' + (m.role === 'MASTER' ? ' master' : ' on'), text: m.role })),
         el('td', { class: 'mono', text: m.file_name }),
         el('td', { text: m.content_type }),
@@ -338,7 +449,7 @@ function tablaMedia(v, titulo) {
           class: 'pill' + (m.status === 'UPLOADED' ? ' on' : m.status === 'FAILED' || viejo ? ' warn' : ''),
           text: viejo ? 'SUBIDA INCOMPLETA' : m.status
         })),
-        el('td', {}, el('div', { class: 'row-actions' }, acc)));
+        el('td', {}, el('div', { class: 'row-actions' }, acc))), ...extra];
     }))));
 }
 
@@ -368,9 +479,31 @@ function bloqueVersion(track, v, n) {
       pub),
     chips,
     el('p', { class: 'zg-nota', text: 'RELEASED exige un MASTER confirmado: la base rechaza el cambio si falta.' }),
-    tablaMedia(v, track.title),
+    tablaMedia(v, track.title, out),
     formSubida({ track, version: v }),
+    bloqueEliminarVersion(track, v, out),
     out);
+}
+
+// HdU-17. Enumera lo que se va. Si la base lo rechaza (pública, RELEASED,
+// lanzamiento programado), el mensaje aparece en `out` tal cual.
+function bloqueEliminarVersion(track, v, out) {
+  const medios = mediaDe(v.id);
+  const bytes = medios.reduce((a, m) => a + (m.size_bytes || 0), 0);
+  const shares = st.shares.filter((s) => s.version_id === v.id && estadoShare(s) === 'VIGENTE').length;
+  const btn = el('button', { class: 'btn danger sm', type: 'button', text: 'Eliminar versión' });
+  if (v.is_public) { btn.disabled = true; btn.title = 'Despublica el tema antes de borrar esta versión.'; }
+  if (v.stage === 'RELEASED') { btn.disabled = true; btn.title = 'Una versión RELEASED no se borra; cambia la etapa primero.'; }
+  const q = `¿Borrar la versión ${fmtFechaHora(v.created_at)} de «${track.title}»? Se van ${medios.length} archivo(s) (${fmtBytes(bytes)}), ${shares} acceso(s) vigente(s) y el historial de etapas. Queda rastro en la bitácora.`;
+  return el('div', { class: 'row-actions', style: 'margin-top:12px' }, btn, confirmarInline(btn, q, () => eliminarVersion(v, out)));
+}
+
+// HdU-19. "Eliminar tema completo": el legado ya no borra temas con versiones.
+function bloqueEliminarTema(track, out) {
+  const vs = versionesDe(track.id);
+  const btn = el('button', { class: 'btn danger sm', type: 'button', text: 'Eliminar tema completo' });
+  const q = `¿Borrar «${track.title}» con sus ${vs.length} versión(es), todos sus archivos y la maqueta legada? Si alguna versión está pública o en un lanzamiento, no se borra nada.`;
+  return el('div', { class: 'row-actions', style: 'margin-top:16px' }, btn, confirmarInline(btn, q, () => eliminarTema(track, out)));
 }
 
 function detalleTema(track) {
@@ -387,6 +520,10 @@ function detalleTema(track) {
   }
   nodos.push(formSubida({ track, version: null }));
   vs.forEach((v, i) => nodos.push(bloqueVersion(track, v, vs.length - i)));
+  if (vs.length > 0) {
+    const out = status();
+    nodos.push(bloqueEliminarTema(track, out), out);
+  }
   return el('div', { class: 'edit open' }, nodos);
 }
 
@@ -623,6 +760,11 @@ function pintar() {
 }
 
 /* ───────────── arranque ───────────── */
+
+// HdU-19: el legado consulta esto antes de borrar un tema (admin.js).
+window.ZignalezProduccion = {
+  versionesDe: (trackId) => versionesDe(trackId).length
+};
 
 function arrancar() {
   ZA = window.ZignalezAdmin;

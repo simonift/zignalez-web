@@ -69,6 +69,12 @@ RETURNS INTERVAL LANGUAGE sql IMMUTABLE
 SET search_path = public, pg_temp
 AS $$ SELECT INTERVAL '30 days' $$;
 
+-- Inofensiva (devuelve una constante), pero la regla del archivo es que ninguna
+-- función nueva quede ejecutable por anon. Se omitió en la primera ejecución en
+-- producción (24-09) y apareció al listar routine_privileges.
+REVOKE ALL ON FUNCTION public.share_plazo_maximo() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.share_plazo_maximo() TO authenticated;
+
 CREATE OR REPLACE FUNCTION public.version_shares_reglas()
 RETURNS TRIGGER
 LANGUAGE plpgsql SECURITY DEFINER
@@ -488,7 +494,7 @@ SELECT
   ' | anon_ejecuta_rpc=' || (SELECT count(*) FROM information_schema.routine_privileges
                            WHERE routine_schema='public' AND grantee='anon'
                              AND routine_name IN ('buscar_usuario_por_correo','mis_versiones_compartidas',
-                                                  'share_vigente'))::TEXT
+                                                  'share_vigente','share_plazo_maximo'))::TEXT
   AS resultado;
 
 -- ESPERADO:
