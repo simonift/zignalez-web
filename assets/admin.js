@@ -152,6 +152,8 @@
   // Rule: no awaited supabase call inside this callback — defer with setTimeout.
   sb.auth.onAuthStateChange(function (event, session) {
     if (event === 'SIGNED_OUT' || !session || !session.user) {
+      window.ZignalezAdmin = null;
+      document.dispatchEvent(new CustomEvent('zg-admin-signout'));
       state.user = null;
       state.tracks = [];
       stopPlayer();
@@ -188,6 +190,10 @@
       show('panel');
       loadTracks();
       loadSubscriberCount();
+      // Puente para los módulos nuevos (admin-produccion.js). Único punto de
+      // contacto con el legado: HdU-04 v1.1, estrangulamiento.
+      window.ZignalezAdmin = { sb: sb, bucket: BUCKET, user: state.user };
+      document.dispatchEvent(new CustomEvent('zg-admin-ready'));
     }).catch(function () {
       $('denied-email').textContent = (state.user && state.user.email) || '';
       resetAllButtons();

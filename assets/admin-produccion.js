@@ -1,0 +1,644 @@
+// admin-produccion.js · Zignalez · 24-09-2026
+//
+// Catálogo con etapas, versiones y sus archivos, colaboradores, shares y
+// bitácora (PROMPT_MAESTRO_HDU_CATALOGO v1.1: HdU-05…08, 12…16).
+//
+// Módulo nuevo junto al admin.js legado (HdU-04, estrangulamiento): no toca su
+// lógica. Se engancha por window.ZignalezAdmin / 'zg-admin-ready'.
+//
+// Toda regla de permiso vive en la base (fix-02 + fix-08). Lo que este archivo
+// deshabilita en pantalla es comodidad, no seguridad: si la base rechaza, se
+// muestra el mensaje de la base tal cual.
+//
+// El DOM se construye con nodos (el()), nunca con innerHTML sobre datos.
+
+const STAGES = ['IDEA', 'DEMO', 'RECORDING', 'MIXING', 'MASTERING', 'RELEASE_READY', 'RELEASED'];
+const ROLES_COLAB = ['PRODUCTOR', 'FEATURE', 'SELLO', 'OTRO'];
+const PLAZO_MAX_DIAS = 30;      // espejo de share_plazo_maximo() en fix-08; la base manda
+const PLAZO_DEFAULT_DIAS = 14;
+const PENDING_VIEJO_MIN = 15;   // una subida PENDING más vieja que esto quedó a medias
+
+let ZA = null;                  // { sb, bucket, user }
+let root = null;
+const st = {
+  tracks: [], versions: [], media: [], collabs: [], shares: [], stageLog: [], audit: [],
+  filtro: 'TODAS', abierto: new Set(), falta: null
+};
+
+/* ───────────── helpers ───────────── */
+
+function el(tag, attrs, ...children) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v === null || v === undefined || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (v === true) n.setAttribute(k, '');
+    else n.setAttribute(k, v);
+  }
+  for (const c of children.flat()) {
+    if (c === null || c === undefined || c === false) continue;
+    n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return n;
+}
+
+function status(msg, kind) {
+  const n = el('div', { class: 'status' + (kind ? ' ' + kind : '') + (msg ? '' : ' hidden'), role: 'status', 'aria-live': 'polite' });
+  n.textContent = msg || '';
+  return n;
+}
+function setStatus(n, msg, kind) {
+  n.textContent = msg || '';
+  n.classList.remove('ok', 'err');
+  if (kind) n.classList.add(kind);
+  n.classList.toggle('hidden', !msg);
+}
+
+// El mensaje de la base ya viene en castellano (fix-08): se muestra tal cual.
+function errText(error, fallback) {
+  if (!error) return fallback || 'Error desconocido.';
+  return (error.message || fallback || 'Error.') + (error.code ? ' [' + error.code + ']' : '');
+}
+
+function fmtFecha(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+function fmtFechaHora(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function fmtBytes(n) {
+  if (!n && n !== 0) return '—';
+  if (n < 1024 * 1024) return Math.round(n / 1024) + ' KB';
+  return (n / (1024 * 1024)).toFixed(1) + ' MB';
+}
+function fmtDur(sec) {
+  const n = parseInt(sec, 10);
+  if (!isFinite(n) || n < 0) return '—';
+  return Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0');
+}
+function extOf(name) {
+  const m = /\.([a-z0-9]{1,6})$/i.exec(String(name || ''));
+  return m ? m[1].toLowerCase() : 'bin';
+}
+function readDuration(file) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const a = new Audio();
+    let done = false;
+    const fin = (v) => { if (done) return; done = true; URL.revokeObjectURL(url); resolve(v); };
+    a.preload = 'metadata';
+    a.addEventListener('loadedmetadata', () => fin(isFinite(a.duration) && a.duration > 0 ? Math.round(a.duration) : null));
+    a.addEventListener('error', () => fin(null));
+    setTimeout(() => fin(null), 12000);
+    a.src = url;
+  });
+}
+function hoyMas(dias) {
+  const d = new Date();
+  d.setDate(d.getDate() + dias);
+  return d.toISOString().slice(0, 10);
+}
+// Fecha elegida (día local) → fin de ese día. Si cae más allá del plazo, la base
+// lo rechaza con SHARE_PLAZO_EXCEDIDO; aquí se recorta para no provocarlo.
+function venceEl(fechaYMD) {
+  const d = new Date(fechaYMD + 'T23:59:00');
+  const max = new Date(Date.now() + PLAZO_MAX_DIAS * 86400000 - 60000);
+  return (d > max ? max : d).toISOString();
+}
+
+/* ───────────── derivados del estado ───────────── */
+
+const versionesDe = (trackId) => st.versions.filter((v) => v.track_id === trackId);
+const mediaDe = (versionId) => st.media.filter((m) => m.version_id === versionId);
+const trackDe = (trackId) => st.tracks.find((t) => t.id === trackId);
+const versionDe = (versionId) => st.versions.find((v) => v.id === versionId);
+
+function listenConfirmado(versionId) {
+  return st.media.some((m) => m.version_id === versionId && m.role === 'LISTEN' && m.status === 'UPLOADED');
+}
+
+function estadoShare(s) {
+  if (s.revoked_at) return 'REVOCADO';
+  if (new Date(s.expires_at) <= new Date()) return 'VENCIDO';
+  return 'VIGENTE';
+}
+
+// HdU-15: el estado propio del colaborador.
+function estadoColab(c) {
+  if (!c.active) return 'SUSPENDIDO';
+  const suyos = st.shares.filter((s) => s.collaborator_id === c.user_id);
+  if (suyos.length === 0) return 'SIN MATERIAL';
+  if (suyos.some((s) => estadoShare(s) === 'VIGENTE')) return 'ACTIVO';
+  return 'ACCESO VENCIDO';
+}
+
+function pendingViejo(m) {
+  return m.status === 'PENDING' && (Date.now() - new Date(m.created_at).getTime()) > PENDING_VIEJO_MIN * 60000;
+}
+
+/* ───────────── carga ───────────── */
+
+async function cargar() {
+  const sb = ZA.sb;
+  const [tr, sv, vm, co, vs, lg, au] = await Promise.all([
+    sb.from('tracks').select('id,title,slug,visible,file_path,sort_order').order('sort_order').order('created_at'),
+    sb.from('song_versions').select('id,track_id,stage,notes,is_public,created_at').order('created_at', { ascending: false }),
+    sb.from('version_media').select('id,version_id,role,file_path,file_name,content_type,size_bytes,duration_seconds,status,created_at,confirmed_at'),
+    sb.from('collaborators').select('user_id,display_name,role,active,created_at').order('created_at'),
+    // revoked_at y las dos bitácoras son de fix-08: si faltan, se avisa en vez de fallar mudo.
+    sb.from('version_shares').select('version_id,collaborator_id,shared_by,shared_at,expires_at,revoked_at'),
+    sb.from('song_version_stage_log').select('version_id,stage_from,stage_to,changed_at').order('changed_at', { ascending: false }),
+    sb.from('acceso_auditoria').select('tabla,accion,actor,fila_antes,fila_despues,ocurrido_el').order('ocurrido_el', { ascending: false }).limit(25)
+  ]);
+
+  const base = [tr, sv, vm, co].find((r) => r.error);
+  if (base) throw base.error;
+  st.falta = [vs, lg, au].some((r) => r.error) ? 'fix-08' : null;
+
+  st.tracks = tr.data || [];
+  st.versions = sv.data || [];
+  st.media = vm.data || [];
+  st.collabs = co.data || [];
+  st.shares = vs.error ? [] : vs.data || [];
+  st.stageLog = lg.error ? [] : lg.data || [];
+  st.audit = au.error ? [] : au.data || [];
+}
+
+async function recargar(nota) {
+  try {
+    await cargar();
+    pintar();
+    if (nota) setStatus(root.querySelector('#zg-global'), nota, 'ok');
+  } catch (e) {
+    root.textContent = '';
+    root.appendChild(el('div', { class: 'zg-banner', text: 'No se pudo cargar producción: ' + errText(e) }));
+  }
+}
+
+/* ───────────── reproducción (reutiliza el reproductor del panel) ───────────── */
+
+async function reproducir(m, titulo, btn) {
+  const player = document.getElementById('player');
+  const bar = document.getElementById('playerbar');
+  const now = document.getElementById('now-playing');
+  btn.disabled = true;
+  const { data, error } = await ZA.sb.storage.from(ZA.bucket).createSignedUrl(m.file_path, 300);
+  btn.disabled = false;
+  if (error || !data?.signedUrl) {
+    setStatus(root.querySelector('#zg-global'), errText(error, 'No se pudo generar el enlace del audio.'), 'err');
+    return;
+  }
+  now.textContent = 'Sonando: ' + titulo + ' · ' + m.role;
+  bar.classList.add('open');
+  player.src = data.signedUrl;
+  player.play().catch(() => {});
+}
+
+/* ───────────── subir (HdU-06) ───────────── */
+
+// Crea (si hace falta) la versión, su fila de medio PENDING, sube a una ruta
+// inmutable sin upsert y confirma contra el bucket. Todo fallo deja rastro:
+// la fila queda FAILED, nunca PENDING para siempre.
+async function subirArchivo({ track, version, file, role, stage, notes }, out) {
+  const sb = ZA.sb;
+  let v = version;
+  let versionNueva = false;
+
+  if (!v) {
+    const r = await sb.from('song_versions').insert({ track_id: track.id, stage, notes: notes || null }).select().single();
+    if (r.error) return setStatus(out, 'No se creó la versión: ' + errText(r.error), 'err');
+    v = r.data;
+    versionNueva = true;
+  }
+
+  const ruta = `${ZA.user.id}/${track.id}/${v.id}/${role.toLowerCase()}-${Date.now()}.${extOf(file.name)}`;
+  setStatus(out, 'Leyendo duración…', null);
+  const dur = await readDuration(file);
+
+  const ins = await sb.from('version_media').insert({
+    version_id: v.id,
+    role,
+    file_path: ruta,
+    file_name: file.name,
+    content_type: file.type || 'application/octet-stream',
+    size_bytes: file.size,
+    duration_seconds: dur
+  }).select().single();
+  if (ins.error) {
+    if (versionNueva) await sb.from('song_versions').delete().eq('id', v.id);
+    return setStatus(out, 'No se registró el archivo: ' + errText(ins.error), 'err');
+  }
+  const m = ins.data;
+
+  setStatus(out, 'Subiendo ' + file.name + ' (' + fmtBytes(file.size) + ')…', null);
+  const up = await sb.storage.from(ZA.bucket).upload(ruta, file, { upsert: false, contentType: file.type || undefined });
+  if (up.error) {
+    await sb.from('version_media').update({ status: 'FAILED' }).eq('id', m.id);
+    await recargar();
+    return setStatus(root.querySelector('#zg-global'), 'La subida falló y quedó marcada como FAILED: ' + errText(up.error), 'err');
+  }
+
+  const conf = await sb.rpc('confirm_version_media', { p_media_id: m.id });
+  if (conf.error) {
+    await recargar();
+    return setStatus(root.querySelector('#zg-global'), 'Subido, pero la confirmación falló: ' + errText(conf.error), 'err');
+  }
+  if (conf.data?.status !== 'UPLOADED') {
+    await recargar();
+    return setStatus(root.querySelector('#zg-global'), 'El archivo no quedó en el bucket: la fila se marcó FAILED.', 'err');
+  }
+  await recargar(`${role} de «${track.title}» subido y confirmado.`);
+}
+
+function formSubida({ track, version }) {
+  const out = status();
+  const file = el('input', { type: 'file', accept: 'audio/*' });
+  const faltantes = version
+    ? ['LISTEN', 'MASTER'].filter((r) => !mediaDe(version.id).some((m) => m.role === r && m.status !== 'FAILED'))
+    : ['LISTEN', 'MASTER'];
+  if (faltantes.length === 0) return null;
+
+  const role = el('select', {}, faltantes.map((r) =>
+    el('option', { value: r, text: r === 'LISTEN' ? 'LISTEN — escucha (mp3/aac liviano)' : 'MASTER — original (wav/flac)' })));
+  const stage = el('select', {}, STAGES.filter((s) => s !== 'RELEASED').map((s) =>
+    el('option', { value: s, text: s, selected: s === 'DEMO' })));
+  const notes = el('input', { type: 'text', placeholder: 'Notas internas (opcional; el colaborador no las ve)' });
+  const btn = el('button', { class: 'btn primary sm', type: 'button', text: version ? 'Agregar archivo' : 'Subir versión nueva' });
+
+  btn.addEventListener('click', async () => {
+    const f = file.files[0];
+    if (!f) return setStatus(out, 'Elige un archivo de audio.', 'err');
+    btn.disabled = true;
+    await subirArchivo({ track, version, file: f, role: role.value, stage: stage.value, notes: notes.value.trim() }, out);
+    btn.disabled = false;
+  });
+
+  return el('div', { class: 'zg-sub' },
+    el('p', { class: 'eyebrow', text: version ? 'Agregar archivo a esta versión' : 'Nueva versión (no reemplaza las anteriores)' }),
+    el('div', { class: 'grid2' },
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Archivo' }), file),
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Tipo de archivo' }), role)),
+    version ? null : el('div', { class: 'grid2' },
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Etapa inicial' }), stage),
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Notas' }), notes)),
+    btn, out);
+}
+
+/* ───────────── catálogo y tema (HdU-05, 07, 08) ───────────── */
+
+async function cambiarEtapa(v, nueva, out) {
+  const { error } = await ZA.sb.from('song_versions').update({ stage: nueva }).eq('id', v.id);
+  if (error) return setStatus(out, errText(error), 'err');
+  await recargar(`Etapa cambiada a ${nueva}.`);
+}
+
+async function publicar(v, out) {
+  const { error } = await ZA.sb.rpc('publish_song_version', { p_version_id: v.id });
+  if (error) return setStatus(out, errText(error), 'err');
+  await recargar('Versión publicada: es el archivo que sirve la maqueta. La visibilidad para fans sigue en el listado de arriba.');
+}
+
+async function marcarFallida(m) {
+  const { error } = await ZA.sb.from('version_media').update({ status: 'FAILED' }).eq('id', m.id);
+  if (error) return setStatus(root.querySelector('#zg-global'), errText(error), 'err');
+  await recargar('Subida incompleta marcada como FAILED.');
+}
+
+function tablaMedia(v, titulo) {
+  const filas = mediaDe(v.id).sort((a, b) => a.role.localeCompare(b.role));
+  if (filas.length === 0) return el('p', { class: 'zg-nota', text: 'Esta versión aún no tiene archivos.' });
+  return el('div', { class: 'zg-scroll' }, el('table', { class: 'zg-tabla' },
+    el('thead', {}, el('tr', {}, ['Rol', 'Archivo', 'Formato', 'Tamaño', 'Duración', 'Estado', ''].map((h) => el('th', { text: h })))),
+    el('tbody', {}, filas.map((m) => {
+      const viejo = pendingViejo(m);
+      const acc = [];
+      if (m.status === 'UPLOADED') {
+        const b = el('button', { class: 'btn ghost sm', type: 'button', text: 'Oír' });
+        b.addEventListener('click', () => reproducir(m, titulo, b));
+        acc.push(b);
+      }
+      if (viejo) {
+        const b = el('button', { class: 'btn danger sm', type: 'button', text: 'Marcar fallida' });
+        b.addEventListener('click', () => marcarFallida(m));
+        acc.push(b);
+      }
+      return el('tr', {},
+        el('td', {}, el('span', { class: 'pill' + (m.role === 'MASTER' ? ' master' : ' on'), text: m.role })),
+        el('td', { class: 'mono', text: m.file_name }),
+        el('td', { text: m.content_type }),
+        el('td', { text: fmtBytes(m.size_bytes) }),
+        el('td', { text: fmtDur(m.duration_seconds) }),
+        el('td', {}, el('span', {
+          class: 'pill' + (m.status === 'UPLOADED' ? ' on' : m.status === 'FAILED' || viejo ? ' warn' : ''),
+          text: viejo ? 'SUBIDA INCOMPLETA' : m.status
+        })),
+        el('td', {}, el('div', { class: 'row-actions' }, acc)));
+    }))));
+}
+
+function bloqueVersion(track, v, n) {
+  const out = status();
+  const chips = el('div', { class: 'zg-chips' }, STAGES.map((s) => {
+    const c = el('button', { class: 'zg-chip' + (s === v.stage ? ' on' : ''), type: 'button', text: s });
+    if (s === v.stage) c.disabled = true;
+    else c.addEventListener('click', () => cambiarEtapa(v, s, out));
+    return c;
+  }));
+  const ultimo = st.stageLog.find((l) => l.version_id === v.id);
+  const pub = el('button', { class: 'btn sm', type: 'button', text: v.is_public ? 'Publicada' : 'Publicar esta versión' });
+  if (v.is_public || !listenConfirmado(v.id)) {
+    pub.disabled = true;
+    if (!v.is_public) pub.title = 'Necesita un archivo LISTEN confirmado.';
+  } else pub.addEventListener('click', () => publicar(v, out));
+
+  return el('div', { class: 'zg-version' },
+    el('div', { class: 'track-head' },
+      el('div', {},
+        el('div', { class: 'track-title', text: `Versión ${n} · ${fmtFechaHora(v.created_at)}` }),
+        el('div', { class: 'meta' },
+          v.is_public ? el('span', { class: 'pill on', text: 'Pública' }) : null,
+          v.notes ? el('span', { text: 'Notas: ' + v.notes }) : null,
+          ultimo ? el('span', { text: `Etapa desde ${fmtFechaHora(ultimo.changed_at)}` + (ultimo.stage_from ? ` (antes ${ultimo.stage_from})` : '') }) : null)),
+      pub),
+    chips,
+    el('p', { class: 'zg-nota', text: 'RELEASED exige un MASTER confirmado: la base rechaza el cambio si falta.' }),
+    tablaMedia(v, track.title),
+    formSubida({ track, version: v }),
+    out);
+}
+
+function detalleTema(track) {
+  const vs = versionesDe(track.id);
+  const nodos = [];
+  const publicada = vs.find((v) => v.is_public);
+  if (publicada && track.file_path && !mediaDe(publicada.id).some((m) => m.file_path === track.file_path)) {
+    nodos.push(el('div', { class: 'zg-banner', text:
+      'La maqueta sirve un archivo que no es el de la versión publicada. Probablemente se subió por el formulario legado. ' +
+      'Regla (ADR-005): a un tema con versiones se le sube una versión nueva, no una maqueta.' }));
+  }
+  if (!publicada && track.file_path && vs.length > 0) {
+    nodos.push(el('p', { class: 'zg-nota', text: 'Mientras no publiques una versión, la maqueta sigue sirviendo su archivo legado.' }));
+  }
+  nodos.push(formSubida({ track, version: null }));
+  vs.forEach((v, i) => nodos.push(bloqueVersion(track, v, vs.length - i)));
+  return el('div', { class: 'edit open' }, nodos);
+}
+
+function etapaActual(trackId) {
+  const vs = versionesDe(trackId);        // ya viene ordenado del más nuevo al más viejo
+  return vs.length ? vs[0].stage : null;
+}
+
+function tarjetaCatalogo() {
+  const filtro = el('select', { 'aria-label': 'Filtrar por etapa' },
+    ['TODAS', 'SIN VERSIONES', ...STAGES].map((s) => el('option', { value: s, text: s, selected: s === st.filtro })));
+  filtro.addEventListener('change', () => { st.filtro = filtro.value; pintar(); });
+
+  const lista = st.tracks.filter((t) => {
+    const e = etapaActual(t.id);
+    if (st.filtro === 'TODAS') return true;
+    if (st.filtro === 'SIN VERSIONES') return e === null;
+    return e === st.filtro;
+  });
+
+  return el('div', { class: 'card' },
+    el('div', { class: 'head' }, el('h2', { text: 'Catálogo y versiones' }), el('span', { class: 'pill', text: `${st.versions.length} versiones` })),
+    el('div', { class: 'zg-filtro' }, el('label', { class: 'lbl', text: 'Etapa', style: 'margin:0' }), filtro),
+    lista.length === 0 ? el('div', { class: 'empty', text: 'Ningún tema en esa etapa.' }) : null,
+    lista.map((t) => {
+      const e = etapaActual(t.id);
+      const n = versionesDe(t.id).length;
+      const abierto = st.abierto.has(t.id);
+      const btn = el('button', { class: 'btn ghost sm', type: 'button', text: abierto ? 'Cerrar' : 'Abrir' });
+      btn.addEventListener('click', () => {
+        if (abierto) st.abierto.delete(t.id); else st.abierto.add(t.id);
+        pintar();
+      });
+      return el('div', { class: 'track' },
+        el('div', { class: 'track-head' },
+          el('div', { class: 'track-id' },
+            el('div', { class: 'track-title', text: t.title || t.slug }),
+            el('div', { class: 'meta' },
+              el('span', { class: 'pill' + (e ? ' on' : ' off'), text: e || 'SIN VERSIONES · LEGADO' }),
+              el('span', { text: `${n} ${n === 1 ? 'versión' : 'versiones'}` }),
+              el('span', { class: 'pill' + (t.visible ? ' on' : ' off'), text: t.visible ? 'Visible' : 'Oculta' }))),
+          btn),
+        abierto ? detalleTema(t) : null);
+    }));
+}
+
+/* ───────────── colaboradores y shares (HdU-12, 13, 15) ───────────── */
+
+async function altaColaborador(email, nombre, rol, out) {
+  if (!email || email.indexOf('@') < 1) return setStatus(out, 'Escribe un correo válido.', 'err');
+  if (!nombre) return setStatus(out, 'Escribe el nombre con que lo vas a reconocer.', 'err');
+  const b = await ZA.sb.rpc('buscar_usuario_por_correo', { p_email: email });
+  if (b.error) return setStatus(out, errText(b.error), 'err');
+  if (!b.data) {
+    return setStatus(out, 'Ese correo no tiene cuenta. Pídele que inicie sesión una vez en zignalez.cl (o en /productor.html) con ese correo y vuelve a intentarlo.', 'err');
+  }
+  if (st.collabs.some((c) => c.user_id === b.data)) return setStatus(out, 'Esa persona ya es colaborador.', 'err');
+  const r = await ZA.sb.from('collaborators').insert({ user_id: b.data, display_name: nombre, role: rol });
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  await recargar(`${nombre} quedó como ${rol}.`);
+}
+
+async function cambiarActivo(c, activo) {
+  const r = await ZA.sb.from('collaborators').update({ active: activo }).eq('user_id', c.user_id);
+  if (r.error) return setStatus(root.querySelector('#zg-global'), errText(r.error), 'err');
+  await recargar(activo ? `${c.display_name} reactivado.` : `${c.display_name} suspendido: su acceso se cortó.`);
+}
+
+// Compartir y renovar usan el mismo upsert: el trigger de fix-08 fuerza autor,
+// fecha y plazo, y trata "vencido/revocado → vigente" como un share nuevo.
+async function compartir(versionId, collaboratorId, fecha, out) {
+  if (!versionId) return setStatus(out, 'Elige una versión.', 'err');
+  if (!fecha) return setStatus(out, 'La fecha de vencimiento es obligatoria.', 'err');
+  const r = await ZA.sb.from('version_shares').upsert(
+    { version_id: versionId, collaborator_id: collaboratorId, expires_at: venceEl(fecha), revoked_at: null },
+    { onConflict: 'version_id,collaborator_id' });
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  await recargar('Compartido hasta el ' + fmtFecha(venceEl(fecha)) + '.');
+}
+
+async function revocar(s) {
+  const r = await ZA.sb.from('version_shares').update({ revoked_at: new Date().toISOString() })
+    .eq('version_id', s.version_id).eq('collaborator_id', s.collaborator_id);
+  if (r.error) return setStatus(root.querySelector('#zg-global'), errText(r.error), 'err');
+  await recargar('Acceso revocado. Un enlace de audio ya abierto puede seguir sonando hasta 60 s.');
+}
+
+function etiquetaVersion(v) {
+  const t = trackDe(v.track_id);
+  return `${t ? t.title : '¿?'} · ${v.stage} · ${fmtFecha(v.created_at)}`;
+}
+
+function formCompartir(c) {
+  const out = status();
+  const compartibles = st.versions.filter((v) => listenConfirmado(v.id));
+  if (compartibles.length === 0) {
+    return el('p', { class: 'zg-nota', text: 'No hay versiones con archivo LISTEN confirmado. Sin LISTEN el colaborador no oiría nada, así que no se puede compartir.' });
+  }
+  const sel = el('select', {}, el('option', { value: '', text: 'Elige una versión…' }),
+    compartibles.map((v) => el('option', { value: v.id, text: etiquetaVersion(v) })));
+  const fecha = el('input', { type: 'date', value: hoyMas(PLAZO_DEFAULT_DIAS), min: hoyMas(1), max: hoyMas(PLAZO_MAX_DIAS) });
+  const btn = el('button', { class: 'btn primary sm', type: 'button', text: 'Compartir' });
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    await compartir(sel.value, c.user_id, fecha.value, out);
+    btn.disabled = false;
+  });
+  return el('div', { class: 'zg-sub' },
+    el('div', { class: 'grid2' },
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Versión' }), sel),
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: `Vence (obligatorio · máx. ${PLAZO_MAX_DIAS} días)` }), fecha)),
+    el('p', { class: 'zg-nota', text:
+      'Se comparte solo el archivo de escucha (LISTEN); el MASTER nunca. Temas con voz invitada: no los compartas sin autorización escrita de quien canta.' }),
+    btn, out);
+}
+
+function tarjetaColaboradores() {
+  const out = status();
+  const email = el('input', { type: 'email', placeholder: 'correo@ejemplo.cl', autocomplete: 'off' });
+  const nombre = el('input', { type: 'text', placeholder: 'MillDiass', autocomplete: 'off' });
+  const rol = el('select', {}, ROLES_COLAB.map((r) => el('option', { value: r, text: r })));
+  const alta = el('button', { class: 'btn primary sm', type: 'button', text: 'Dar de alta' });
+  alta.addEventListener('click', async () => {
+    alta.disabled = true;
+    await altaColaborador(email.value.trim(), nombre.value.trim(), rol.value, out);
+    alta.disabled = false;
+  });
+
+  const lista = st.collabs.map((c) => {
+    const estado = estadoColab(c);
+    const suyos = st.shares.filter((s) => s.collaborator_id === c.user_id)
+      .sort((a, b) => new Date(b.shared_at) - new Date(a.shared_at));
+    const toggle = el('button', { class: 'btn sm' + (c.active ? ' danger' : ''), type: 'button', text: c.active ? 'Suspender' : 'Reactivar' });
+    toggle.addEventListener('click', () => cambiarActivo(c, !c.active));
+
+    return el('div', { class: 'track' },
+      el('div', { class: 'track-head' },
+        el('div', { class: 'track-id' },
+          el('div', { class: 'track-title', text: c.display_name }),
+          el('div', { class: 'meta' },
+            el('span', { class: 'pill', text: c.role }),
+            el('span', { class: 'pill' + (estado === 'ACTIVO' ? ' on' : estado === 'ACCESO VENCIDO' ? ' warn' : ' off'), text: estado }),
+            el('span', { text: 'Alta ' + fmtFecha(c.created_at) }))),
+        toggle),
+      estado === 'ACCESO VENCIDO'
+        ? el('p', { class: 'zg-nota', text: 'Figura activo pero ya no ve nada: todos sus accesos vencieron.' }) : null,
+      suyos.length ? el('div', { class: 'zg-scroll' }, el('table', { class: 'zg-tabla' },
+        el('thead', {}, el('tr', {}, ['Versión', 'Compartida', 'Vence', 'Estado', ''].map((h) => el('th', { text: h })))),
+        el('tbody', {}, suyos.map((s) => {
+          const v = versionDe(s.version_id);
+          const e = estadoShare(s);
+          const acc = [];
+          if (e === 'VIGENTE') {
+            const b = el('button', { class: 'btn danger sm', type: 'button', text: 'Revocar' });
+            b.addEventListener('click', () => revocar(s));
+            acc.push(b);
+          } else {
+            const b = el('button', { class: 'btn ghost sm', type: 'button', text: `Renovar ${PLAZO_DEFAULT_DIAS} días` });
+            b.addEventListener('click', () => compartir(s.version_id, s.collaborator_id, hoyMas(PLAZO_DEFAULT_DIAS), root.querySelector('#zg-global')));
+            acc.push(b);
+          }
+          return el('tr', {},
+            el('td', { text: v ? etiquetaVersion(v) : s.version_id }),
+            el('td', { text: fmtFecha(s.shared_at) }),
+            el('td', { text: fmtFecha(s.expires_at) }),
+            el('td', {}, el('span', { class: 'pill' + (e === 'VIGENTE' ? ' on' : ' off'), text: e })),
+            el('td', {}, el('div', { class: 'row-actions' }, acc)));
+        })))) : null,
+      c.active ? formCompartir(c) : null);
+  });
+
+  return el('div', { class: 'card' },
+    el('div', { class: 'head' }, el('h2', { text: 'Colaboradores' }), el('span', { class: 'pill', text: `${st.collabs.length}` })),
+    el('div', { class: 'grid3' },
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Correo con cuenta' }), email),
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Nombre' }), nombre),
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Rol' }), rol)),
+    alta, out,
+    st.collabs.length === 0 ? el('div', { class: 'empty', text: 'Sin colaboradores todavía.' }) : null,
+    lista);
+}
+
+/* ───────────── bitácora (HdU-16) ───────────── */
+
+function describirAuditoria(a) {
+  const f = a.fila_despues || a.fila_antes || {};
+  const quien = st.collabs.find((c) => c.user_id === (f.user_id || f.collaborator_id));
+  const nombre = quien ? quien.display_name : 'colaborador';
+  if (a.tabla === 'collaborators') {
+    if (a.accion === 'INSERT') return `Alta de ${nombre}`;
+    if (a.accion === 'DELETE') return `Baja de ${nombre}`;
+    if (a.fila_antes && a.fila_despues && a.fila_antes.active !== a.fila_despues.active) {
+      return (a.fila_despues.active ? 'Reactivado ' : 'Suspendido ') + nombre;
+    }
+    return `Cambio en ${nombre}`;
+  }
+  const v = versionDe(f.version_id);
+  const cual = v ? etiquetaVersion(v) : 'una versión';
+  if (a.accion === 'INSERT') return `Compartido con ${nombre}: ${cual}`;
+  if (a.accion === 'DELETE') return `Share borrado: ${nombre} · ${cual}`;
+  if (a.fila_despues?.revoked_at && !a.fila_antes?.revoked_at) return `Revocado a ${nombre}: ${cual}`;
+  return `Renovado/editado para ${nombre}: ${cual} (vence ${fmtFecha(a.fila_despues?.expires_at)})`;
+}
+
+function tarjetaBitacora() {
+  return el('div', { class: 'card' },
+    el('div', { class: 'head' }, el('h2', { text: 'Bitácora de acceso' }), el('span', { class: 'pill', text: 'últimos 25' })),
+    el('p', { class: 'zg-nota', text: 'Registra altas, suspensiones, shares y revocaciones. No registra qué archivos se escucharon: sin servidor propio eso no se puede garantizar.' }),
+    st.audit.length === 0 ? el('div', { class: 'empty', text: 'Sin movimientos.' }) :
+      el('div', { class: 'zg-scroll' }, el('table', { class: 'zg-tabla' },
+        el('tbody', {}, st.audit.map((a) => el('tr', {},
+          el('td', { class: 'mono', text: fmtFechaHora(a.ocurrido_el) }),
+          el('td', { text: describirAuditoria(a) })))))));
+}
+
+/* ───────────── pintar ───────────── */
+
+function pintar() {
+  const global = root.querySelector('#zg-global');
+  const msg = global ? global.textContent : '';
+  const kind = global?.classList.contains('err') ? 'err' : global?.classList.contains('ok') ? 'ok' : null;
+  root.textContent = '';
+  if (st.falta) {
+    root.appendChild(el('div', { class: 'zg-banner', text:
+      'Falta ejecutar sitio-zignalez/supabase/fix-08-produccion-colaboradores.sql en Supabase. ' +
+      'Sin él no hay plazo obligatorio en los shares, ni bitácora, ni vista de productor: colaboradores y shares quedan deshabilitados.' }));
+  }
+  root.appendChild(status(msg, kind)).id = 'zg-global';
+  root.appendChild(tarjetaCatalogo());
+  if (!st.falta) {
+    root.appendChild(tarjetaColaboradores());
+    root.appendChild(tarjetaBitacora());
+  }
+}
+
+/* ───────────── arranque ───────────── */
+
+function arrancar() {
+  ZA = window.ZignalezAdmin;
+  root = document.getElementById('zg-produccion');
+  if (!ZA || !root) return;
+  root.textContent = '';
+  root.appendChild(el('div', { class: 'card' }, el('div', { class: 'empty', text: 'Cargando producción…' })));
+  recargar();
+}
+
+document.addEventListener('zg-admin-ready', arrancar);
+document.addEventListener('zg-admin-signout', () => {
+  ZA = null;
+  st.abierto.clear();
+  const r = document.getElementById('zg-produccion');
+  if (r) r.textContent = '';
+});
+// El módulo carga diferido: si el admin ya quedó validado antes, arrancar ya.
+if (window.ZignalezAdmin) arrancar();
