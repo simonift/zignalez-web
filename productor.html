@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zignalez — Material compartido</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  --ink:#0A0A0B; --ink-2:#111116; --ink-3:#17171d;
+  --uv:#8B3DFF; --uv-soft:#A66BFF;
+  --chrome:#C7CCD1; --chrome-hi:#E8EAED; --smoke:#8A86A0; --white:#FFFFFF;
+  --line:rgba(199,204,209,.14); --line-2:rgba(199,204,209,.28); --amber:#D9A441;
+  --font-d:'Syne',system-ui,sans-serif; --font-b:'Manrope',system-ui,sans-serif; --font-m:'Space Mono',ui-monospace,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--ink);color:var(--chrome);font-family:var(--font-b);font-size:15px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 96px}
+h1,h2{font-family:var(--font-d);font-weight:800;letter-spacing:-.01em;color:var(--chrome-hi);margin:0}
+h1{font-size:clamp(26px,5vw,36px);line-height:1.1}
+.eyebrow{font-family:var(--font-m);font-size:11px;text-transform:uppercase;letter-spacing:.28em;color:var(--smoke);margin:0 0 10px}
+.muted{color:var(--smoke)}
+.card{background:linear-gradient(180deg,var(--ink-2),var(--ink-3));border:1px solid var(--line);border-radius:2px;padding:20px;margin-top:22px}
+label{display:block;font-family:var(--font-m);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--smoke);margin:0 0 6px}
+input[type=email]{width:100%;background:#0d0d12;color:var(--chrome-hi);border:1px solid var(--line-2);border-radius:2px;padding:10px 12px;font-size:14px;font-family:var(--font-b)}
+input:focus{outline:none;border-color:var(--uv);box-shadow:0 0 0 3px rgba(139,61,255,.18)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-m);font-size:11px;text-transform:uppercase;
+  letter-spacing:.16em;padding:11px 18px;border-radius:2px;cursor:pointer;background:transparent;color:var(--chrome-hi);border:1px solid var(--line-2)}
+.btn:hover:not(:disabled){border-color:var(--uv);color:var(--white)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--uv);border-color:var(--uv);color:var(--white)}
+.btn.sm{padding:7px 12px;font-size:10px}
+.status{font-family:var(--font-m);font-size:11.5px;letter-spacing:.06em;padding:10px 12px;border-radius:2px;border:1px solid var(--line);
+  color:var(--smoke);margin-top:14px}
+.status.hidden{display:none}
+.status.ok{border-color:rgba(139,61,255,.45);color:var(--uv-soft)}
+.status.err{border-color:rgba(217,164,65,.45);color:var(--amber)}
+.screen{display:none}.screen.active{display:block}
+.top{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:flex-end;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.who{font-family:var(--font-m);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke);word-break:break-all}
+.item{border:1px solid var(--line);border-radius:2px;background:var(--ink-2);padding:16px;margin-top:12px;
+  display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.item .t{font-family:var(--font-d);font-weight:700;font-size:17px;color:var(--chrome-hi)}
+.meta{font-family:var(--font-m);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--smoke);margin-top:6px;
+  display:flex;flex-wrap:wrap;gap:6px 14px}
+.empty{padding:26px;text-align:center;font-family:var(--font-m);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--smoke)}
+.player{position:sticky;bottom:0;margin-top:18px;background:rgba(17,17,22,.94);border:1px solid var(--line);border-radius:2px;padding:12px 14px;display:none}
+.player.open{display:block}
+.player .now{font-family:var(--font-m);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--uv-soft);margin-bottom:8px}
+audio{width:100%;display:block}
+</style>
+</head>
+<body>
+
+<section id="screen-login" class="screen active">
+  <div class="wrap">
+    <p class="eyebrow">Zignalez · Colaboradores</p>
+    <h1>Material compartido</h1>
+    <div class="card">
+      <p class="muted" style="margin:0 0 16px;font-size:14px">Ingresa con el correo con que Zignalez te dio acceso. Te llega un enlace para entrar.</p>
+      <form id="login-form" novalidate>
+        <label for="email">Correo</label>
+        <input type="email" id="email" autocomplete="email" placeholder="tu@correo.cl" required>
+        <button class="btn primary" id="btn-login" type="submit" style="width:100%;margin-top:14px">Enviar enlace</button>
+      </form>
+      <div class="status hidden" id="login-status" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section id="screen-lista" class="screen">
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <p class="eyebrow">Zignalez · Colaboradores</p>
+        <h1>Lo que te compartieron</h1>
+      </div>
+      <div style="text-align:right">
+        <div class="who" id="who"></div>
+        <button class="btn sm" id="btn-logout" type="button" style="margin-top:8px">Cerrar sesión</button>
+      </div>
+    </div>
+    <p class="muted" style="font-size:13px;margin:14px 0 0">Cada acceso tiene fecha de vencimiento. Al vencer o ser revocado, deja de aparecer aquí.</p>
+    <div id="lista"><div class="empty">Cargando…</div></div>
+    <div class="status hidden" id="lista-status" role="status" aria-live="polite"></div>
+    <div class="player" id="player-bar">
+      <div class="now" id="now"></div>
+      <audio id="player" controls preload="none"></audio>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"
+        integrity="sha384-JBR+x8blGwjDRO63aHCGiZMD4VNiTR4ZUGA+N6ZKLf3zNt1fK8IBpcgPaMrxqWBp"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+<script type="module" src="assets/productor.js"></script>
+</body>
+</html>
