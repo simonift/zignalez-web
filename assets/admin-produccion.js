@@ -1,8 +1,9 @@
 // admin-produccion.js · Zignalez · 24-09-2026 · v1.1
 //
 // Catálogo con etapas, versiones y sus archivos, colaboradores, shares y
-// bitácora (PROMPT_MAESTRO_HDU_CATALOGO v1.1: HdU-05…08, 12…16) y borrado con
-// guardas (PROMPT_MAESTRO_HDU_BORRADO_Y_LANZAMIENTO v1.0: HdU-17, 18, 19, 23, 25).
+// bitácora (PROMPT_MAESTRO_HDU_CATALOGO v1.1: HdU-05…08, 12…16), borrado con
+// guardas y lanzamiento mínimo (PROMPT_MAESTRO_HDU_BORRADO_Y_LANZAMIENTO v1.0:
+// HdU-17…25). v1.2 · 25-09-2026.
 //
 // Módulo nuevo junto al admin.js legado (HdU-04, estrangulamiento): no toca su
 // lógica. Se engancha por window.ZignalezAdmin / 'zg-admin-ready'.
@@ -18,12 +19,16 @@ const ROLES_COLAB = ['PRODUCTOR', 'FEATURE', 'SELLO', 'OTRO'];
 const PLAZO_MAX_DIAS = 30;      // espejo de share_plazo_maximo() en fix-08; la base manda
 const PLAZO_DEFAULT_DIAS = 14;
 const PENDING_VIEJO_MIN = 15;   // una subida PENDING más vieja que esto quedó a medias
+const REL_STATES = ['PLANNING', 'READY', 'SCHEDULED', 'RELEASED'];
+const PLATAFORMAS = ['SPOTIFY', 'APPLE', 'YOUTUBE', 'DEEZER', 'TIDAL', 'AMAZON'];  // lista cerrada de fix-03
+const AVISO_ANTELACION_DIAS = 14;
 
 let ZA = null;                  // { sb, bucket, user }
 let root = null;
 const st = {
   tracks: [], versions: [], media: [], collabs: [], shares: [], stageLog: [], audit: [],
-  filtro: 'TODAS', abierto: new Set(), falta: null
+  releases: {},                 // track_id → release (fix-03 + fix-10)
+  filtro: 'TODAS', abierto: new Set(), falta: null, falta03: false
 };
 
 /* ───────────── helpers ───────────── */
@@ -151,6 +156,18 @@ async function limpiarBucket(rutas) {
   return ` ${rutas.length} archivo(s) borrados del bucket.`;
 }
 
+// Fecha de estreno: día local → 00:00 America/Santiago del dispositivo, TIMESTAMPTZ.
+function estrenoISO(fechaYMD) {
+  return fechaYMD ? new Date(fechaYMD + 'T00:00:00').toISOString() : null;
+}
+function estrenoYMD(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+const releaseDe = (trackId) => st.releases[trackId] || null;
+
 /* ───────────── derivados del estado ───────────── */
 
 const versionesDe = (trackId) => st.versions.filter((v) => v.track_id === trackId);
@@ -185,7 +202,7 @@ function pendingViejo(m) {
 
 async function cargar() {
   const sb = ZA.sb;
-  const [tr, sv, vm, co, vs, lg, au] = await Promise.all([
+  const [tr, sv, vm, co, vs, lg, au, rt] = await Promise.all([
     sb.from('tracks').select('id,title,slug,visible,file_path,sort_order').order('sort_order').order('created_at'),
     sb.from('song_versions').select('id,track_id,stage,notes,is_public,created_at').order('created_at', { ascending: false }),
     sb.from('version_media').select('id,version_id,role,file_path,file_name,content_type,size_bytes,duration_seconds,status,created_at,confirmed_at'),
@@ -193,7 +210,9 @@ async function cargar() {
     // revoked_at y las dos bitácoras son de fix-08: si faltan, se avisa en vez de fallar mudo.
     sb.from('version_shares').select('version_id,collaborator_id,shared_by,shared_at,expires_at,revoked_at'),
     sb.from('song_version_stage_log').select('version_id,stage_from,stage_to,changed_at').order('changed_at', { ascending: false }),
-    sb.from('acceso_auditoria').select('tabla,accion,actor,fila_antes,fila_despues,ocurrido_el').order('ocurrido_el', { ascending: false }).limit(25)
+    sb.from('acceso_auditoria').select('tabla,accion,actor,fila_antes,fila_despues,ocurrido_el').order('ocurrido_el', { ascending: false }).limit(25),
+    // fix-03: si falta, el bloque Lanzamiento lo dice y no falla nada más.
+    sb.from('release_tracks').select('track_id,release:releases(id,title,release_type,status,release_date,platforms)')
   ]);
 
   const base = [tr, sv, vm, co].find((r) => r.error);
@@ -207,6 +226,16 @@ async function cargar() {
   st.shares = vs.error ? [] : vs.data || [];
   st.stageLog = lg.error ? [] : lg.data || [];
   st.audit = au.error ? [] : au.data || [];
+  st.falta03 = !!rt.error;
+  st.releases = {};
+  if (!rt.error) {
+    // Un tema puede tener lanzamientos RELEASED antiguos y uno abierto: gana el abierto.
+    for (const r of rt.data || []) {
+      if (!r.release) continue;
+      const actual = st.releases[r.track_id];
+      if (!actual || (actual.status === 'RELEASED' && r.release.status !== 'RELEASED')) st.releases[r.track_id] = r.release;
+    }
+  }
 }
 
 async function recargar(nota) {
@@ -244,7 +273,7 @@ async function reproducir(m, titulo, btn) {
 // Crea (si hace falta) la versión, su fila de medio PENDING, sube a una ruta
 // inmutable sin upsert y confirma contra el bucket. Todo fallo deja rastro:
 // la fila queda FAILED, nunca PENDING para siempre.
-async function subirArchivo({ track, version, file, role, stage, notes }, out) {
+async function subirArchivo({ track, version, file, role, stage, notes, estreno }, out) {
   const sb = ZA.sb;
   let v = version;
   let versionNueva = false;
@@ -297,7 +326,20 @@ async function subirArchivo({ track, version, file, role, stage, notes }, out) {
     await recargar();
     return setStatus(root.querySelector('#zg-global'), 'El archivo no quedó en el bucket: la fila se marcó FAILED.', 'err');
   }
-  await recargar(`${role} de «${track.title}» subido y confirmado.`);
+  let nota = '';
+  // HdU-20/21: fecha de estreno opcional al subir el MASTER. Deja el lanzamiento
+  // en PLANNING con fecha (decisión 25-09). Programar es un acto aparte.
+  if (role === 'MASTER' && estreno && !st.falta03) {
+    const rel = releaseDe(track.id);
+    if (!rel) {
+      const c = await sb.rpc('crear_single', { p_track_id: track.id, p_release_date: estrenoISO(estreno) });
+      nota = c.error ? ` El archivo quedó, pero no se creó el lanzamiento: ${errText(c.error)}` : ` Lanzamiento creado con estreno el ${fmtFecha(estrenoISO(estreno))}.`;
+    } else if (rel.status !== 'RELEASED') {
+      const u = await sb.from('releases').update({ release_date: estrenoISO(estreno) }).eq('id', rel.id);
+      nota = u.error ? ` El archivo quedó, pero la fecha no se guardó: ${errText(u.error)}` : ` Fecha de estreno actualizada al ${fmtFecha(estrenoISO(estreno))}.`;
+    } else nota = ' El lanzamiento ya está RELEASED: la fecha no se toca.';
+  }
+  await recargar(`${role} de «${track.title}» subido y confirmado.` + nota);
 }
 
 function formSubida({ track, version }) {
@@ -328,13 +370,24 @@ function formSubida({ track, version }) {
   const stage = el('select', {}, STAGES.filter((s) => s !== 'RELEASED').map((s) =>
     el('option', { value: s, text: s, selected: s === 'DEMO' })));
   const notes = el('input', { type: 'text', placeholder: 'Notas internas (opcional; el colaborador no las ve)' });
+  const rel = releaseDe(track.id);
+  const estreno = el('input', { type: 'date', min: hoyMas(1), value: rel ? estrenoYMD(rel.release_date) : '' });
+  const estrenoWrap = el('div', { class: 'field hidden' },
+    el('label', { class: 'lbl', text: 'Fecha de estreno (opcional; editable después)' }), estreno,
+    st.falta03 ? el('p', { class: 'zg-nota', text: 'Requiere ejecutar fix-03 y fix-10 en Supabase.' }) :
+    rel && rel.status === 'RELEASED' ? el('p', { class: 'zg-nota', text: 'Este tema ya se publicó: la fecha está congelada.' }) : null);
+  const syncEstreno = () => estrenoWrap.classList.toggle('hidden', role.value !== 'MASTER');
+  role.addEventListener('change', syncEstreno);
+  file.addEventListener('change', syncEstreno);
+  syncEstreno();
+  if (st.falta03 || (rel && rel.status === 'RELEASED')) estreno.disabled = true;
   const btn = el('button', { class: 'btn primary sm', type: 'button', text: version ? 'Agregar archivo' : 'Subir versión nueva' });
 
   btn.addEventListener('click', async () => {
     const f = file.files[0];
     if (!f) return setStatus(out, 'Elige un archivo de audio.', 'err');
     btn.disabled = true;
-    await subirArchivo({ track, version, file: f, role: role.value, stage: stage.value, notes: notes.value.trim() }, out);
+    await subirArchivo({ track, version, file: f, role: role.value, stage: stage.value, notes: notes.value.trim(), estreno: estreno.disabled ? '' : estreno.value }, out);
     btn.disabled = false;
   });
 
@@ -344,6 +397,7 @@ function formSubida({ track, version }) {
       el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Archivo' }), file),
       el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Tipo de archivo' }), role)),
     aviso,
+    estrenoWrap,
     version ? null : el('div', { class: 'grid2' },
       el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Etapa inicial' }), stage),
       el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Notas' }), notes)),
@@ -506,6 +560,104 @@ function bloqueEliminarTema(track, out) {
   return el('div', { class: 'row-actions', style: 'margin-top:16px' }, btn, confirmarInline(btn, q, () => eliminarTema(track, out)));
 }
 
+/* ───────────── lanzamiento (HdU-20, 21, 22) ───────────── */
+
+async function guardarFecha(rel, ymd, out) {
+  const r = await ZA.sb.from('releases').update({ release_date: estrenoISO(ymd) }).eq('id', rel.id);
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  await recargar(ymd ? 'Fecha de estreno: ' + fmtFecha(estrenoISO(ymd)) + '.' : 'Fecha de estreno quitada.');
+}
+async function cambiarEstadoRelease(rel, nuevo, out) {
+  const r = await ZA.sb.from('releases').update({ status: nuevo }).eq('id', rel.id);
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  await recargar(`Lanzamiento en ${nuevo}.`);
+}
+async function guardarPlataformas(rel, lista, out) {
+  const r = await ZA.sb.from('releases').update({ platforms: lista }).eq('id', rel.id);
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  await recargar('Plataformas guardadas.');
+}
+async function crearLanzamiento(track, ymd, out) {
+  const r = await ZA.sb.rpc('crear_single', { p_track_id: track.id, p_release_date: estrenoISO(ymd) });
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  await recargar(ymd ? 'Lanzamiento creado con estreno el ' + fmtFecha(estrenoISO(ymd)) + '.' : 'Lanzamiento creado sin fecha.');
+}
+async function eliminarLanzamiento(rel, out) {
+  const r = await ZA.sb.from('releases').delete().eq('id', rel.id);
+  if (r.error) return setStatus(out, errText(r.error), 'err');
+  await recargar('Lanzamiento eliminado. El tema y sus versiones siguen intactos.');
+}
+
+function bloqueLanzamiento(track) {
+  const out = status();
+  if (st.falta03) {
+    return el('div', { class: 'zg-sub' }, el('p', { class: 'eyebrow', text: 'Lanzamiento' }),
+      el('p', { class: 'zg-nota', text: 'La fecha de estreno vive en la tabla de lanzamientos (fix-03). Ejecuta fix-03 y fix-10 en Supabase para activarla.' }));
+  }
+  const rel = releaseDe(track.id);
+  if (!rel) {
+    const fecha = el('input', { type: 'date', min: hoyMas(1) });
+    const btn = el('button', { class: 'btn primary sm', type: 'button', text: 'Fijar fecha de estreno' });
+    btn.addEventListener('click', async () => { btn.disabled = true; await crearLanzamiento(track, fecha.value, out); btn.disabled = false; });
+    return el('div', { class: 'zg-sub' }, el('p', { class: 'eyebrow', text: 'Lanzamiento' }),
+      el('p', { class: 'zg-nota', text: 'Sin lanzamiento. Fija una fecha (o crea el lanzamiento sin fecha y decídela después). Un tema = un single.' }),
+      el('div', { class: 'grid2' }, el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Fecha de estreno (opcional)' }), fecha), el('div', { class: 'field' }, btn)),
+      out);
+  }
+  const terminal = rel.status === 'RELEASED';
+  const fecha = el('input', { type: 'date', value: estrenoYMD(rel.release_date), min: terminal ? null : hoyMas(1) });
+  if (terminal) { fecha.disabled = true; fecha.title = 'Congelada al publicar (RELEASED_INMUTABLE).'; }
+  const guardar = el('button', { class: 'btn primary sm', type: 'button', text: 'Guardar fecha' });
+  guardar.disabled = terminal;
+  guardar.addEventListener('click', () => guardarFecha(rel, fecha.value, out));
+  const quitar = ['PLANNING', 'READY'].includes(rel.status) && rel.release_date
+    ? el('button', { class: 'btn ghost sm', type: 'button', text: 'Quitar fecha' }) : null;
+  if (quitar) quitar.addEventListener('click', () => guardarFecha(rel, '', out));
+
+  // Aviso, no bloqueo: menos de 14 días y no programado.
+  const dias = rel.release_date ? Math.round((new Date(rel.release_date) - Date.now()) / 86400000) : null;
+  const aviso = dias !== null && dias < AVISO_ANTELACION_DIAS && rel.status !== 'SCHEDULED' && !terminal
+    ? el('p', { class: 'zg-nota', text: `Faltan ${dias} día(s) y el lanzamiento no está programado (SCHEDULED). Las plataformas piden el material con antelación.` }) : null;
+
+  const chips = el('div', { class: 'zg-chips' }, REL_STATES.map((s) => {
+    const c = el('button', { class: 'zg-chip' + (s === rel.status ? ' on' : ''), type: 'button', text: s });
+    if (s === rel.status || terminal) c.disabled = true;
+    else c.addEventListener('click', () => cambiarEstadoRelease(rel, s, out));
+    if (terminal && s !== rel.status) c.title = 'RELEASED es terminal.';
+    return c;
+  }));
+
+  const plats = el('div', { class: 'zg-chips' }, PLATAFORMAS.map((p) => {
+    const c = el('button', { class: 'zg-chip' + ((rel.platforms || []).includes(p) ? ' on' : ''), type: 'button', text: p });
+    c.style.cursor = 'pointer';
+    if (terminal) c.disabled = true;
+    else c.addEventListener('click', () => {
+      const cur = new Set(rel.platforms || []);
+      cur.has(p) ? cur.delete(p) : cur.add(p);
+      guardarPlataformas(rel, [...cur], out);
+    });
+    return c;
+  }));
+
+  const nodos = [
+    el('p', { class: 'eyebrow', text: `Lanzamiento · ${rel.release_type} · ${rel.status}` }),
+    el('div', { class: 'grid2' },
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: terminal ? 'Fecha de estreno (congelada)' : 'Fecha de estreno' }), fecha),
+      el('div', { class: 'field' }, el('div', { class: 'row-actions' }, guardar, quitar))),
+    aviso,
+    el('p', { class: 'zg-nota', text: 'Estado. READY/SCHEDULED exigen una versión RELEASE_READY con MASTER confirmado; SCHEDULED exige fecha; RELEASED congela todo.' }),
+    chips,
+    el('p', { class: 'zg-nota', text: 'Plataformas' }), plats
+  ];
+  if (rel.status === 'PLANNING') {
+    const del = el('button', { class: 'btn danger sm', type: 'button', text: 'Eliminar lanzamiento' });
+    nodos.push(el('div', { class: 'row-actions', style: 'margin-top:12px' }, del,
+      confirmarInline(del, '¿Eliminar el lanzamiento? El tema y sus versiones no se tocan.', () => eliminarLanzamiento(rel, out))));
+  }
+  nodos.push(out);
+  return el('div', { class: 'zg-sub' }, nodos);
+}
+
 function detalleTema(track) {
   const vs = versionesDe(track.id);
   const nodos = [];
@@ -518,6 +670,7 @@ function detalleTema(track) {
   if (!publicada && track.file_path && vs.length > 0) {
     nodos.push(el('p', { class: 'zg-nota', text: 'Mientras no publiques una versión, la maqueta sigue sirviendo su archivo legado.' }));
   }
+  nodos.push(bloqueLanzamiento(track));
   nodos.push(formSubida({ track, version: null }));
   vs.forEach((v, i) => nodos.push(bloqueVersion(track, v, vs.length - i)));
   if (vs.length > 0) {
@@ -564,7 +717,10 @@ function tarjetaCatalogo() {
             el('div', { class: 'meta' },
               el('span', { class: 'pill' + (e ? ' on' : ' off'), text: e || 'SIN VERSIONES · LEGADO' }),
               el('span', { text: `${n} ${n === 1 ? 'versión' : 'versiones'}` }),
-              el('span', { class: 'pill' + (t.visible ? ' on' : ' off'), text: t.visible ? 'Visible' : 'Oculta' }))),
+              el('span', { class: 'pill' + (t.visible ? ' on' : ' off'), text: t.visible ? 'Visible' : 'Oculta' }),
+              (() => { const r = releaseDe(t.id); return r && r.release_date
+                ? el('span', { class: 'pill' + (r.status === 'RELEASED' ? ' on' : ' master'), text: (r.status === 'RELEASED' ? 'Estrenado ' : 'Estreno ') + fmtFecha(r.release_date) })
+                : r ? el('span', { class: 'pill off', text: 'Lanzamiento sin fecha' }) : null; })())),
           btn),
         abierto ? detalleTema(t) : null);
     }));
