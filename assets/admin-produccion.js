@@ -579,9 +579,81 @@ function bloqueEliminarTema(track, out) {
 
 /* ───────────── preview público (HdU-28) ───────────── */
 
-// El recorte lo hace el artista (DAW o docs/scripts/generar-preview.sh) y lo
-// sube aquí. Se comprueba la duración contra los segundos declarados (±3 s):
-// un "preview de 30 s" de 3 minutos sería la maqueta completa en público.
+// Carga diferida de lamejs (150 KB) y del recortador: solo cuando el admin
+// recorta. CSP: script-src 'self', por eso viven en assets/.
+function cargarScript(src) {
+  return new Promise((res, rej) => {
+    if (document.querySelector(`script[src="${src}"]`)) return res();
+    const sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = () => rej(new Error('No cargó ' + src));
+    document.head.appendChild(sc);
+  });
+}
+
+// HdU-28 desde el panel: baja el audio fuente (firmado), lo decodifica, corta
+// [inicio, inicio+segundos) con fade, codifica a MP3 128 kbps y lo publica.
+// MP3 porque es lo único que el navegador codifica y que suena en todo (el
+// WebView de Instagram incluido). El original nunca sale al público.
+async function recortarYPublicar(track, fuentePath, start, seconds, out) {
+  const sb = ZA.sb;
+  const secs = parseInt(seconds, 10), ini = Math.max(0, parseInt(start, 10) || 0);
+  if (!fuentePath) return setStatus(out, 'Elige el archivo fuente.', 'err');
+  if (!(secs >= 15 && secs <= 60)) return setStatus(out, 'Los segundos van entre 15 y 60.', 'err');
+  try {
+    setStatus(out, 'Cargando el codificador…');
+    await cargarScript('assets/vendor/lame.min.js');
+    await cargarScript('assets/preview-recorte.js');
+    setStatus(out, 'Bajando el audio fuente…');
+    const su = await sb.storage.from(ZA.bucket).createSignedUrl(fuentePath, 600);
+    if (su.error || !su.data?.signedUrl) throw new Error(errText(su.error, 'No se pudo firmar el audio fuente.'));
+    const ab = await (await fetch(su.data.signedUrl)).arrayBuffer();
+    setStatus(out, 'Decodificando…');
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = await ctx.decodeAudioData(ab);
+    if (ini >= buf.duration - 5) throw new Error(`El inicio (${fmtDur(ini)}) está al final del tema (${fmtDur(Math.floor(buf.duration))}).`);
+    const canales = [];
+    for (let c = 0; c < Math.min(2, buf.numberOfChannels); c++) canales.push(buf.getChannelData(c));
+    const rec = window.ZgRecorte.recortar(canales, buf.sampleRate, ini, secs);
+    const durReal = Math.round(rec.duracion);
+    setStatus(out, `Codificando ${durReal} s a MP3… (unos segundos)`);
+    await new Promise((r) => setTimeout(r, 30));   // que se pinte el estado antes de bloquear el hilo
+    const trozos = window.ZgRecorte.codificarMp3(window.lamejs, rec.canales, rec.sampleRate, 128);
+    const blob = new Blob(trozos, { type: 'audio/mpeg' });
+    const ruta = `previews/${track.id}/${Date.now()}.mp3`;
+    setStatus(out, `Subiendo ${fmtBytes(blob.size)}…`);
+    const up = await sb.storage.from(ZA.bucket).upload(ruta, blob, { upsert: false, contentType: 'audio/mpeg' });
+    if (up.error) throw new Error('No se subió: ' + errText(up.error));
+    const r = await sb.rpc('registrar_preview', { p_track_id: track.id, p_path: ruta, p_seconds: Math.max(15, durReal), p_start: ini });
+    if (r.error) throw new Error(errText(r.error));
+    const anterior = track.preview_path;
+    if (anterior && anterior !== ruta) await sb.storage.from(ZA.bucket).remove([anterior]);
+    await recargar(`Preview de «${track.title}» publicado: ${durReal} s desde ${fmtDur(ini)} (${fmtBytes(blob.size)}).`);
+  } catch (e) {
+    setStatus(out, e.message || String(e), 'err');
+  }
+}
+
+// Probar el punto de inicio antes de recortar: reproduce la fuente desde `ini`
+// durante `secs` en el reproductor del panel.
+async function escucharDesde(fuentePath, ini, secs, titulo, btn) {
+  const player = document.getElementById('player');
+  const bar = document.getElementById('playerbar');
+  const now = document.getElementById('now-playing');
+  btn.disabled = true;
+  const { data, error } = await ZA.sb.storage.from(ZA.bucket).createSignedUrl(fuentePath, 300);
+  btn.disabled = false;
+  if (error || !data?.signedUrl) return;
+  now.textContent = `Probando inicio · ${titulo} · desde ${fmtDur(ini)}`;
+  bar.classList.add('open');
+  player.src = data.signedUrl;
+  const alCargar = () => { player.currentTime = ini; player.play().catch(() => {}); };
+  player.addEventListener('loadedmetadata', alCargar, { once: true });
+  const tope = () => { if (player.currentTime >= ini + secs) { player.pause(); player.removeEventListener('timeupdate', tope); } };
+  player.addEventListener('timeupdate', tope);
+}
+
+// Subir un recorte hecho fuera (DAW o docs/scripts/generar-preview.sh). Se
+// comprueba la duración contra los segundos declarados (±3 s): un "preview de
+// 30 s" de 3 minutos sería la maqueta completa en público.
 async function subirPreview(track, file, seconds, start, out) {
   const sb = ZA.sb;
   if (!file) return setStatus(out, 'Elige el recorte (.m4a/.mp3).', 'err');
@@ -616,14 +688,30 @@ function bloquePreview(track) {
     return el('div', { class: 'zg-sub' }, el('p', { class: 'eyebrow', text: 'Preview público' }),
       el('p', { class: 'zg-nota', text: 'Requiere ejecutar fix-11 en Supabase.' }));
   }
-  const file = el('input', { type: 'file', accept: 'audio/*' });
+  // Fuentes posibles: archivos UPLOADED de sus versiones + la maqueta legada.
+  const fuentes = [];
+  versionesDe(track.id).forEach((v, i) => mediaDe(v.id).filter((m) => m.status === 'UPLOADED').forEach((m) =>
+    fuentes.push({ path: m.file_path, label: `${m.role} · versión ${versionesDe(track.id).length - i} · ${m.file_name}` })));
+  if (track.file_path) fuentes.push({ path: track.file_path, label: 'Maqueta legada · ' + track.file_path.split('/').pop() });
+  const pref = fuentes.find((f) => /^LISTEN/.test(f.label)) || fuentes[0];
+
+  const fuente = el('select', {}, fuentes.length ? fuentes.map((f) => el('option', { value: f.path, text: f.label, selected: f === pref })) : [el('option', { value: '', text: 'Sin audio en este tema' })]);
   const secs = el('input', { type: 'number', min: '15', max: '60', value: String(track.preview_seconds || 30) });
   const ini = el('input', { type: 'number', min: '0', max: String(track.duration_seconds || 600), value: String(track.preview_start || 0) });
-  const btn = el('button', { class: 'btn primary sm', type: 'button', text: track.preview_path ? 'Reemplazar recorte' : 'Publicar preview' });
-  btn.addEventListener('click', async () => { btn.disabled = true; await subirPreview(track, file.files[0], secs.value, ini.value, out); btn.disabled = false; });
-  const acc = [btn];
+  const probar = el('button', { class: 'btn ghost sm', type: 'button', text: 'Escuchar desde aquí' });
+  probar.addEventListener('click', () => escucharDesde(fuente.value, parseInt(ini.value, 10) || 0, parseInt(secs.value, 10) || 30, track.title, probar));
+  const cortar = el('button', { class: 'btn primary sm', type: 'button', text: track.preview_path ? 'Recortar y reemplazar' : 'Recortar y publicar' });
+  cortar.addEventListener('click', async () => { cortar.disabled = true; await recortarYPublicar(track, fuente.value, ini.value, secs.value, out); cortar.disabled = false; });
+  if (!fuentes.length) { probar.disabled = true; cortar.disabled = true; }
+
+  // Alternativa: subir un recorte hecho fuera.
+  const file = el('input', { type: 'file', accept: 'audio/*' });
+  const subir = el('button', { class: 'btn sm', type: 'button', text: 'Subir recorte propio' });
+  subir.addEventListener('click', async () => { subir.disabled = true; await subirPreview(track, file.files[0], secs.value, ini.value, out); subir.disabled = false; });
+
+  const acc = [];
   if (track.preview_path) {
-    const oir = el('button', { class: 'btn ghost sm', type: 'button', text: 'Oír preview' });
+    const oir = el('button', { class: 'btn ghost sm', type: 'button', text: 'Oír preview publicado' });
     oir.addEventListener('click', () => reproducir({ file_path: track.preview_path, role: 'PREVIEW' }, track.title, oir));
     const quitar = el('button', { class: 'btn danger sm', type: 'button', text: 'Retirar preview' });
     acc.push(oir, quitar, confirmarInline(quitar, '¿Retirar el preview? El hero deja de ofrecerlo y el recorte se borra del bucket.', () => quitarPreview(track, out)));
@@ -631,13 +719,16 @@ function bloquePreview(track) {
   return el('div', { class: 'zg-sub' },
     el('p', { class: 'eyebrow', text: 'Preview público' + (track.preview_path ? ` · publicado (${track.preview_seconds} s desde ${fmtDur(track.preview_start)})` : ' · sin publicar') }),
     el('p', { class: 'zg-nota', text: track.visible
-      ? 'Lo oye cualquiera desde el hero, sin cuenta. Es un recorte aparte: la maqueta completa sigue siendo solo para la lista. Elige el gancho (el coro), no la intro.'
+      ? 'Lo oye cualquiera desde el hero, sin cuenta. Es un recorte aparte en MP3: la maqueta completa sigue siendo solo para la lista. Elige el gancho (el coro), pruébalo, y recorta.'
       : 'El tema está oculto: el preview no se mostrará hasta que sea visible.' }),
     el('div', { class: 'grid3' },
-      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Recorte (.m4a/.mp3, dura lo que declaras)' }), file),
-      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Segundos (15–60)' }), secs),
-      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Empieza en el segundo' }), ini)),
-    el('div', { class: 'row-actions' }, acc), out);
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Archivo fuente' }), fuente),
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Empieza en el segundo' }), ini),
+      el('div', { class: 'field' }, el('label', { class: 'lbl', text: 'Segundos (15–60)' }), secs)),
+    el('div', { class: 'row-actions' }, probar, cortar, ...acc),
+    el('details', {}, el('summary', { class: 'zg-nota', text: 'O subir un recorte hecho fuera (DAW / generar-preview.sh)' }),
+      el('div', { class: 'grid2', style: 'margin-top:8px' }, el('div', { class: 'field' }, file), el('div', { class: 'field' }, subir))),
+    out);
 }
 
 /* ───────────── lanzamiento (HdU-20, 21, 22) ───────────── */
