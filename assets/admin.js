@@ -106,7 +106,7 @@
   }
 
   /* ---------------- state ---------------- */
-  var state = { user: null, tracks: [], pendingFile: null, pendingDuration: null, pendingPeaks: null, booted: false, listadoOk: false };
+  var state = { user: null, tracks: [], pendingFile: null, pendingDuration: null, pendingPeaks: null, booted: false, booting: false, listadoOk: false };
 
   /* ---------------- auth ---------------- */
   var loginForm = $('login-form');
@@ -152,7 +152,11 @@
   // Rule: no awaited supabase call inside this callback — defer with setTimeout.
   sb.auth.onAuthStateChange(function (event, session) {
     if (event === 'SIGNED_OUT' || !session || !session.user) {
+      window.ZignalezAdmin = null;
+      document.dispatchEvent(new CustomEvent('zg-admin-signout'));
       state.user = null;
+      state.booted = false;
+      state.booting = false;
       state.tracks = [];
       stopPlayer();
       resetAllButtons();
@@ -168,7 +172,12 @@
     if (event === 'USER_UPDATED' && state.booted) return;
 
     state.user = session.user;
-    if (state.booted) return;
+    // HdU-24 (24-09-2026): entre INITIAL_SESSION y el siguiente evento de auth,
+    // booted todavía era false y bootAdmin corría dos veces: 2× is_admin, 20
+    // peticiones por carga en vez de 10, y el formulario de alta se vaciaba a
+    // mitad de escritura. Medido en producción.
+    if (state.booted || state.booting) return;
+    state.booting = true;
     show('loading');
     setTimeout(bootAdmin, 0);
   });
@@ -176,6 +185,7 @@
   function bootAdmin() {
     sb.rpc('is_admin').then(function (res) {
       if (res.error || res.data !== true) {
+        state.booting = false;
         var de = $('denied-email');
         de.textContent = (state.user && state.user.email) || '';
         resetAllButtons();
@@ -183,12 +193,18 @@
         return;
       }
       state.booted = true;
+      state.booting = false;
       $('panel-email').textContent = (state.user && state.user.email) || '';
       resetAllButtons();
       show('panel');
       loadTracks();
       loadSubscriberCount();
+      // Puente para los módulos nuevos (admin-produccion.js). Único punto de
+      // contacto con el legado: HdU-04 v1.1, estrangulamiento.
+      window.ZignalezAdmin = { sb: sb, bucket: BUCKET, user: state.user };
+      document.dispatchEvent(new CustomEvent('zg-admin-ready'));
     }).catch(function () {
+      state.booting = false;
       $('denied-email').textContent = (state.user && state.user.email) || '';
       resetAllButtons();
       show('denied');
@@ -232,6 +248,9 @@
   /* ---------------- tracks ---------------- */
   var listEl = $('tracks');
   var listStatus = $('list-status');
+
+  // HdU-19: el módulo de producción avisa cuando borró un tema completo.
+  document.addEventListener('zg-tracks-cambiaron', function () { if (state.booted) loadTracks(); });
 
   function loadTracks() {
     listEl.textContent = '';
@@ -718,6 +737,14 @@
     row.appendChild(conf);
 
     btnDel.addEventListener('click', function () {
+      // HdU-19 (24-09-2026): tracks → song_versions es CASCADE y dejaría los
+      // archivos de las versiones huérfanos en el bucket. Con versiones, se
+      // borra desde "Catálogo y versiones" (borrar_tema, fix-09).
+      var nv = window.ZignalezProduccion ? window.ZignalezProduccion.versionesDe(t.id) : 0;
+      if (nv > 0) {
+        setStatus(listStatus, 'Este tema tiene ' + nv + ' versión(es). Bórralo desde «Catálogo y versiones» → Abrir → Eliminar tema completo.', 'err');
+        return;
+      }
       conf.classList.add('open');
       btnDel.disabled = true;
     });
