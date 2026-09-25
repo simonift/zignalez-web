@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zignalez — música urbana desde Santiago de Chile</title>
-<meta name="description" content="Seis temas terminados que todavía no salen. Suenan acá con la letra corriendo, línea por línea. Perreo oscuro desde Santiago de Chile.">
+<title>LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · estreno 1 de octubre</title>
+<meta name="description" content="LUCE BIEN, lo nuevo de Zignalez con ACHEH y D-FOX, sale el 1 de octubre a las 20:00. Guárdalo ahora y te llega solo el día del estreno.">
 <link rel="canonical" href="https://zignalez.cl/">
 
 <!-- Identidad en la pestaña y en el escritorio. Antes no habia ninguna: el
@@ -18,22 +18,22 @@
      WhatsApp; sin estas etiquetas el enlace llegaba como texto pelado y el
      esfuerzo de quien lo comparte se perdia entero. URL absoluta obligatoria:
      las relativas no las resuelve ningun rastreador social. -->
-<meta property="og:type" content="profile">
+<meta property="og:type" content="music.song">
 <meta property="og:site_name" content="Zignalez">
 <meta property="og:locale" content="es_CL">
 <meta property="og:url" content="https://zignalez.cl/">
-<meta property="og:title" content="Zignalez — urbano desde Santiago de Chile">
-<meta property="og:description" content="Seis temas terminados que todavía no salen. Suenan acá con la letra corriendo, línea por línea.">
-<meta property="og:image" content="https://zignalez.cl/og-zignalez.jpg?v=2">
+<meta property="og:title" content="LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · 1 de octubre, 20:00">
+<meta property="og:description" content="Guárdalo ahora y te llega solo el día del estreno.">
+<meta property="og:image" content="https://zignalez.cl/og-lucebien.jpg?v=1">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Zignalez, artista urbano de Santiago de Chile, de frente con lentes rojos">
+<meta property="og:image:alt" content="LUCE BIEN — Zignalez con ACHEH y D-FOX en el set del video">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Zignalez — urbano desde Santiago de Chile">
-<meta name="twitter:description" content="Seis temas terminados que todavía no salen.">
-<meta name="twitter:image" content="https://zignalez.cl/og-zignalez.jpg?v=2">
+<meta name="twitter:title" content="LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · 1 de octubre, 20:00">
+<meta name="twitter:description" content="Guárdalo ahora y te llega solo el día del estreno.">
+<meta name="twitter:image" content="https://zignalez.cl/og-lucebien.jpg?v=1">
 
 <!-- MusicGroup NO produce resultados enriquecidos en Google: eso es folclore
      SEO. Lo que hace es desambiguar la entidad (Zignalez = artista musical
@@ -112,6 +112,13 @@
   .display .uv{color:var(--uv);text-shadow:0 0 34px rgba(139,61,255,.55)}
   .sub{font-family:var(--font-d);color:var(--chrome-hi);font-size:clamp(18px,3vw,26px);margin:10px 0 0;font-weight:700}
   .tagline{max-width:54ch;margin:20px 0 0;font-size:18px;color:var(--chrome)}
+  /* Campaña LUCE BIEN · 25-09-2026 */
+  .estreno-hero{margin-top:26px;padding:16px 18px;border:1px solid var(--line);border-left:3px solid var(--uv);border-radius:6px;max-width:520px;background:rgba(139,61,255,.06)}
+  .estreno-hero-kicker{font-family:var(--font-m);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--uv-soft)}
+  .estreno-hero-title{font-size:clamp(26px,4vw,38px);font-weight:700;line-height:1.05;margin:6px 0 2px}
+  .estreno-hero-feat{font-family:var(--font-m);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome)}
+  .estreno-hero-fecha{margin-top:8px;font-family:var(--font-m);font-size:13px;color:var(--chrome-hi)}
+  .estreno-hero-fecha .cd{color:var(--uv-soft);margin-left:8px}
   .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;align-items:center}
   .btn{font-family:var(--font-m);font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:15px 26px;border-radius:2px;display:inline-flex;align-items:center;gap:10px;transition:transform .15s ease;cursor:pointer;border:0}
   .btn-primary{background:var(--uv);color:var(--white)}
@@ -773,9 +780,20 @@
            accion pedible es ESCUCHAR, no inscribirse: nadie deja su correo antes
            de que le guste una cancion. El formulario sigue arriba del pliegue,
            como accion secundaria. -->
+      <!-- 25-09-2026 · Campaña LUCE BIEN (estreno 01-10-2026 20:00 CLT). Un solo
+           bloque, dos estados que conmuta assets/estreno.js por fecha: antes del
+           estreno el CTA primario es el pre-save; después, "Escuchar ahora" al
+           mismo enlace (Orchard lo redirige al release). Spotify artista baja a
+           secundario mientras dure la campaña; la lista sigue arriba del pliegue. -->
+      <div class="estreno-hero" id="estrenoHero" data-estreno="2026-10-01T20:00:00-03:00">
+        <div class="estreno-hero-kicker"><span data-pre>Próximo estreno</span><span data-post hidden>Ya disponible</span></div>
+        <div class="estreno-hero-title">LUCE BIEN</div>
+        <div class="estreno-hero-feat">feat. ACHEH &amp; D-FOX · prod. Le Carter</div>
+        <div class="estreno-hero-fecha" data-pre>1 de octubre · 20:00 <span class="cd" id="estrenoCd" aria-live="polite"></span></div>
+      </div>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="https://open.spotify.com/artist/0M4ZFfQbpLYiLksk0QyOph" target="_blank" rel="noopener">Escuchar en Spotify ↗</a>
-        <a class="btn btn-ghost" href="#videos">▶ Ver los videos</a>
+        <a class="btn btn-primary" id="ctaEstreno" data-cta="presave-hero" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escuchar ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=hero&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
+        <a class="btn btn-ghost" href="#estreno">▶ Ver adelanto</a>
         <a class="btn btn-ghost" href="#lista">Entra a la lista</a>
       </div>
       <!-- 25-09-2026 · Preview público (fix-11, HdU-27): lo pinta app.js solo si hay
@@ -784,7 +802,7 @@
            no 6.000 px más abajo: Clarity muestra que el 87% no pasa del 10%. -->
       <div class="hero-preview" id="heroPreview" hidden></div>
       <div class="hero-meta">
-        <span>En edición · <b>HAYABUSA</b> (con Flacko Loyal)</span>
+        <span>Estreno · <b>LUCE BIEN</b> · 1 oct · 20:00</span>
         <span>Distribuido por <b>División Rec</b></span>
         <span><b>@zignalez</b> · verificado</span>
       </div>
@@ -805,11 +823,11 @@
               <video class="estreno-vid" muted loop playsinline autoplay preload="metadata" poster="assets/poster-13587d37.jpg">
                 <source src="assets/lucebien.mp4" type="video/mp4"></video>
               <div class="estreno-over">
-                <div class="estreno-kicker">Se viene · todavía sin audio</div>
+                <div class="estreno-kicker"><span data-pre>Estreno 1 de octubre · 20:00 · adelanto sin audio</span><span data-post hidden>Ya disponible · con video</span></div>
                 <h3 class="estreno-title">LUCE BIEN</h3>
-                <p class="estreno-feat">con Fox y Acheh · <span class="st">GRABADO · EN EDICIÓN</span></p>
-                <p class="estreno-lead">Crudo, desde el set. La lista lo escucha primero.</p>
-                <a class="btn btn-primary" href="#lista">Escúchalo antes</a>
+                <p class="estreno-feat">feat. ACHEH &amp; D-FOX · prod. Le Carter · <span class="st"><span data-pre>PRE-SAVE ABIERTO</span><span data-post hidden>EN TODAS LAS PLATAFORMAS</span></span></p>
+                <p class="estreno-lead">Crudo, desde el set. Guárdalo y el 1 de octubre te llega solo.</p>
+                <a class="btn btn-primary" data-cta="presave-slide" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escuchar ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=carrusel&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
               </div>
             </div>
           </article>
@@ -820,8 +838,8 @@
               <div class="estreno-over">
                 <div class="estreno-kicker">Grabado · falta soltarlo</div>
                 <h3 class="estreno-title">HAYABUSA</h3>
-                <p class="estreno-feat">con Flacko Loyal · <span class="st">GRABADO · EN EDICIÓN</span></p>
-                <p class="estreno-lead">El de Flacko. Todavía sin audio — lo completo llega primero acá.</p>
+                <p class="estreno-feat">prod. Flacko Loyal · <span class="st">GRABADO · EN EDICIÓN</span></p>
+                <p class="estreno-lead">Beat de Flacko. Todavía sin audio — lo completo llega primero acá.</p>
                 <a class="btn btn-primary" href="#lista">Escúchalo antes</a>
               </div>
             </div>
@@ -991,6 +1009,7 @@
 <script src="assets/app.js"></script>
 <script src="assets/senal.js"></script>
 <script src="assets/carrusel.js"></script>
+<script src="assets/estreno.js"></script>
 <script src="assets/spotify.js"></script>
 <script src="assets/apps-nativas.js"></script>
 
