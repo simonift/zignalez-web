@@ -130,3 +130,23 @@ copia. Es la fase con más riesgo de regresión y menos valor visible: va últim
 - Comentarios/feedback del productor sobre el tema (otro prompt: requiere tabla y política nuevas).
 - Compartir desde la fila del archivo en el admin (se propuso el 29-09; es del admin, no de esta vista).
 - Descargar el WAV: el ADR-003 lo prohíbe para LISTEN; no se agrega botón.
+
+---
+
+## Ejecución (29-09-2026) · fases 1 y 2
+
+- **Fase 1**: `assets/zp-player.js` (módulo `window.ZP`, ~330 líneas, port 1:1 del reproductor de socios sin
+  socios/letra/Supabase) y `assets/zp-player.css` (copia literal del bloque `.zp-*` de `index.html` + reduced-motion +
+  `.zp-quieto` para el disco en reposo). `supabase/fix-13-productor-picos.sql`: la RPC agrega `peaks`. **Pendiente
+  de ejecutar en Supabase**; hasta entonces la onda es la barra neutra.
+- **Fase 2**: `productor.html` y `assets/productor.js` reescritos: dos columnas (disco 448 px + lista) en ≥ 980 px,
+  reproductor pegado abajo en móvil, tarjetas con título limpio / prod. / etapa con etiqueta / duración / "compartido
+  hace" / "vence en N días" (ámbar ≤ 7) / NUEVO < 48 h, login con disco quieto, vacío sin botones. Invariantes
+  intactas: la fuente del reproductor es **siempre** un `blob:` bajado con URL firmada de 60 s (`fuenteDe`), el
+  MASTER no entra, `noindex`, sin analítica.
+- Verificado en Chromium headless con un arnés (WAV sintético de 6 s + 200 picos): monta, reproduce, disco gira
+  (`.suena`), onda real, `aria-valuetext` "0:01 de 0:06", teclado en la onda, siguiente, mudo con `aria-pressed`;
+  sin errores de consola. `comprobar-meta.sh .` y `comprobar-privacidad.sh privacidad.html` verdes.
+- Semántica de repetir = la del sitio: 0 sigue la lista y para al **final de la lista** (no tras cada tema).
+- **Fase 3 (unificar `index.html`) no ejecutada**: requiere tu aprobación aparte.
+- Pendiente en navegador real: revocar un share y ver que un ▶ nuevo falla en ≤ 60 s; VoiceOver; 390 px; Lighthouse.
