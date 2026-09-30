@@ -1,0 +1,174 @@
+/* zp-player.css · Zignalez · 29-09-2026
+ * EL DISCO como CSS compartido (PROMPT_MAESTRO_PRODUCTOR_ZIGNALEZ §3.1): copia literal del bloque .zp-*
+ * de index.html (l. 284–507 + reduced-motion). index.html conserva su copia hasta la fase 3 (unificar).
+ * Requiere los tokens :root del sitio (--ink, --uv, --line, --font-*). */
+
+.zp{border:1px solid var(--line);border-radius:6px;
+    background:linear-gradient(180deg,var(--ink-2),var(--ink));padding:22px;display:none}
+.zp.visible{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:20px}
+
+/* ---- Escena 3D ----------------------------------------------------
+   Tres transformaciones SEPARADAS, y el orden importa:
+     .zp-zona    perspective (la camara)
+     .zp-escena  vaiven lento  -- inclinacion que respira
+     .zp-par     paralaje del puntero
+     .zp-disco   rotateZ      -- el giro, y SOLO el giro
+   Si la inclinacion viviera en el mismo elemento que el giro, el disco
+   daria tumbos como una moneda en vez de girar sobre su eje.
+   ------------------------------------------------------------------- */
+.zp-zona{position:relative;display:grid;place-items:center;flex-shrink:0;
+   perspective:760px;perspective-origin:50% 38%;padding:8px 0 22px}
+.zp-escena{transform-style:preserve-3d;
+   animation:zp-vaiven 11s ease-in-out infinite}
+.zp-par{transform-style:preserve-3d;transition:transform .32s ease-out;
+   position:relative}
+@keyframes zp-vaiven{
+  0%,100%{transform:rotateX(25deg) rotateY(-7deg)}
+  50%    {transform:rotateX(30deg) rotateY(7deg)}
+}
+
+/* El alto manda tanto como el ancho: en un portatil de 768px de alto un
+   disco de 230px deja la lista fuera de pantalla. */
+.zp-disco{--d:min(58vw,26vh,230px);width:var(--d);height:var(--d);border-radius:50%;position:relative;
+   transform-style:preserve-3d;
+   background:
+     repeating-radial-gradient(circle at 50% 50%,rgba(0,0,0,.34) 0 1px,rgba(0,0,0,0) 1px 3px),
+     conic-gradient(from 0deg,#7a5210,#e8c169,#fff4cd,#d9a63f,#8a5f14,#f2d391,#b8862c,#e8c169,#7a5210);
+   animation:zp-girar 1.8s linear infinite;animation-play-state:paused}
+.zp-disco.suena{animation-play-state:running}
+
+/* Canto: dos capas hundidas en Z. El ojo lee la diferencia de luminancia
+   entre ellas como grosor. Mas capas no aportan y cuestan composicion. */
+.zp-canto,.zp-canto2{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+   background:conic-gradient(from 0deg,#3a2708,#8a6420,#c9a35a,#6b4a12,#2e1f06,#a8823a,#5c400f,#3a2708)}
+.zp-canto {transform:translateZ(-4px)  scale(1.018);filter:brightness(.62)}
+.zp-canto2{transform:translateZ(-8px)  scale(1.028);filter:brightness(.30)}
+
+/* Segunda capa girando a OTRA velocidad y en sentido inverso. Un solo
+   elemento girando entero se ve plano; la diferencia de velocidad es lo que
+   produce la difraccion. */
+.zp-iris{position:absolute;inset:0;border-radius:50%;mix-blend-mode:overlay;
+   background:repeating-conic-gradient(from 0deg,
+     rgba(255,40,90,.13) 0deg 5deg,rgba(255,196,0,.13) 5deg 10deg,
+     rgba(60,255,170,.13) 10deg 15deg,rgba(0,150,255,.13) 15deg 20deg,
+     rgba(170,60,255,.13) 20deg 25deg,rgba(255,255,255,.05) 25deg 30deg);
+   animation:zp-girar 6.4s linear infinite reverse;animation-play-state:paused}
+.zp-disco.suena .zp-iris{animation-play-state:running}
+
+/* El reflejo NO gira pero SI se inclina: pertenece a la sala, proyectado
+   sobre un disco inclinado. Por eso vive en .zp-par y no en .zp-disco. */
+.zp-par::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
+   transform:translateZ(1px);
+   background:linear-gradient(112deg,
+              rgba(255,255,255,0) 6%,  rgba(255,255,255,.62) 17%, rgba(255,255,255,.10) 27%,
+              rgba(255,255,255,0) 40%, rgba(0,0,0,.30) 56%,
+              rgba(255,255,255,0) 70%, rgba(255,255,255,.34) 82%, rgba(255,255,255,0) 92%);
+   mix-blend-mode:overlay}
+/* Borde iluminado: separa el disco del fondo negro y remata el canto. */
+.zp-par::before{content:'';position:absolute;inset:-1px;border-radius:50%;pointer-events:none;
+   transform:translateZ(2px);
+   box-shadow:inset 0 1px 1px rgba(255,255,255,.45), inset 0 -2px 3px rgba(0,0,0,.6),
+              0 0 0 1px rgba(255,214,128,.30)}
+
+/* Sombra de contacto: sin ella el disco flota sobre la nada y el 3D no
+   termina de cerrar. Va en la zona, fuera de la escena, sin perspectiva. */
+.zp-sombra{position:absolute;left:50%;bottom:2px;width:64%;height:16px;
+   transform:translateX(-50%);border-radius:50%;pointer-events:none;
+   background:radial-gradient(ellipse at center,rgba(0,0,0,.72),rgba(0,0,0,0) 72%);
+   filter:blur(6px);animation:zp-sombra 11s ease-in-out infinite}
+@keyframes zp-sombra{
+  0%,100%{transform:translateX(-50%) scaleX(1) ;opacity:.85}
+  50%    {transform:translateX(-50%) scaleX(.92);opacity:.70}
+}
+
+/* Etiqueta y orificio: van 1px por delante de la cara para que el
+   preserve-3d no los reordene detras del disco. */
+.zp-label{position:absolute;inset:31%;border-radius:50%;display:grid;
+   align-items:end;justify-items:center;text-align:center;
+   padding:0 8% 15%;overflow:hidden;transform:translateZ(1px);
+   background:radial-gradient(circle at 50% 42%,#1a1a20,#0b0b0f 74%);
+   box-shadow:inset 0 0 0 1px rgba(255,214,128,.34),0 0 16px rgba(0,0,0,.6)}
+/* Dos lineas como maximo y recortado en JS: el texto de una etiqueta vive
+   dentro de un CIRCULO, no de la caja cuadrada que lo contiene. */
+.zp-label span{font-family:var(--font-m);font-size:8px;letter-spacing:.30em;
+   text-transform:uppercase;color:rgba(255,214,128,.85);line-height:1.4;
+   white-space:nowrap;overflow:hidden;max-width:100%}
+.zp-hoyo{position:absolute;inset:46.5%;border-radius:50%;background:var(--ink);
+   transform:translateZ(2px);
+   box-shadow:inset 0 0 0 1px rgba(255,214,128,.28),0 0 6px rgba(0,0,0,.8)}
+
+@keyframes zp-girar{to{transform:rotate(360deg)}}
+
+.zp-panel{min-width:0}
+.zp-eyebrow{font-family:var(--font-m);font-size:10px;letter-spacing:.28em;text-transform:uppercase;
+   color:rgba(255,214,128,.72)}
+.zp-title{font-family:var(--font-d);color:var(--white);font-size:21px;margin:5px 0 0;
+   overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+   overflow-wrap:anywhere}
+/* 2 lineas: la descripcion completa medía 4 y empujaba el transporte fuera
+   de la pantalla en portatiles. */
+.zp-desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+   font-family:var(--font-m);font-size:11px;letter-spacing:.05em;color:var(--smoke);
+   margin:5px 0 0}
+
+
+/* ---- Transporte ---- */
+.zp-tr{display:flex;flex-direction:column;gap:11px}
+.zp-linea{display:flex;align-items:center;gap:10px;width:100%}
+.zp-btns{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap}
+.zp-b{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-2);background:transparent;
+   color:var(--chrome);cursor:pointer;display:grid;place-items:center;padding:0;flex-shrink:0;
+   transition:background .15s ease,border-color .15s ease,color .15s ease}
+.zp-b:hover:not(:disabled){border-color:rgba(255,214,128,.6);color:rgba(255,222,150,1)}
+.zp-b:disabled{opacity:.35;cursor:default}
+.zp-b svg{width:13px;height:13px;fill:currentColor;pointer-events:none}
+/* El area de golpeo llega a 44x44 aunque el circulo visible sea menor.
+   Sin esto, 6 de los 7 controles del reproductor quedaban por debajo del
+   minimo tactil. */
+.zp-b{position:relative}
+.zp-b::before{content:'';position:absolute;
+   top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%}
+.zp-b.zp-grande{width:44px;height:44px;background:rgba(255,214,128,.12);
+   border-color:rgba(255,214,128,.45);color:rgba(255,226,160,1)}
+.zp-b.zp-grande svg{width:16px;height:16px}
+/* Estado activo de repetir y de silencio. El color no puede ser el unico
+   indicador: va con punto. Estaba solo en la franja, que ya no existe. */
+.zp-b.on{color:#f2d391;border-color:rgba(255,214,128,.6)}
+.zp-b.on::after{content:'';position:absolute;bottom:2px;left:50%;
+   transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#f2d391}
+.zp-t{font-family:var(--font-m);font-size:11px;color:var(--smoke);font-variant-numeric:tabular-nums;
+   flex-shrink:0;min-width:36px}
+/* La onda sustituye a la barra: mismo rol de slider, mismo scrub, mismo
+   teclado. Venia de la franja y se movio aqui entera. */
+.zp-onda{flex:1;min-width:0;height:44px;position:relative;cursor:pointer;touch-action:none}
+.zp-onda:focus-visible{outline:2px solid rgba(255,214,128,.7);outline-offset:3px;border-radius:3px}
+.zp-onda canvas{display:block;width:100%;height:100%}
+.zp-estado{font-family:var(--font-m);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+   color:var(--smoke);margin-top:9px;min-height:13px}
+
+
+@media (prefers-reduced-motion: reduce){
+  .zp-disco,.zp-iris,.zp-sombra{animation:none}
+  .zp-escena{animation:none;transform:rotateX(26deg)}
+  .zp-par{transition:none}
+  .zp-l{transition:none}
+}
+
+
+/* Disco en reposo (login / vacío): quieto pero inclinado, sin vaivén. */
+.zp.zp-quieto .zp-escena{animation:none;transform:rotateX(26deg)}
+.zp.zp-quieto .zp-sombra{animation:none}
+.zp-panel{width:100%}
+@media (max-width:360px){ .zp-btns{gap:6px} }
+/* Una columna: disco chico, como socios (index.html l. 508–530). */
+@media (max-width:979px){ .zp-disco{--d:min(34vw,16vh,130px)} .zp-zona{padding:4px 0 14px} .zp-desc{display:none} }
+@supports (height:1svh){
+  .zp-disco{--d:min(58vw,26svh,230px)}
+  @media (max-width:979px){ .zp-disco{--d:min(34vw,16svh,130px)} }
+}
+@media (orientation:landscape) and (max-height:520px){
+  .zp{padding:14px}
+  .zp.visible{grid-template-columns:auto minmax(0,1fr);justify-items:stretch;align-items:center;gap:16px}
+  .zp-disco{--d:min(30vw,112px)} .zp-zona{padding:4px 0 12px} .zp-title{font-size:17px;-webkit-line-clamp:1}
+  .zp-sombra{height:9px} .zp-onda{height:34px}
+}
