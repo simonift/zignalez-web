@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · estreno 1 de octubre</title>
-<meta name="description" content="LUCE BIEN, lo nuevo de Zignalez con ACHEH y D-FOX, sale el 1 de octubre a las 20:00. Guárdalo ahora y te llega solo el día del estreno.">
+<title>LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · 1 de octubre · 20:00</title>
+<meta name="description" content="LUCE BIEN, lo nuevo de Zignalez con ACHEH y D-FOX, prod. Le Carter. Desde el 1 de octubre a las 20:00 en todas las plataformas, con video oficial en 4K.">
 <link rel="canonical" href="https://zignalez.cl/">
 
 <!-- Identidad en la pestaña y en el escritorio. Antes no habia ninguna: el
@@ -23,8 +23,8 @@
 <meta property="og:locale" content="es_CL">
 <meta property="og:url" content="https://zignalez.cl/">
 <meta property="og:title" content="LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · 1 de octubre, 20:00">
-<meta property="og:description" content="Guárdalo ahora y te llega solo el día del estreno.">
-<meta property="og:image" content="https://zignalez.cl/og-lucebien.jpg?v=1">
+<meta property="og:description" content="Desde el 1 de octubre a las 20:00 en todas las plataformas. Escúchalo y mira el video oficial en 4K.">
+<meta property="og:image" content="https://zignalez.cl/og-lucebien.jpg?v=2">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -32,8 +32,8 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · 1 de octubre, 20:00">
-<meta name="twitter:description" content="Guárdalo ahora y te llega solo el día del estreno.">
-<meta name="twitter:image" content="https://zignalez.cl/og-lucebien.jpg?v=1">
+<meta name="twitter:description" content="Desde el 1 de octubre a las 20:00 en todas las plataformas. Escúchalo y mira el video oficial en 4K.">
+<meta name="twitter:image" content="https://zignalez.cl/og-lucebien.jpg?v=2">
 
 <!-- MusicGroup NO produce resultados enriquecidos en Google: eso es folclore
      SEO. Lo que hace es desambiguar la entidad (Zignalez = artista musical
@@ -71,10 +71,14 @@
     --uv:#8B3DFF; --uv-soft:#A66BFF;
     --chrome:#C7CCD1; --chrome-hi:#E8EAED; --smoke:#8A86A0; --white:#FFFFFF;
     --line:rgba(199,204,209,.14); --line-2:rgba(199,204,209,.28);
+    --amber:#D9A441; /* 01-10-2026 · acento del estado POST (mismo valor que productor.html) */
     --maxw:1140px;
     --font-d:'Syne',system-ui,sans-serif; --font-b:'Manrope',system-ui,sans-serif; --font-m:'Space Mono',ui-monospace,monospace;
   }
   *{box-sizing:border-box}
+  /* 01-10-2026 · [hidden] debe ganar a cualquier display de autor (.btn, .link-inline…): sin esto
+     un boton .btn[hidden] se ve igual. Las reglas .x[hidden] mas abajo quedan como refuerzo. */
+  [hidden]{display:none!important}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--ink);color:var(--chrome);font-family:var(--font-b);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
@@ -134,6 +138,59 @@
   .estreno-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
   .estreno-frame.has-yt .estreno-vid,.estreno-frame.has-yt .estreno-over{display:none}
   @media(max-width:720px){ .cd-cell{min-width:44px} }
+  /* 01-10-2026 · ESTADO POST (estreno disponible). Todo cuelga de html.estreno-post o de
+     [data-post]; el estado PRE no cambia. Ámbar = único acento no-UV del hero: por eso
+     el badge se ve. El video se reproduce en la página (slide 0), nunca iframe antes del clic. */
+  html.estreno-post .estreno-hero{border-left-color:var(--amber);background:rgba(139,61,255,.10);
+    box-shadow:0 0 0 1px rgba(166,107,255,.18),0 18px 48px -24px rgba(139,61,255,.55)}
+  .ya-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--ink);background:var(--amber);padding:6px 10px 5px;border-radius:2px;font-weight:700}
+  .ya-badge[hidden]{display:none}
+  .ya-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ink);animation:ya-pulse 1.8s ease-in-out infinite}
+  @keyframes ya-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+  html.estreno-post .ya-badge{animation:ya-in .5s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes ya-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .estreno-vcard{position:relative;display:flex;align-items:center;gap:12px;margin-top:12px;padding:8px;border:1px solid var(--line);
+    border-radius:8px;background:rgba(10,10,11,.55);text-decoration:none;color:var(--chrome-hi);transition:border-color .18s,transform .18s}
+  .estreno-vcard[hidden]{display:none}
+  .estreno-vcard img{width:112px;aspect-ratio:16/9;object-fit:cover;border-radius:4px;filter:saturate(.85);display:block;flex-shrink:0}
+  .estreno-vcard-play{position:absolute;left:47px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;
+    background:var(--uv);color:#fff;display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+  .estreno-vcard-play svg{width:13px;height:13px;fill:#fff;margin-left:2px}
+  .estreno-vcard:hover,.estreno-vcard:focus-visible{border-color:var(--uv);transform:translateY(-2px)}
+  .estreno-vcard-txt{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .estreno-vcard-txt b{font-family:var(--font-d);font-size:15px;line-height:1.15}
+  .estreno-vcard-txt small{font-family:var(--font-m);font-size:11px;color:var(--smoke);letter-spacing:.06em}
+  html.estreno-post #ctaEstreno{box-shadow:0 0 0 3px rgba(139,61,255,.25)}
+  .estreno-vcard-nota{margin:10px 0 0;font-family:var(--font-m);font-size:11.5px;letter-spacing:.04em;color:var(--smoke)}
+  .estreno-volver{position:absolute;top:10px;right:10px;z-index:6;font-family:var(--font-m);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    padding:8px 10px;border-radius:2px;border:1px solid var(--line-2);background:rgba(10,10,11,.75);color:var(--chrome-hi);cursor:pointer}
+  .estreno-volver:hover{border-color:var(--uv)}
+  .btn-copiado{border-color:var(--amber)!important;color:var(--amber)!important}
+  html.estreno-post .hero-actions a[href="#lista"]{background:transparent;border:0;padding:15px 4px;color:var(--uv-soft);text-decoration:underline;text-underline-offset:4px}
+  .btn:focus-visible,.estreno-vcard:focus-visible,.estreno-play-big:focus-visible{outline:2px solid var(--chrome-hi);outline-offset:3px}
+  /* momento 20:00:00 con visitante presente */
+  .cd-box.cd-cero b{color:var(--amber);animation:cd-flash .6s ease-out 1}
+  @keyframes cd-flash{0%{opacity:1}30%{opacity:.2}100%{opacity:1}}
+  .estreno-hero.is-revelando{animation:hero-glow .8s ease-out 1}
+  @keyframes hero-glow{0%{box-shadow:0 0 0 0 rgba(217,164,65,0)}50%{box-shadow:0 0 0 6px rgba(217,164,65,.35),0 0 60px rgba(139,61,255,.45)}100%{box-shadow:0 0 0 1px rgba(166,107,255,.18),0 18px 48px -24px rgba(139,61,255,.55)}}
+  /* slide 0: play central grande en POST */
+  .estreno-play-big{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;width:84px;height:84px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.35);background:rgba(139,61,255,.85);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    cursor:pointer;display:grid;place-items:center;padding:0;transition:background .15s,transform .15s}
+  .estreno-play-big[hidden]{display:none}
+  .estreno-play-big svg{width:34px;height:34px;fill:#fff;margin-left:4px}
+  .estreno-play-big:hover,.estreno-play-big:focus-visible{background:var(--uv);transform:translate(-50%,-50%) scale(1.06)}
+  .estreno-frame.has-yt .estreno-play-big{display:none}
+  html.estreno-post #estreno .slide[data-yt] .estreno-over{background:linear-gradient(to top,rgba(10,10,11,.96),rgba(10,10,11,.3) 60%,rgba(10,10,11,.1))}
+  @media(prefers-reduced-motion:reduce){.ya-badge::before,.ya-badge,.cd-box.cd-cero b,.estreno-hero.is-revelando{animation:none!important}}
+  @media(max-width:640px){
+    html.estreno-post .estreno-hero{max-width:none}
+    .estreno-vcard{gap:10px}.estreno-vcard img{width:96px}.estreno-vcard-play{left:39px}
+    html.estreno-post .hero-actions{flex-direction:column;align-items:stretch;gap:10px}
+    html.estreno-post .hero-actions .btn{justify-content:center}
+    .estreno-play-big{width:64px;height:64px}.estreno-play-big svg{width:26px;height:26px}
+  }
   .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;align-items:center}
   .btn{font-family:var(--font-m);font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:15px 26px;border-radius:2px;display:inline-flex;align-items:center;gap:10px;transition:transform .15s ease;cursor:pointer;border:0}
   .btn-primary{background:var(--uv);color:var(--white)}
@@ -801,10 +858,20 @@
            mismo enlace (Orchard lo redirige al release). Spotify artista baja a
            secundario mientras dure la campaña; la lista sigue arriba del pliegue. -->
       <div class="estreno-hero" id="estrenoHero" data-estreno="2026-10-01T20:00:00-03:00">
-        <div class="estreno-hero-kicker"><span data-pre>Próximo estreno</span><span data-post hidden>Ya disponible</span></div>
+        <div class="estreno-hero-kicker"><span data-pre>Próximo estreno</span><span class="ya-badge" data-post hidden data-hoy="Salió hoy" data-luego="Ya salió">Salió hoy</span></div>
         <div class="estreno-hero-title">LUCE BIEN</div>
         <div class="estreno-hero-feat">feat. ACHEH &amp; D-FOX · prod. Le Carter</div>
-        <div class="estreno-hero-fecha" data-pre>1 de octubre · 20:00 <span class="cd" id="estrenoCd" aria-live="polite"></span></div>
+        <div class="estreno-hero-fecha"><span data-pre>1 de octubre · 20:00</span><span data-post hidden data-hoy="Desde hoy a las 20:00 · Spotify, Apple, YouTube y donde escuches" data-luego="Desde el 1 de octubre · Spotify, Apple, YouTube y donde escuches">Desde hoy a las 20:00 · Spotify, Apple, YouTube y donde escuches</span> <span class="cd" id="estrenoCd" aria-live="polite"></span></div>
+        <!-- 01-10-2026 · POST: tarjeta del video oficial. El href real (youtu.be) funciona sin
+             JS y como enlace; con JS, estreno.js la intercepta y reproduce en el slide 0,
+             una sola ruta de iframe. "Ver en YouTube" queda como enlace explícito. -->
+        <a class="estreno-vcard" data-post hidden href="https://youtu.be/f1n262mj6AE" data-cta="video-hero-card" data-yt-play
+           aria-label="Reproducir el video oficial de LUCE BIEN">
+          <img src="assets/poster-13587d37.jpg" alt="" width="112" height="63" decoding="async">
+          <span class="estreno-vcard-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="estreno-vcard-txt"><b>Video oficial · LUCE BIEN</b><small>YouTube · 3:00 · 4K</small></span>
+        </a>
+        <p class="estreno-vcard-nota" data-post hidden data-yt-espera>El video se habilita en YouTube en unos minutos. Mientras, escúchalo.</p>
         <!-- 30-09-2026 · Cuenta regresiva al segundo (estreno.js). La version hablada
              (#estrenoCd, por minuto) sigue arriba: un lector de pantalla no debe oir
              un numero nuevo cada segundo. -->
@@ -816,9 +883,12 @@
         </div>
       </div>
       <div class="hero-actions">
-        <a class="btn btn-primary" id="ctaEstreno" data-cta="presave-hero" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escuchar ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=hero&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
+        <a class="btn btn-primary" id="ctaEstreno" data-cta="presave-hero" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escúchalo ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=hero&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
         <a class="btn btn-ghost" href="#estreno" data-pre>▶ Ver adelanto</a>
-        <a class="btn btn-ghost" href="https://youtu.be/f1n262mj6AE" data-post hidden data-cta="video-hero" target="_blank" rel="noopener">▶ Ver el video ↗</a>
+        <a class="link-inline" href="https://youtu.be/f1n262mj6AE" data-post hidden data-cta="video-hero-yt" data-yt-link target="_blank" rel="noopener">Ver en YouTube ↗</a>
+        <!-- 01-10-2026 · Compartir nativo (Web Share API): el sitio se mueve por DM y WhatsApp.
+             Sin navigator.share, copia el enlace. Solo en POST. -->
+        <button class="btn btn-ghost" type="button" id="btnCompartir" data-post hidden data-cta="share">Mándaselo a alguien</button>
         <a class="btn btn-ghost" href="#lista">Entra a la lista</a>
       </div>
       <!-- 25-09-2026 · Preview público (fix-11, HdU-27): lo pinta app.js solo si hay
@@ -827,7 +897,7 @@
            no 6.000 px más abajo: Clarity muestra que el 87% no pasa del 10%. -->
       <div class="hero-preview" id="heroPreview" hidden></div>
       <div class="hero-meta">
-        <span>Estreno · <b>LUCE BIEN</b> · 1 oct · 20:00</span>
+        <span><span data-pre>Estreno</span><span data-post hidden>Salió el 1 oct</span> · <b>LUCE BIEN</b><span data-pre> · 1 oct · 20:00</span></span>
         <span>Distribuido por <b>División Rec</b></span>
         <span><b>@zignalez</b> · verificado</span>
       </div>
@@ -847,14 +917,18 @@
             <div class="estreno-frame">
               <video class="estreno-vid" muted loop playsinline autoplay preload="metadata" poster="assets/poster-13587d37.jpg">
                 <source src="assets/lucebien.mp4" type="video/mp4"></video>
+              <button class="estreno-ytbtn estreno-play-big" type="button" data-post hidden data-cta="video-slide-big" aria-label="Reproducir el video oficial de LUCE BIEN">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              </button>
               <div class="estreno-over">
-                <div class="estreno-kicker"><span data-pre>Estreno 1 de octubre · 20:00 · adelanto sin audio</span><span data-post hidden>Ya disponible · con video</span></div>
+                <div class="estreno-kicker"><span data-pre>Estreno 1 de octubre · 20:00 · adelanto sin audio</span><span data-post hidden>Salió hoy · video oficial en 4K</span></div>
                 <h3 class="estreno-title">LUCE BIEN</h3>
                 <p class="estreno-feat">feat. ACHEH &amp; D-FOX · prod. Le Carter · <span class="st"><span data-pre>PRE-SAVE ABIERTO</span><span data-post hidden>EN TODAS LAS PLATAFORMAS</span></span></p>
-                <p class="estreno-lead">Crudo, desde el set. Guárdalo y el 1 de octubre te llega solo.</p>
+                <p class="estreno-lead"><span data-pre>Crudo, desde el set. Guárdalo y el 1 de octubre te llega solo.</span><span data-post hidden>Ya salió. Escúchalo, mira el video y, si te gustó, mándaselo a alguien — el algoritmo no lo va a hacer por ti.</span></p>
                 <div class="estreno-ctas">
-                  <a class="btn btn-primary" data-cta="presave-slide" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escuchar ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=carrusel&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
+                  <a class="btn btn-primary" data-cta="presave-slide" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escúchalo ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=carrusel&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
                   <button class="btn btn-ghost estreno-ytbtn" type="button" data-post hidden data-cta="video-slide">▶ Ver el video</button>
+                  <a class="link-inline" href="https://youtu.be/f1n262mj6AE" data-post hidden data-cta="video-slide-yt" data-yt-link target="_blank" rel="noopener">Ver en YouTube ↗</a>
                 </div>
               </div>
             </div>

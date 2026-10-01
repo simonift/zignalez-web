@@ -39,7 +39,15 @@
   var openVideo = null;
   function closeVideo(card){ if(!card) return; var f=card.querySelector('.vframe'); if(f){ var fr=f.querySelector('iframe'); if(fr) fr.remove(); } card.classList.remove('open'); if(openVideo===card) openVideo=null; }
   var estrenoForzado = /[?&]estreno=post\b/.test(location.search);
-  VIDEOS.filter(function(v){ return !v.desde || estrenoForzado || Date.parse(v.desde) <= Date.now(); }).forEach(function(v){
+  var disponible = function(v){ return !v.desde || estrenoForzado || Date.parse(v.desde) <= Date.now(); };
+  /* 01-10-2026 · Si el visitante esta en la pagina cuando llega la hora del estreno,
+     estreno.js dispara 'estreno:post' y la tarjeta gateada entra al frente sin recargar. */
+  document.addEventListener('estreno:post', function(e){
+    var ahora = (e.detail && e.detail.ahora) || Date.now();
+    VIDEOS.forEach(function(v){ if(v.desde && !v._pintado && Date.parse(v.desde) <= ahora){ v._pintado = true; pintarVideo(v, true); } });
+  });
+  VIDEOS.filter(disponible).forEach(function(v){ v._pintado = true; pintarVideo(v, false); });
+  function pintarVideo(v, alFrente){
     var card = document.createElement('div'); card.className='vcard';
     var spDisabled = (v.sp === ARTIST_SPOTIFY);
     card.innerHTML =
@@ -77,8 +85,8 @@
       card.classList.add('open'); openVideo=card;
     });
     card.querySelector('.vclose').addEventListener('click', function(e){ e.stopPropagation(); closeVideo(card); });
-    vgrid.appendChild(card);
-  });
+    if(alFrente && vgrid.firstChild) vgrid.insertBefore(card, vgrid.firstChild); else vgrid.appendChild(card);
+  }
 
   /* ====== TikTok ====== */
   var tkMount = document.getElementById('tk-mount');
@@ -179,6 +187,8 @@
 
   form.addEventListener('submit', function(e){
     e.preventDefault();
+    /* 01-10-2026 · altas a la lista durante el estreno, para saber si el estreno la movio */
+    try{ if(document.documentElement.classList.contains('estreno-post') && typeof window.clarity==='function') window.clarity('event','lista_post'); }catch(err){}
     if(!sb){
       note.className='form-note err';
       note.textContent='Algo falló de mi lado. Recarga la página y vuelve a intentar.';
