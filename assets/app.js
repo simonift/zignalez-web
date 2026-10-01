@@ -8,6 +8,9 @@
      página de artista — NO se inventan IDs de álbum. */
   var ARTIST_SPOTIFY = "https://open.spotify.com/artist/0M4ZFfQbpLYiLksk0QyOph";
   var VIDEOS = [
+    /* desde: el video es PRIVADO en YouTube hasta el estreno; antes de esa hora no se pinta
+       (una tarjeta con "video no disponible" es peor que ninguna). ?estreno=post lo fuerza. */
+    {yt:"f1n262mj6AE", t:"LUCE BIEN (ft ACHEH & D-FOX)", badge:"Estreno", uv:true, sp:"https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&utm_medium=videos&utm_campaign=lucebien", desde:"2026-10-01T20:00:00-03:00"},
     {yt:"lzW1ZlMEqTs", t:"ORBITÁNDOTE (Studio Preview)", badge:"Preview", sp:ARTIST_SPOTIFY},
     {yt:"sf9pJw4ww8w", t:"HAYABUSA (Live)", badge:"con Flacko Loyal", uv:true, sp:ARTIST_SPOTIFY},
     {yt:"_nAUBog0kzk", t:"ALTA GAMA (ft Migue Ramos)", badge:"Video Lyrics", sp:"https://open.spotify.com/track/7N2R96fWEwgVT0PLRfSs0I"},
@@ -35,7 +38,8 @@
   var vgrid = document.getElementById('vgrid');
   var openVideo = null;
   function closeVideo(card){ if(!card) return; var f=card.querySelector('.vframe'); if(f){ var fr=f.querySelector('iframe'); if(fr) fr.remove(); } card.classList.remove('open'); if(openVideo===card) openVideo=null; }
-  VIDEOS.forEach(function(v){
+  var estrenoForzado = /[?&]estreno=post\b/.test(location.search);
+  VIDEOS.filter(function(v){ return !v.desde || estrenoForzado || Date.parse(v.desde) <= Date.now(); }).forEach(function(v){
     var card = document.createElement('div'); card.className='vcard';
     var spDisabled = (v.sp === ARTIST_SPOTIFY);
     card.innerHTML =

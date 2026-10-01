@@ -119,6 +119,21 @@
   .estreno-hero-feat{font-family:var(--font-m);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--chrome)}
   .estreno-hero-fecha{margin-top:8px;font-family:var(--font-m);font-size:13px;color:var(--chrome-hi)}
   .estreno-hero-fecha .cd{color:var(--uv-soft);margin-left:8px}
+  /* Cuenta regresiva: cifras tabulares en Syne, etiquetas en Space Mono. Ancho fijo por
+     celda para que el reloj no "respire" al cambiar de 9 a 10. */
+  .cd-box{display:flex;align-items:flex-start;gap:6px;margin-top:12px}
+  .cd-box[hidden]{display:none}
+  .cd-cell{display:flex;flex-direction:column;align-items:center;min-width:52px}
+  .cd-cell b{font-family:var(--font-d);font-weight:800;font-size:clamp(26px,4vw,38px);line-height:1;color:var(--chrome-hi);
+     font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .cd-cell small{font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke);margin-top:6px}
+  .cd-sep{font-family:var(--font-d);font-weight:800;font-size:clamp(22px,3.4vw,32px);line-height:1;color:var(--uv);padding-top:1px}
+  .cd-box.cd-hoy b{color:var(--uv-soft)}
+  .estreno-ctas{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .estreno-ytbtn[hidden]{display:none}
+  .estreno-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .estreno-frame.has-yt .estreno-vid,.estreno-frame.has-yt .estreno-over{display:none}
+  @media(max-width:720px){ .cd-cell{min-width:44px} }
   .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;align-items:center}
   .btn{font-family:var(--font-m);font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:15px 26px;border-radius:2px;display:inline-flex;align-items:center;gap:10px;transition:transform .15s ease;cursor:pointer;border:0}
   .btn-primary{background:var(--uv);color:var(--white)}
@@ -790,10 +805,20 @@
         <div class="estreno-hero-title">LUCE BIEN</div>
         <div class="estreno-hero-feat">feat. ACHEH &amp; D-FOX · prod. Le Carter</div>
         <div class="estreno-hero-fecha" data-pre>1 de octubre · 20:00 <span class="cd" id="estrenoCd" aria-live="polite"></span></div>
+        <!-- 30-09-2026 · Cuenta regresiva al segundo (estreno.js). La version hablada
+             (#estrenoCd, por minuto) sigue arriba: un lector de pantalla no debe oir
+             un numero nuevo cada segundo. -->
+        <div class="cd-box" id="estrenoCdBox" data-pre role="timer" aria-hidden="true">
+          <span class="cd-cell"><b data-cd="d">00</b><small>días</small></span><span class="cd-sep">:</span>
+          <span class="cd-cell"><b data-cd="h">00</b><small>horas</small></span><span class="cd-sep">:</span>
+          <span class="cd-cell"><b data-cd="m">00</b><small>min</small></span><span class="cd-sep">:</span>
+          <span class="cd-cell"><b data-cd="s">00</b><small>seg</small></span>
+        </div>
       </div>
       <div class="hero-actions">
         <a class="btn btn-primary" id="ctaEstreno" data-cta="presave-hero" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escuchar ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=hero&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
-        <a class="btn btn-ghost" href="#estreno">▶ Ver adelanto</a>
+        <a class="btn btn-ghost" href="#estreno" data-pre>▶ Ver adelanto</a>
+        <a class="btn btn-ghost" href="https://youtu.be/f1n262mj6AE" data-post hidden data-cta="video-hero" target="_blank" rel="noopener">▶ Ver el video ↗</a>
         <a class="btn btn-ghost" href="#lista">Entra a la lista</a>
       </div>
       <!-- 25-09-2026 · Preview público (fix-11, HdU-27): lo pinta app.js solo si hay
@@ -818,7 +843,7 @@
         <button class="arrow prev" aria-label="Anterior">‹</button>
         <button class="arrow next" aria-label="Siguiente">›</button>
         <div class="viewport"><div class="track">
-          <article class="slide is-active" data-idx="0" aria-hidden="false">
+          <article class="slide is-active" data-idx="0" aria-hidden="false" data-yt="f1n262mj6AE" data-yt-title="LUCE BIEN · video oficial">
             <div class="estreno-frame">
               <video class="estreno-vid" muted loop playsinline autoplay preload="metadata" poster="assets/poster-13587d37.jpg">
                 <source src="assets/lucebien.mp4" type="video/mp4"></video>
@@ -827,7 +852,10 @@
                 <h3 class="estreno-title">LUCE BIEN</h3>
                 <p class="estreno-feat">feat. ACHEH &amp; D-FOX · prod. Le Carter · <span class="st"><span data-pre>PRE-SAVE ABIERTO</span><span data-post hidden>EN TODAS LAS PLATAFORMAS</span></span></p>
                 <p class="estreno-lead">Crudo, desde el set. Guárdalo y el 1 de octubre te llega solo.</p>
-                <a class="btn btn-primary" data-cta="presave-slide" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escuchar ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=carrusel&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
+                <div class="estreno-ctas">
+                  <a class="btn btn-primary" data-cta="presave-slide" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escuchar ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=carrusel&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
+                  <button class="btn btn-ghost estreno-ytbtn" type="button" data-post hidden data-cta="video-slide">▶ Ver el video</button>
+                </div>
               </div>
             </div>
           </article>
