@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · ya disponible</title>
-<meta name="description" content="LUCE BIEN, lo nuevo de Zignalez con ACHEH y D-FOX, prod. Le Carter. Ya disponible en todas las plataformas, con video oficial en 4K.">
+<title>LUCE BIEN — Zignalez, ACHEH &amp; D-FOX · ya disponible</title>
+<meta name="description" content="LUCE BIEN, lo nuevo de Zignalez con ACHEH y D-FOX, prod. Le Carter y MillDiass. Ya disponible en todas las plataformas, con video oficial en 4K.">
 <link rel="canonical" href="https://zignalez.cl/">
 
 <!-- Identidad en la pestaña y en el escritorio. Antes no habia ninguna: el
@@ -22,7 +22,7 @@
 <meta property="og:site_name" content="Zignalez">
 <meta property="og:locale" content="es_CL">
 <meta property="og:url" content="https://zignalez.cl/">
-<meta property="og:title" content="LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · ya disponible">
+<meta property="og:title" content="LUCE BIEN — Zignalez, ACHEH &amp; D-FOX · ya disponible">
 <meta property="og:description" content="Ya está afuera, en todas las plataformas. Escúchalo y mira el video oficial en 4K.">
 <meta property="og:image" content="https://zignalez.cl/og-lucebien.jpg?v=2">
 <meta property="og:image:type" content="image/jpeg">
@@ -31,7 +31,7 @@
 <meta property="og:image:alt" content="LUCE BIEN — Zignalez con ACHEH y D-FOX en el set del video">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="LUCE BIEN — Zignalez feat. ACHEH &amp; D-FOX · ya disponible">
+<meta name="twitter:title" content="LUCE BIEN — Zignalez, ACHEH &amp; D-FOX · ya disponible">
 <meta name="twitter:description" content="Ya está afuera, en todas las plataformas. Escúchalo y mira el video oficial en 4K.">
 <meta name="twitter:image" content="https://zignalez.cl/og-lucebien.jpg?v=2">
 
@@ -112,7 +112,12 @@
   .hero-bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
   .hero .wrap{position:relative;z-index:1}
   .hero .eyebrow{margin-bottom:22px}
-  .display{font-family:var(--font-d);font-weight:800;color:var(--white);font-size:clamp(44px,12vw,150px);line-height:.9;letter-spacing:-.03em;margin:0;word-break:break-word}
+  /* 02-10-2026 · El nombre NO se parte nunca. Antes: word-break:break-word con
+     12vw lo cortaba en "ZIGNALE / Z" en movil y "ZIGNAL / EZ" en escritorio —
+     tres evaluadores independientes lo leyeron como error. nowrap + tamano que
+     cabe en la columna del hero (que es ~45% del viewport en escritorio). */
+  .display{font-family:var(--font-d);font-weight:800;color:var(--white);font-size:clamp(29px,8.2vw,112px);line-height:.9;letter-spacing:-.03em;margin:0;
+    white-space:nowrap;word-break:normal;overflow-wrap:normal}
   .display .uv{color:var(--uv);text-shadow:0 0 34px rgba(139,61,255,.55)}
   .sub{font-family:var(--font-d);color:var(--chrome-hi);font-size:clamp(18px,3vw,26px);margin:10px 0 0;font-weight:700}
   .tagline{max-width:54ch;margin:20px 0 0;font-size:18px;color:var(--chrome)}
@@ -162,7 +167,8 @@
   .estreno-vcard-txt b{font-family:var(--font-d);font-size:15px;line-height:1.15}
   .estreno-vcard-txt small{font-family:var(--font-m);font-size:11px;color:var(--smoke);letter-spacing:.06em}
   html.estreno-post #ctaEstreno{box-shadow:0 0 0 3px rgba(139,61,255,.25)}
-  .estreno-vcard-nota{margin:10px 0 0;font-family:var(--font-m);font-size:11.5px;letter-spacing:.04em;color:var(--smoke)}
+  .estreno-vcard-nota,.estreno-creditos{margin:10px 0 0;font-family:var(--font-m);font-size:11.5px;letter-spacing:.04em;color:var(--smoke)}
+  .estreno-creditos{margin-top:8px;line-height:1.5}
   .estreno-volver{position:absolute;top:10px;right:10px;z-index:6;font-family:var(--font-m);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
     padding:8px 10px;border-radius:2px;border:1px solid var(--line-2);background:rgba(10,10,11,.75);color:var(--chrome-hi);cursor:pointer}
   .estreno-volver:hover{border-color:var(--uv)}
@@ -208,6 +214,10 @@
   .tp-item.tp-escuchada .tp-title{color:var(--smoke)}
   .zp-card.zp-escuchada .zp-card-t,.zp-vt.zp-escuchada{opacity:.55}
   .tp-cuando{font-family:var(--font-m);font-size:11px;letter-spacing:.08em;color:var(--smoke);margin-top:2px}
+  .foot-contacto{margin:16px 0 0;font-family:var(--font-m);font-size:12px;letter-spacing:.06em;display:flex;flex-direction:column;gap:3px}
+  .foot-contacto span{color:var(--smoke);text-transform:uppercase;font-size:10.5px;letter-spacing:.18em}
+  .foot-contacto a{color:var(--chrome-hi);text-decoration:underline;text-underline-offset:3px}
+  .foot-contacto a:hover{color:var(--uv-soft)}
   .hero-meta{margin-top:40px;display:flex;flex-wrap:wrap;gap:26px;font-family:var(--font-m);font-size:12px;letter-spacing:.08em;color:var(--smoke);border-top:1px solid var(--line);padding-top:18px}
   .hero-meta b{color:var(--chrome-hi);font-weight:700}
 
@@ -860,7 +870,7 @@
       <div class="estreno-hero" id="estrenoHero" data-estreno="2026-10-01T20:00:00-03:00">
         <div class="estreno-hero-kicker"><span data-pre>Próximo estreno</span><span class="ya-badge" data-post hidden data-hoy="Salió hoy" data-luego="Ya salió">Salió hoy</span></div>
         <div class="estreno-hero-title">LUCE BIEN</div>
-        <div class="estreno-hero-feat">feat. ACHEH &amp; D-FOX · prod. Le Carter</div>
+        <div class="estreno-hero-feat">Zignalez, ACHEH &amp; D-FOX</div>
         <div class="estreno-hero-fecha"><span data-pre>1 de octubre · 20:00</span><span data-post hidden data-hoy="Desde hoy a las 20:00 · Spotify, Apple, YouTube y donde escuches" data-luego="Desde el 1 de octubre · Spotify, Apple, YouTube y donde escuches">Desde hoy a las 20:00 · Spotify, Apple, YouTube y donde escuches</span> <span class="cd" id="estrenoCd" aria-live="polite"></span></div>
         <!-- 01-10-2026 · POST: tarjeta del video oficial. El href real (youtu.be) funciona sin
              JS y como enlace; con JS, estreno.js la intercepta y reproduce en el slide 0,
@@ -872,6 +882,10 @@
           <span class="estreno-vcard-txt"><b>Video oficial · LUCE BIEN</b><small>YouTube · 3:00 · 4K</small></span>
         </a>
         <p class="estreno-vcard-nota" data-post hidden data-yt-espera>El video se habilita en YouTube en unos minutos. Mientras, escúchalo.</p>
+        <!-- 02-10-2026 · Créditos en línea propia, no en el título: el hero cortaba en
+             dos renglones a 390 px y MillDiass faltaba. Grafía y roles tomados de los
+             Credits de Spotify del release (fuente declarada: División Rec). -->
+        <p class="estreno-creditos" data-post hidden>Beat: Le Carter · Grabación, mezcla y master: MillDiass</p>
         <!-- 30-09-2026 · Cuenta regresiva al segundo (estreno.js). La version hablada
              (#estrenoCd, por minuto) sigue arriba: un lector de pantalla no debe oir
              un numero nuevo cada segundo. -->
@@ -921,9 +935,9 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
               </button>
               <div class="estreno-over">
-                <div class="estreno-kicker"><span data-pre>Estreno 1 de octubre · 20:00 · adelanto sin audio</span><span data-post hidden>Salió hoy · video oficial en 4K</span></div>
+                <div class="estreno-kicker"><span data-pre>Estreno 1 de octubre · 20:00 · adelanto sin audio</span><span data-post hidden data-hoy="Salió hoy · video oficial en 4K" data-luego="Ya salió · video oficial en 4K">Ya salió · video oficial en 4K</span></div>
                 <h3 class="estreno-title">LUCE BIEN</h3>
-                <p class="estreno-feat">feat. ACHEH &amp; D-FOX · prod. Le Carter · <span class="st"><span data-pre>PRE-SAVE ABIERTO</span><span data-post hidden>EN TODAS LAS PLATAFORMAS</span></span></p>
+                <p class="estreno-feat">Zignalez, ACHEH &amp; D-FOX · prod. Le Carter y MillDiass · <span class="st"><span data-pre>PRE-SAVE ABIERTO</span><span data-post hidden>EN TODAS LAS PLATAFORMAS</span></span></p>
                 <p class="estreno-lead"><span data-pre>Crudo, desde el set. Guárdalo y el 1 de octubre te llega solo.</span><span data-post hidden>Ya salió. Escúchalo, mira el video y, si te gustó, mándaselo a alguien — el algoritmo no lo va a hacer por ti.</span></p>
                 <div class="estreno-ctas">
                   <a class="btn btn-primary" data-cta="presave-slide" data-pre-txt="Guardar en Spotify / Apple" data-post-txt="Escúchalo ahora ↗" href="https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&amp;utm_medium=carrusel&amp;utm_campaign=lucebien" target="_blank" rel="noopener">Guardar en Spotify / Apple</a>
@@ -983,7 +997,10 @@
     </div>
   </section>
 
-  <section id="tiktok">
+  <!-- 02-10-2026 · APAGADA. Las tarjetas usan un degradado CSS como portada
+       (.tkc-cover), sin imagen: se leen como seccion rota. Vuelve sola al
+       quitar el hidden, cuando cada entrada de TIKTOKS tenga su caratula. -->
+  <section id="tiktok" hidden>
     <div class="wrap">
       <div class="sec-head">
         <h2>En TikTok</h2>
@@ -1086,6 +1103,10 @@
     <div class="foot-grid">
       <div>
         <a class="brandmark" href="#top" style="font-size:24px">ZIGNA<span>LEZ</span></a>
+        <!-- 02-10-2026 · Booking/prensa. El sitio no tenia NINGUN contacto: un
+             curador o A&R que quisiera escribir no podia. Cambiar por una
+             direccion del dominio cuando exista. -->
+        <p class="foot-contacto"><span>Booking y prensa</span><a href="mailto:simon.faundezt@gmail.com?subject=Booking%20%2F%20prensa%20%C2%B7%20Zignalez">simon.faundezt@gmail.com</a></p>
         <p class="foot-legal" style="margin-top:14px">© 2026 Zignalez. Distribuido por División Rec, Santiago, Chile.<br>
         <a href="/privacidad.html">Política de privacidad</a> · Al dejar tu contacto la aceptas.</p>
       </div>

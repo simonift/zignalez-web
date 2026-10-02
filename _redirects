@@ -3,5 +3,6 @@
 # el destino puede cambiar (release directo) sin que el navegador cachee el 301.
 /lucebien  https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&utm_medium=short&utm_campaign=lucebien  302
 
-# Link-in-bio · 02-10-2026. URL limpia sin .html, mismo documento (200).
-/link  /link.html  200
+# Link-in-bio: NO lleva regla. Cloudflare Pages ya sirve link.html en /link y
+# normaliza /link.html -> /link con un 308. La regla "/link /link.html 200" que
+# estuvo aqui el 02-10-2026 creaba un bucle infinito: /link -> /link (308).

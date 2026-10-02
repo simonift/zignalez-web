@@ -1,7 +1,8 @@
 /* Campaña LUCE BIEN · 25-09-2026 · 30-09: cuenta regresiva al segundo · 01-10: estado POST
    Un bloque, dos estados, conmutados por fecha en el cliente. Antes de
    2026-10-01 20:00 CLT: pre-save + cuenta regresiva. Después: "Escúchalo ahora"
-   (Orchard redirige al release), badge SALIÓ HOY y video oficial en el slide 0.
+   (Orchard redirige al release), badge SALIÓ HOY o YA SALIÓ segun el dia, y el
+   video oficial en el slide 0.
    Sin dependencias. Si este archivo no carga, el HTML ya muestra el estado PRE.
    Reloj: Date.now() del dispositivo corregido con la cabecera Date (+Age) del
    propio sitio (un HEAD same-origin). En la ventana de ±10 min del estreno el
@@ -27,6 +28,19 @@
   function ahora(){ return Date.now() + skew; }
   var DIA = 86400000;
 
+  /* Día calendario en Chile, con el huso del país y no con el del visitante: el
+     estreno es una fecha chilena. Sin soporte de Intl, cae a la regla antigua. */
+  function diaCL(ms){
+    try{
+      return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago',
+        year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms));
+    }catch(e){ return null; }
+  }
+  function mismoDiaCL(a, b){
+    var x = diaCL(a), y = diaCL(b);
+    return (x && y) ? x === y : (a - b < DIA);
+  }
+
   function clarity(n){ try{ if(typeof window.clarity==='function') window.clarity('event', n); }catch(e){} }
 
   function pintar(post){
@@ -37,10 +51,12 @@
     });
     document.documentElement.classList.toggle('estreno-post', post);
     if(post){
-      /* "Salió hoy" las primeras 24 h; después "Ya salió". */
-      var hoy = ahora() - T < DIA;
+      /* "Salió hoy" solo mientras siga siendo el mismo día calendario en Chile.
+         02-10-2026: antes se medía en milisegundos (< 24 h) y a las 09:59 del día
+         siguiente seguía diciendo "Salió hoy", porque solo habían pasado 14 h. */
+      var hoy = mismoDiaCL(ahora(), T);
       document.querySelectorAll('[data-hoy][data-luego]').forEach(function(el){ el.textContent = el.getAttribute(hoy ? 'data-hoy' : 'data-luego'); });
-      if(!/ya salió/i.test(document.title)) document.title = 'LUCE BIEN — ya salió · Zignalez feat. ACHEH & D-FOX';
+      if(!/ya salió/i.test(document.title)) document.title = 'LUCE BIEN — ya salió · Zignalez, ACHEH & D-FOX';
     }
   }
 
@@ -214,7 +230,7 @@
     share.addEventListener('click', function(){
       clarity('share');
       if(navigator.share){
-        navigator.share({ title: 'LUCE BIEN — Zignalez feat. ACHEH & D-FOX', text: 'Salió LUCE BIEN. Escúchalo y mira el video:', url: urlShare }).catch(function(){});
+        navigator.share({ title: 'LUCE BIEN — Zignalez, ACHEH & D-FOX', text: 'Salió LUCE BIEN. Escúchalo y mira el video:', url: urlShare }).catch(function(){});
         return;
       }
       var txt = share.textContent;

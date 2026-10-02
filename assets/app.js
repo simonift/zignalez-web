@@ -62,7 +62,9 @@
         '<div class="vtitle">'+v.t+'</div>' +
         '<div class="vactions">' +
           '<a class="chip" href="https://www.youtube.com/watch?v='+v.yt+'" target="_blank" rel="noopener">YouTube ↗</a>' +
-          '<a class="chip sp" href="'+v.sp+'" target="_blank" rel="noopener"'+(spDisabled?' title="En Spotify: pronto"':'')+'>'+(spDisabled?'Spotify · pronto ↗':'Spotify ↗')+'</a>' +
+          /* 02-10-2026 · Si todavia no esta en Spotify no se muestra el chip.
+             "Spotify · pronto" le cuenta al visitante lo que NO tienes. */
+          (spDisabled ? '' : '<a class="chip sp" href="'+v.sp+'" target="_blank" rel="noopener">Spotify ↗</a>') +
         '</div>' +
       '</div>';
     var thumb = card.querySelector('.vthumb');
@@ -562,6 +564,11 @@
           t.duration_seconds = t.preview_path ? (t.preview_seconds || 0) : 0;
           t.peaks            = null;   /* los picos son del tema entero, no del recorte */
           return t;
+        }).filter(function(t){
+          /* 02-10-2026 · Una maqueta sin extracto publicado salia en la lista
+             atenuada y en 0:00. Quien ya pago con su correo veia un item muerto
+             como recompensa. No se lista hasta que tenga recorte. */
+          return !!t.file_path && t.duration_seconds > 0;
         });
         if(!tracks.length){
           setState('Las maquetas están en el horno. Te aviso apenas suban.');
