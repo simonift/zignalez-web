@@ -281,12 +281,24 @@
     if(!pend) return;
     sb.auth.getSession().then(function(s){
       if(!(s && s.data && s.data.session)) return;   /* aún sin confirmar */
+
+      /* El tema es lo que se le prometió al visitante: se entrega SIEMPRE que
+         haya confirmado el correo. El registro de la elección es telemetría
+         nuestra, y es el mejor esfuerzo. Si fix-13 todavía no está aplicado,
+         registrar_eleccion no existe y la RPC falla; eso no puede costarle el
+         tema a quien ya dejó su correo (M-7: el fallo no se traga en silencio,
+         pero tampoco se le cobra al usuario). */
+      var t = temas.filter(function(x){ return x.track_id === pend; })[0];
+      borrar(PENDIENTE);
+      evento('optin_confirmado');
+      if(t){ salido = t; mostrarTema(t); }
+
       sb.rpc('registrar_eleccion', { p_track_id: pend }).then(function(r){
-        borrar(PENDIENTE);
-        if(r && r.error){ console.warn('registrar_eleccion:', r.error); return; }
-        evento('optin_confirmado');
-        var t = temas.filter(function(x){ return x.track_id === pend; })[0];
-        if(t){ salido = t; mostrarTema(t); }
+        if(r && r.error){
+          /* 42883 / PGRST202 = la función no existe todavía (falta fix-13). */
+          console.warn('registrar_eleccion no disponible:', r.error.message || r.error);
+          evento('eleccion_no_registrada');
+        }
       });
     });
   }
