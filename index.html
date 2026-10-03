@@ -209,6 +209,17 @@
   .hero-preview{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:16px}
   .hero-preview[hidden]{display:none}
   .hero-preview audio{display:none}
+  .hero-ruleta{display:flex;align-items:center;gap:13px;margin-top:16px;padding:13px 15px;
+    border:1px solid var(--line);border-radius:4px;text-decoration:none;color:inherit;
+    background:color-mix(in oklab,var(--uv) 9%,transparent);transition:border-color .15s,transform .15s}
+  .hero-ruleta:hover,.hero-ruleta:focus-visible{border-color:var(--uv);transform:translateY(-1px)}
+  .hero-ruleta:focus-visible{outline:2px solid var(--uv);outline-offset:2px}
+  .hr-ojo{font-family:var(--font-m);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--uv);border:1px solid var(--line);border-radius:3px;padding:5px 7px;flex:none}
+  .hr-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .hr-txt b{font-size:14px;font-weight:700}
+  .hr-txt small{font-size:12px;color:var(--smoke)}
+  .hr-fl{margin-left:auto;color:var(--uv);font-size:17px;flex:none}
   .hp-estado{font-family:var(--font-m);font-size:12px;letter-spacing:.06em;color:var(--smoke);flex-basis:100%}
   .hp-estado:empty{display:none}
   .tp-item.tp-escuchada .tp-title{color:var(--smoke)}
@@ -910,6 +921,20 @@
            completa. Sin autoplay. Al terminar, el CTA a la lista aparece aquí,
            no 6.000 px más abajo: Clarity muestra que el 87% no pasa del 10%. -->
       <div class="hero-preview" id="heroPreview" hidden></div>
+      <!-- 03-10-2026 · Ruleta de inéditos (ADR-007, fix-13). NO es un banner
+           encima de la página: `CLAUDE.md` prohíbe el pop-up al entrar, y
+           además Clarity (25-09) muestra que el 84,6% no pasa del 5% de la
+           página. Por eso la entrada vive en el hero, que es el único espacio
+           que de verdad se ve. El módulo está en /ruleta; si no hay ningún
+           extracto publicado, esa página lo dice en vez de girar en vacío. -->
+      <a class="hero-ruleta" href="/ruleta" data-cta="ruleta-hero">
+        <span class="hr-ojo">Inéditos</span>
+        <span class="hr-txt">
+          <b>Gira la ruleta</b>
+          <small>Un tema que no está en ninguna plataforma</small>
+        </span>
+        <span class="hr-fl" aria-hidden="true">&#8594;</span>
+      </a>
       <div class="hero-meta">
         <span><span data-pre>Estreno</span><span data-post hidden>Salió el 1 oct</span> · <b>LUCE BIEN</b><span data-pre> · 1 oct · 20:00</span></span>
         <span>Distribuido por <b>División Rec</b></span>

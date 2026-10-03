@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zignalez — la ruleta de inéditos</title>
+<meta name="description" content="Gira y escucha un tema de Zignalez que no está en ninguna plataforma. Sin registrarte.">
+<link rel="canonical" href="https://zignalez.cl/ruleta">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#0A0A0B">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Zignalez">
+<meta property="og:locale" content="es_CL">
+<meta property="og:url" content="https://zignalez.cl/ruleta">
+<meta property="og:title" content="Un tema que no está en ninguna plataforma">
+<meta property="og:description" content="Gira la ruleta y escucha un inédito de Zignalez. Sin registrarte.">
+<meta property="og:image" content="https://zignalez.cl/og-zignalez.jpg?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Un tema que no está en ninguna plataforma">
+<meta name="twitter:description" content="Gira la ruleta y escucha un inédito de Zignalez.">
+<meta name="twitter:image" content="https://zignalez.cl/og-zignalez.jpg?v=2">
+
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/icono.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="font" type="font/woff2" href="/assets/fuentes/syne-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/assets/fuentes/manrope-latin.woff2" crossorigin>
+
+<style>
+@font-face{font-family:'Syne';font-style:normal;font-weight:700 800;font-display:swap;src:url('/assets/fuentes/syne-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Syne';font-style:normal;font-weight:700 800;font-display:swap;src:url('/assets/fuentes/syne-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:400 700;font-display:swap;src:url('/assets/fuentes/manrope-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Space Mono';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fuentes/space-mono-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+/* Paleta del artista. Nunca el rojo #F80606 del sello. */
+:root{
+  --ink:#0A0A0B; --uv:#8B3DFF; --uv-soft:#A66BFF;
+  --chrome:#C7CCD1; --smoke:#8A86A0; --white:#FFF;
+  --line:rgba(199,204,209,.14); --card:rgba(255,255,255,.04);
+  --font-d:'Syne',system-ui,sans-serif; --font-b:'Manrope',system-ui,sans-serif;
+  --font-m:'Space Mono',ui-monospace,monospace;
+  --bg:var(--ink); --fg:var(--white); --fg-2:var(--chrome); --fg-3:var(--smoke);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--fg); font:400 15px/1.5 var(--font-b);
+  -webkit-font-smoothing:antialiased; min-height:100svh;
+  padding:24px 16px calc(28px + env(safe-area-inset-bottom));
+  display:flex; justify-content:center;
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(70% 42% at 50% -4%, color-mix(in oklab, var(--uv) 30%, transparent), transparent 70%),
+    radial-gradient(44% 30% at 92% 104%, color-mix(in oklab, var(--uv) 14%, transparent), transparent 72%);
+}
+.wrap{width:100%; max-width:440px}
+
+header{text-align:center; margin-bottom:20px}
+.marca{font:800 clamp(28px,9vw,36px)/.92 var(--font-d); letter-spacing:-.02em; margin:0; text-transform:uppercase}
+.marca a{color:inherit; text-decoration:none}
+.marca i{font-style:normal; color:var(--uv)}
+.kicker{font:400 10px/1 var(--font-m); letter-spacing:.22em; text-transform:uppercase; color:var(--fg-3); margin-top:9px}
+
+.paso[hidden]{display:none}
+h1.lead,h2.lead{font:800 clamp(23px,6.4vw,29px)/1.08 var(--font-d); letter-spacing:-.025em; margin:0 0 10px; text-wrap:balance}
+.sub{margin:0 0 18px; color:var(--fg-3); font-size:13.5px; line-height:1.55}
+.ojo{font:400 10px/1 var(--font-m); letter-spacing:.2em; text-transform:uppercase; color:var(--uv); margin:0 0 9px}
+
+/* ── Rueda ───────────────────────────────────────────────── */
+.rueda-caja{position:relative; display:grid; place-items:center; margin:4px 0 20px; min-height:252px}
+.aguja{
+  position:absolute; top:0; left:50%; transform:translateX(-50%); z-index:3;
+  width:0; height:0; border-left:9px solid transparent; border-right:9px solid transparent;
+  border-top:15px solid var(--chrome); filter:drop-shadow(0 0 6px rgba(199,204,209,.5));
+}
+.rueda{
+  width:min(248px,74vw); aspect-ratio:1; border-radius:50%; position:relative;
+  box-shadow:inset 0 0 0 2px var(--line), inset 0 0 36px color-mix(in oklab,var(--uv) 26%,transparent),
+             0 0 46px -8px color-mix(in oklab,var(--uv) 55%,transparent);
+  transition:transform 4.2s cubic-bezier(.12,.72,.14,1);
+}
+.rueda.gira-lento{animation:deriva 30s linear infinite}
+@keyframes deriva{to{transform:rotate(360deg)}}
+.rueda b{
+  position:absolute; top:50%; left:50%; transform-origin:0 0; white-space:nowrap;
+  font:400 11px/1 var(--font-m); letter-spacing:.1em; color:var(--fg-2);
+}
+.cubo{
+  position:absolute; width:58px; height:58px; border-radius:50%; display:grid; place-items:center;
+  background:radial-gradient(circle at 38% 32%,#241a38,#0B0810);
+  box-shadow:inset 0 0 0 1px var(--line), 0 0 22px color-mix(in oklab,var(--uv) 38%,transparent);
+  font:400 9px/1 var(--font-m); letter-spacing:.14em; color:var(--fg-3);
+}
+
+/* ── Botones ─────────────────────────────────────────────── */
+.btn{
+  display:flex; align-items:center; justify-content:center; gap:10px; width:100%;
+  min-height:52px; padding:0 16px; margin-bottom:10px; border-radius:4px; cursor:pointer;
+  font:700 15px/1 var(--font-b); text-decoration:none; color:var(--fg);
+  border:1px solid var(--line); background:var(--card);
+  transition:border-color .15s, transform .15s, background .15s;
+}
+.btn:hover,.btn:focus-visible{border-color:var(--uv); transform:translateY(-1px)}
+.btn:focus-visible{outline:2px solid var(--uv); outline-offset:2px}
+.btn.fuerte{background:color-mix(in oklab,var(--uv) 16%,transparent); border-color:color-mix(in oklab,var(--uv) 46%,transparent)}
+.btn[disabled]{opacity:.45; cursor:not-allowed; transform:none}
+
+/* ── Resultado ───────────────────────────────────────────── */
+.ficha{border:1px solid var(--line); border-radius:4px; background:var(--card); padding:18px 16px; margin-bottom:14px}
+.ficha h2{font:800 clamp(27px,8vw,34px)/1 var(--font-d); letter-spacing:-.03em; margin:0 0 6px; text-wrap:balance}
+.ficha .cred{margin:0 0 15px; font-size:12.5px; color:var(--fg-3); line-height:1.5}
+.repro{display:flex; align-items:center; gap:12px}
+.play{
+  width:46px; height:46px; flex:none; border-radius:50%; cursor:pointer; display:grid; place-items:center;
+  border:1px solid var(--line); background:rgba(255,255,255,.05); color:var(--fg);
+}
+.play:hover{border-color:var(--uv)}
+.play:focus-visible{outline:2px solid var(--uv); outline-offset:2px}
+.onda{display:flex; align-items:flex-end; gap:2px; height:32px; flex:1; min-width:0; overflow:hidden}
+.onda i{flex:1; min-width:1px; background:var(--line); border-radius:1px; transition:background .2s}
+.onda i.on{background:var(--uv)}
+.tiempos{display:flex; justify-content:space-between; margin-top:9px; font:400 10.5px/1 var(--font-m); color:var(--fg-3); font-variant-numeric:tabular-nums}
+.estado{margin:10px 0 0; font:400 10px/1.4 var(--font-m); letter-spacing:.08em; color:var(--fg-3); min-height:13px}
+
+/* ── Elegir ──────────────────────────────────────────────── */
+.campo{margin-bottom:14px}
+.campo label.et{display:block; margin-bottom:7px; font:400 10px/1 var(--font-m); letter-spacing:.16em; text-transform:uppercase; color:var(--fg-3)}
+input[type=email]{
+  width:100%; min-height:52px; padding:0 13px; border-radius:4px; color:var(--fg);
+  border:1px solid var(--line); background:rgba(255,255,255,.04);
+  font:400 16px/1 var(--font-b);
+}
+input[type=email]:focus{outline:0; border-color:var(--uv); box-shadow:0 0 0 3px color-mix(in oklab,var(--uv) 20%,transparent)}
+.fichas{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.tema{
+  display:flex; flex-direction:column; gap:3px; text-align:left; cursor:pointer;
+  padding:11px 10px; border-radius:4px; border:1px solid var(--line); background:var(--card);
+  font:700 13px/1.25 var(--font-b); color:var(--fg-2);
+  transition:border-color .15s, background .15s, color .15s;
+}
+.tema em{font:400 9px/1 var(--font-m); font-style:normal; letter-spacing:.14em; color:var(--fg-3)}
+.tema[aria-pressed="true"]{border-color:var(--uv); background:color-mix(in oklab,var(--uv) 14%,transparent); color:var(--fg)}
+.tema:focus-visible{outline:2px solid var(--uv); outline-offset:2px}
+.consent{display:flex; gap:10px; align-items:flex-start; margin:16px 0}
+.consent input{margin-top:3px; width:18px; height:18px; flex:none; accent-color:var(--uv)}
+.consent label{font-size:11.5px; line-height:1.5; color:var(--fg-3)}
+.consent a{color:var(--fg-2); text-underline-offset:2px}
+.legal{border-left:2px solid var(--line); padding-left:11px; margin:14px 0 0; font-size:10.5px; line-height:1.6; color:var(--fg-3)}
+.aviso{margin:0 0 12px; padding:11px 12px; border-radius:4px; font-size:12.5px; line-height:1.45;
+       border:1px solid var(--line); background:var(--card); color:var(--fg-2)}
+.aviso.mal{border-color:color-mix(in oklab,var(--uv) 50%,transparent)}
+
+footer{margin-top:26px; text-align:center}
+footer a{display:inline-flex; align-items:center; min-height:48px; padding:0 16px;
+         font:400 10px/1 var(--font-m); letter-spacing:.16em; text-transform:uppercase;
+         color:var(--fg-3); text-decoration:none}
+footer a:hover{color:var(--uv)}
+@media (prefers-reduced-motion:reduce){*{transition:none !important} .rueda.gira-lento{animation:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header>
+    <h1 class="marca"><a href="/">Zigna<i>lez</i></a></h1>
+    <p class="kicker">La ruleta de inéditos</p>
+  </header>
+
+  <!-- 1 · RULETA -->
+  <section class="paso" id="paso-rueda">
+    <p class="ojo">No está en Spotify · No está en YouTube</p>
+    <h2 class="lead">Gira y escucha un tema que todavía no existe en ninguna plataforma.</h2>
+    <p class="sub" id="subRueda">Cargando los temas…</p>
+
+    <div class="rueda-caja">
+      <span class="aguja" aria-hidden="true"></span>
+      <div class="rueda gira-lento" id="rueda" role="img" aria-label="Ruleta de temas inéditos"></div>
+      <span class="cubo" aria-hidden="true">GIRA</span>
+    </div>
+
+    <button class="btn fuerte" id="bGirar" disabled>GIRAR LA RULETA</button>
+    <button class="btn" id="bElegir1">Prefiero elegir yo</button>
+  </section>
+
+  <!-- 2 · RESULTADO -->
+  <section class="paso" id="paso-tema" hidden>
+    <p class="ojo">Te tocó</p>
+    <div class="ficha">
+      <h2 id="tTitulo">—</h2>
+      <p class="cred" id="tCred"></p>
+      <div class="repro">
+        <button class="play" id="bPlay" aria-label="Reproducir el extracto">
+          <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path id="icoPlay" d="M3 1.8v12.4L14 8z" fill="currentColor"/></svg>
+        </button>
+        <div class="onda" id="onda" aria-hidden="true"></div>
+      </div>
+      <div class="tiempos"><span id="tAhora">0:00</span><span id="tTotal">0:30</span></div>
+      <p class="estado" id="tEstado">RECIÉN PUBLICADA</p>
+    </div>
+    <button class="btn fuerte" id="bElegir2">QUIERO ELEGIR OTRO TEMA</button>
+    <button class="btn" id="bOtra">Girar de nuevo</button>
+    <p class="sub" style="margin-top:4px">El tema completo lo escucha primero la lista. Esto son los segundos del gancho.</p>
+  </section>
+
+  <!-- 3 · ELEGIR -->
+  <section class="paso" id="paso-elegir" hidden>
+    <p class="ojo">Elegir tú</p>
+    <h2 class="lead">Dime cuál quieres oír.</h2>
+    <p class="sub">Deja tu correo y escoges el tema. De paso entras a la lista que escucha los estrenos antes que nadie.</p>
+
+    <div class="aviso" id="avisoElegir" hidden></div>
+
+    <div class="campo">
+      <label class="et" for="correo">Tu correo</label>
+      <input type="email" id="correo" placeholder="tu@correo.cl" autocomplete="email" inputmode="email">
+    </div>
+
+    <div class="campo">
+      <span class="et">El tema</span>
+      <div class="fichas" id="fichas"></div>
+    </div>
+
+    <div class="consent">
+      <input type="checkbox" id="acepto">
+      <label for="acepto">Autorizo a <strong>Simón Faúndez</strong> a tratar mi correo electrónico para enviarme novedades sobre lanzamientos y contenido exclusivo. Puedo retirarlo en cualquier momento, gratis, desde el enlace de baja de cada correo. He leído la <a href="/privacidad.html">Política de Privacidad</a>.</label>
+    </div>
+
+    <button class="btn fuerte" id="bEnviar" disabled>DESBLOQUEAR EL TEMA</button>
+
+    <p class="legal">Base legal: tu consentimiento. Guardamos tu correo y nada más. No lo vendemos ni lo cedemos a terceros con fines comerciales. Los datos se alojan fuera de Chile: hay transferencia internacional. Tienes derecho de acceso, rectificación, supresión, oposición, bloqueo y portabilidad escribiendo a simon.faundezt@gmail.com.</p>
+  </section>
+
+  <!-- 4 · CONFIRMAR -->
+  <section class="paso" id="paso-correo" hidden>
+    <p class="ojo">Te mandamos un correo</p>
+    <h2 class="lead">Confirma y se abre <span id="elegidoTitulo">el tema</span>.</h2>
+    <p class="sub">Un clic en el enlace que te llegó y vuelves acá con el tema desbloqueado. Lo pedimos para saber que el correo es tuyo — nada más.</p>
+    <button class="btn" id="bVolver">Volver a la ruleta</button>
+  </section>
+
+  <footer>
+    <a href="/">zignalez.cl</a>
+    <a href="/link">Todos los enlaces</a>
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/assets/clarity.js" defer></script>
+<script src="/assets/ruleta.js" defer></script>
+</body>
+</html>
