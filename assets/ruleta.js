@@ -64,11 +64,36 @@
     volviendoDelCorreo();
   });
 
-  /* ── 2 · La rueda ─────────────────────────────────────────────────── */
+  /* 03-10-2026 · Verificado en producción: los títulos de tracks traen el nombre
+     del artista delante y el productor en paréntesis — el hero en vivo muestra
+     "ZIGNALEZ - HAYABUSA (FLACKOLOYAL)". Tomar las 4 primeras letras tal cual
+     daba "ZIGN" para TODOS los temas: la rueda quedaba ilegible.
+     limpiar() solo quita el prefijo del propio artista, redundante en su propio
+     sitio. No inventa ni recorta nada más: el paréntesis del productor se
+     conserva en el título visible y solo se ignora al derivar el código. */
+  function limpiar(t){
+    var s = (t.titulo || '').trim();
+    return s.replace(/^\s*zignalez\s*[-–—:·]\s*/i, '') || (t.titulo || '');
+  }
+
+  var _codigos = null;
   function codigo(t){
-    /* Código corto para el borde: 4 letras del título, sin espacios ni tildes. */
-    var s = (t.titulo || '').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-zÑñ]/g,'').toUpperCase();
-    return s.slice(0,4) || '???';
+    if(!_codigos){
+      _codigos = {}; var usados = {};
+      temas.forEach(function(x, i){
+        var base = limpiar(x).normalize('NFD')
+          .replace(/[̀-ͯ]/g, '')
+          .replace(/\([^)]*\)/g, ' ')
+          .replace(/[^A-Za-zÑñ]/g, '')
+          .toUpperCase().slice(0, 4);
+        if(!base) base = 'T' + (i + 1);
+        var c = base, n = 2;
+        while(usados[c]){ c = base.slice(0, 3) + n; n++; }   /* choque: HAYA, HAY2… */
+        usados[c] = true;
+        _codigos[x.track_id] = c;
+      });
+    }
+    return _codigos[t.track_id] || '???';
   }
 
   function dibujarRueda(){
@@ -131,7 +156,7 @@
   }
 
   function mostrarTema(t){
-    $('tTitulo').textContent = t.titulo;
+    $('tTitulo').textContent = limpiar(t);
     /* FALTA: preview_publico() no devuelve créditos. No se inventan: la línea
        queda vacía hasta que la RPC los exponga. */
     $('tCred').hidden = true;
@@ -198,7 +223,7 @@
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'tema'; b.setAttribute('aria-pressed','false');
       var em = document.createElement('em'); em.textContent = codigo(t);
-      b.appendChild(em); b.appendChild(document.createTextNode(t.titulo));
+      b.appendChild(em); b.appendChild(document.createTextNode(limpiar(t)));
       b.addEventListener('click', function(){
         elegido = t;
         Array.prototype.forEach.call(caja.children, function(x){ x.setAttribute('aria-pressed','false'); });
@@ -244,7 +269,7 @@
       sb.from('subscribers').insert({ email: correo }).then(function(ins){
         if(ins && ins.error && ins.error.code !== '23505') console.warn('subscribers insert:', ins.error);
       });
-      $('elegidoTitulo').textContent = elegido.titulo;
+      $('elegidoTitulo').textContent = limpiar(elegido);
       evento('eleccion_enviada');
       paso('paso-correo');
     });
