@@ -115,6 +115,23 @@ h1.lead,h2.lead{font:800 clamp(23px,6.4vw,29px)/1.08 var(--font-d); letter-spaci
 .btn.fuerte{background:color-mix(in oklab,var(--uv) 16%,transparent); border-color:color-mix(in oklab,var(--uv) 46%,transparent)}
 .btn[disabled]{opacity:.45; cursor:not-allowed; transform:none}
 
+/* Tamaño del disco en esta página. La definición del componente vive en
+   assets/disco.js; acá solo se dice cuán grande va. */
+.ficha .zp-disco{--d:min(46vw,190px)}
+@media (max-width:420px){ .ficha .zp-disco{--d:min(52vw,170px)} }
+@media (prefers-reduced-motion:reduce){ .ficha .zp-disco{--d:min(38vw,140px)} }
+
+/* ── Catálogo con candado ────────────────────────────────── */
+.candados{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.cand{position:relative;border:1px solid var(--line);border-radius:4px;background:var(--card);
+  padding:13px 11px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.cand .n{font:700 13.5px/1.25 var(--font-b);color:var(--fg-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cand .s{font:400 9px/1 var(--font-m);letter-spacing:.14em;color:var(--fg-3);text-transform:uppercase}
+.cand.oida{border-color:color-mix(in oklab,var(--uv) 46%,transparent);
+  background:color-mix(in oklab,var(--uv) 12%,transparent)}
+.cand.oida .n{color:var(--fg)}
+.cand .ic{position:absolute;top:11px;right:11px;opacity:.5}
+
 /* ── Resultado ───────────────────────────────────────────── */
 .ficha{border:1px solid var(--line); border-radius:4px; background:var(--card); padding:18px 16px; margin-bottom:14px}
 .ficha h2{font:800 clamp(27px,8vw,34px)/1 var(--font-d); letter-spacing:-.03em; margin:0 0 6px; text-wrap:balance}
@@ -198,6 +215,7 @@ footer a:hover{color:var(--uv)}
     <div class="ficha">
       <h2 id="tTitulo">—</h2>
       <p class="cred" id="tCred"></p>
+      <div id="discoMonta"></div>
       <div class="repro">
         <button class="play" id="bPlay" aria-label="Reproducir el extracto">
           <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><path id="icoPlay" d="M3 1.8v12.4L14 8z" fill="currentColor"/></svg>
@@ -240,7 +258,19 @@ footer a:hover{color:var(--uv)}
     <p class="legal">Base legal: tu consentimiento. Guardamos tu correo y nada más. No lo vendemos ni lo cedemos a terceros con fines comerciales. Los datos se alojan fuera de Chile: hay transferencia internacional. Tienes derecho de acceso, rectificación, supresión, oposición, bloqueo y portabilidad escribiendo a simon.faundezt@gmail.com.</p>
   </section>
 
-  <!-- 4 · CONFIRMAR -->
+  <!-- 4 · BLOQUEO · el catálogo visible pero cerrado -->
+  <section class="paso" id="paso-bloqueo" hidden>
+    <p class="ojo">Se acabó la de regalo</p>
+    <h2 class="lead">Una te la regala la ruleta. El resto las escucha la lista.</h2>
+    <p class="sub" id="bloqueoSub">Ya oíste tu tema. Deja tu correo, eliges cuál sigue, y además te enteras cuando salgan.</p>
+
+    <div class="candados" id="candados"></div>
+
+    <button class="btn fuerte" id="bDesbloquear">ENTRAR A LA LISTA Y ELEGIR</button>
+    <button class="btn" id="bVolverRueda">Volver</button>
+  </section>
+
+  <!-- 5 · CONFIRMAR -->
   <section class="paso" id="paso-correo" hidden>
     <p class="ojo">Te mandamos un correo</p>
     <h2 class="lead">Confirma y se abre <span id="elegidoTitulo">el tema</span>.</h2>
@@ -257,6 +287,7 @@ footer a:hover{color:var(--uv)}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="/assets/clarity.js" defer></script>
+<script src="/assets/disco.js" defer></script>
 <script src="/assets/ruleta.js" defer></script>
 </body>
 </html>

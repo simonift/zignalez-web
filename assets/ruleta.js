@@ -22,13 +22,32 @@
 
   var $ = function(id){ return document.getElementById(id); };
   var PENDIENTE = 'zig_eleccion_pendiente';
+  var OIDAS     = 'zig_ruleta_oidas';
+  var LIMITE    = 1;   /* temas de regalo antes de pedir el correo */
+
+  /* LÍMITE BLANDO, y se dice: el extracto es un objeto público en previews/, y
+     cualquier tope en el cliente se salta con una ventana de incógnito. No es
+     un candado, es una puerta: su trabajo es pedir el correo en el momento en
+     que la persona ya quiere más, no proteger el audio — que ya es público.
+     El límite DURO existe y es otro: escucha_unica_activa() sobre el tema
+     completo, para quien sí tiene sesión (fix-11). */
+  function oidas(){
+    try { return JSON.parse(localStorage.getItem(OIDAS) || '[]'); } catch(e){ return []; }
+  }
+  function marcarOida(id){
+    try {
+      var a = oidas();
+      if(a.indexOf(id) < 0){ a.push(id); localStorage.setItem(OIDAS, JSON.stringify(a)); }
+    } catch(e){}
+  }
+  function bloqueado(){ return oidas().length >= LIMITE; }
 
   var temas = [], girando = false, salido = null;
   var RADIO = 66;            /* distancia de la etiqueta al centro, en px */
   var MAX_ETIQUETA = 11;     /* caracteres antes de recortar; se ajusta al nº de temas */
 
   function paso(id){
-    ['paso-rueda','paso-tema','paso-elegir','paso-correo'].forEach(function(p){
+    ['paso-rueda','paso-tema','paso-elegir','paso-bloqueo','paso-correo'].forEach(function(p){
       var el = $(p); if(el) el.hidden = (p !== id);
     });
     try{ window.scrollTo({top:0, behavior:'instant'}); }catch(e){ window.scrollTo(0,0); }
@@ -132,6 +151,7 @@
   var vueltas = 0;
   $('bGirar').addEventListener('click', function(){
     if(girando || temas.length === 0) return;
+    if(bloqueado()){ evento('ruleta_bloqueada'); pintarCandados(); paso('paso-bloqueo'); return; }
     girando = true;
     var b = this; b.disabled = true;
     var rueda = $('rueda');
@@ -154,6 +174,7 @@
 
   /* ── 3 · Resultado y reproductor ──────────────────────────────────── */
   var audio = new Audio(); audio.preload = 'none';
+  var disco = null;
   var barras = [], NB = 42, firmadoPara = null, raf = null;
 
   (function ondaInicial(){
@@ -173,6 +194,13 @@
   }
 
   function mostrarTema(t){
+    if(!disco && window.ZDisco){
+      disco = window.ZDisco.crear(corto(t));
+      $('discoMonta').appendChild(disco.zona);
+    } else if(disco){
+      disco.poner(corto(t));
+      disco.sonando(false);
+    }
     $('tTitulo').textContent = limpiar(t);
     /* FALTA: preview_publico() no devuelve créditos. No se inventan: la línea
        queda vacía hasta que la RPC los exponga. */
@@ -186,6 +214,7 @@
 
   function pararAudio(){
     try{ audio.pause(); }catch(e){}
+    if(disco) disco.sonando(false);
     if(raf){ cancelAnimationFrame(raf); raf = null; }
     $('icoPlay').setAttribute('d','M3 1.8v12.4L14 8z');
   }
@@ -203,7 +232,7 @@
     if(!audio.paused){ pararAudio(); return; }
 
     if(firmadoPara === salido.track_id && audio.src){
-      audio.play().then(function(){ $('icoPlay').setAttribute('d','M3.5 2h3.2v12H3.5zM9.3 2h3.2v12H9.3z'); raf = requestAnimationFrame(seguir); })
+      audio.play().then(function(){ if(disco) disco.sonando(true); $('icoPlay').setAttribute('d','M3.5 2h3.2v12H3.5zM9.3 2h3.2v12H9.3z'); raf = requestAnimationFrame(seguir); })
                   .catch(function(){ $('tEstado').textContent = 'TOCA OTRA VEZ PARA OÍR'; });
       return;
     }
@@ -219,6 +248,7 @@
       $('tEstado').textContent = 'RECIÉN PUBLICADA';
       audio.play().then(function(){
         evento('extracto_play');
+        if(disco) disco.sonando(true);
         $('icoPlay').setAttribute('d','M3.5 2h3.2v12H3.5zM9.3 2h3.2v12H9.3z');
         raf = requestAnimationFrame(seguir);
       }).catch(function(){ $('tEstado').textContent = 'TOCA OTRA VEZ PARA OÍR'; });
@@ -227,9 +257,37 @@
 
   audio.addEventListener('ended', function(){
     evento('extracto_fin');
+    if(salido) marcarOida(salido.track_id);
     pararAudio(); pintarOnda(1);
     $('tAhora').textContent = $('tTotal').textContent;
   });
+
+  /* ── Catálogo con candado ──────────────────────────────────────────
+     Todos los temas a la vista, cerrados salvo el que ya oyó. Que se vea lo que
+     hay es el punto: un candado sobre una lista vacía no tienta a nadie. */
+  function pintarCandados(){
+    var caja = $('candados'); if(!caja) return;
+    var ya = oidas();
+    caja.innerHTML = '';
+    temas.forEach(function(t){
+      var oida = ya.indexOf(t.track_id) >= 0;
+      var d = document.createElement('div');
+      d.className = 'cand' + (oida ? ' oida' : '');
+      var n = document.createElement('div'); n.className = 'n'; n.textContent = corto(t);
+      var sb = document.createElement('div'); sb.className = 's';
+      sb.textContent = oida ? 'Ya la oíste' : 'Cerrada';
+      var ic = document.createElement('span'); ic.className = 'ic';
+      ic.innerHTML = oida
+        ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
+        : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>';
+      d.appendChild(n); d.appendChild(sb); d.appendChild(ic);
+      caja.appendChild(d);
+    });
+    var ya1 = temas.filter(function(t){ return ya.indexOf(t.track_id) >= 0; })[0];
+    $('bloqueoSub').textContent = ya1
+      ? 'Ya oíste ' + corto(ya1) + '. Deja tu correo, eliges cuál sigue, y además te enteras cuando salgan.'
+      : 'Deja tu correo, eliges cuál quieres oír, y además te enteras cuando salgan.';
+  }
 
   /* ── 4 · Elegir ───────────────────────────────────────────────────── */
   var elegido = null;
@@ -321,9 +379,15 @@
   }
 
   /* ── 6 · Navegación ───────────────────────────────────────────────── */
+  $('bDesbloquear').addEventListener('click', function(){ aviso(''); evento('eleccion_abierta'); paso('paso-elegir'); });
+  $('bVolverRueda').addEventListener('click', function(){ paso('paso-rueda'); });
   $('bElegir1').addEventListener('click', function(){ aviso(''); evento('eleccion_abierta'); paso('paso-elegir'); });
   $('bElegir2').addEventListener('click', function(){ aviso(''); evento('eleccion_abierta'); paso('paso-elegir'); });
-  $('bOtra').addEventListener('click', function(){ pararAudio(); pintarOnda(-1); paso('paso-rueda'); });
+  $('bOtra').addEventListener('click', function(){
+    pararAudio(); pintarOnda(-1);
+    if(bloqueado()){ pintarCandados(); paso('paso-bloqueo'); return; }
+    paso('paso-rueda');
+  });
   $('bVolver').addEventListener('click', function(){
     $('rueda').style.transform = ''; vueltas = 0; colocarEtiquetas(0);
     paso('paso-rueda');

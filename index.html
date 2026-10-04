@@ -401,97 +401,11 @@
       background:linear-gradient(180deg,var(--ink-2),var(--ink));padding:22px;display:none}
   .zp.visible{display:grid;grid-template-columns:minmax(0,1fr);justify-items:center;gap:20px}
 
-  /* ---- Escena 3D ----------------------------------------------------
-     Tres transformaciones SEPARADAS, y el orden importa:
-       .zp-zona    perspective (la camara)
-       .zp-escena  vaiven lento  -- inclinacion que respira
-       .zp-par     paralaje del puntero
-       .zp-disco   rotateZ      -- el giro, y SOLO el giro
-     Si la inclinacion viviera en el mismo elemento que el giro, el disco
-     daria tumbos como una moneda en vez de girar sobre su eje.
-     ------------------------------------------------------------------- */
-  .zp-zona{position:relative;display:grid;place-items:center;flex-shrink:0;
-     perspective:760px;perspective-origin:50% 38%;padding:8px 0 22px}
-  .zp-escena{transform-style:preserve-3d;
-     animation:zp-vaiven 11s ease-in-out infinite}
-  .zp-par{transform-style:preserve-3d;transition:transform .32s ease-out;
-     position:relative}
-  @keyframes zp-vaiven{
-    0%,100%{transform:rotateX(25deg) rotateY(-7deg)}
-    50%    {transform:rotateX(30deg) rotateY(7deg)}
-  }
-
-  /* El alto manda tanto como el ancho: en un portatil de 768px de alto un
-     disco de 230px deja la lista fuera de pantalla. */
-  .zp-disco{--d:min(58vw,26vh,230px);width:var(--d);height:var(--d);border-radius:50%;position:relative;
-     transform-style:preserve-3d;
-     background:
-       repeating-radial-gradient(circle at 50% 50%,rgba(0,0,0,.34) 0 1px,rgba(0,0,0,0) 1px 3px),
-       conic-gradient(from 0deg,#7a5210,#e8c169,#fff4cd,#d9a63f,#8a5f14,#f2d391,#b8862c,#e8c169,#7a5210);
-     animation:zp-girar 1.8s linear infinite;animation-play-state:paused}
-  .zp-disco.suena{animation-play-state:running}
-
-  /* Canto: dos capas hundidas en Z. El ojo lee la diferencia de luminancia
-     entre ellas como grosor. Mas capas no aportan y cuestan composicion. */
-  .zp-canto,.zp-canto2{position:absolute;inset:0;border-radius:50%;pointer-events:none;
-     background:conic-gradient(from 0deg,#3a2708,#8a6420,#c9a35a,#6b4a12,#2e1f06,#a8823a,#5c400f,#3a2708)}
-  .zp-canto {transform:translateZ(-4px)  scale(1.018);filter:brightness(.62)}
-  .zp-canto2{transform:translateZ(-8px)  scale(1.028);filter:brightness(.30)}
-
-  /* Segunda capa girando a OTRA velocidad y en sentido inverso. Un solo
-     elemento girando entero se ve plano; la diferencia de velocidad es lo que
-     produce la difraccion. */
-  .zp-iris{position:absolute;inset:0;border-radius:50%;mix-blend-mode:overlay;
-     background:repeating-conic-gradient(from 0deg,
-       rgba(255,40,90,.13) 0deg 5deg,rgba(255,196,0,.13) 5deg 10deg,
-       rgba(60,255,170,.13) 10deg 15deg,rgba(0,150,255,.13) 15deg 20deg,
-       rgba(170,60,255,.13) 20deg 25deg,rgba(255,255,255,.05) 25deg 30deg);
-     animation:zp-girar 6.4s linear infinite reverse;animation-play-state:paused}
-  .zp-disco.suena .zp-iris{animation-play-state:running}
-
-  /* El reflejo NO gira pero SI se inclina: pertenece a la sala, proyectado
-     sobre un disco inclinado. Por eso vive en .zp-par y no en .zp-disco. */
-  .zp-par::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;
-     transform:translateZ(1px);
-     background:linear-gradient(112deg,
-                rgba(255,255,255,0) 6%,  rgba(255,255,255,.62) 17%, rgba(255,255,255,.10) 27%,
-                rgba(255,255,255,0) 40%, rgba(0,0,0,.30) 56%,
-                rgba(255,255,255,0) 70%, rgba(255,255,255,.34) 82%, rgba(255,255,255,0) 92%);
-     mix-blend-mode:overlay}
-  /* Borde iluminado: separa el disco del fondo negro y remata el canto. */
-  .zp-par::before{content:'';position:absolute;inset:-1px;border-radius:50%;pointer-events:none;
-     transform:translateZ(2px);
-     box-shadow:inset 0 1px 1px rgba(255,255,255,.45), inset 0 -2px 3px rgba(0,0,0,.6),
-                0 0 0 1px rgba(255,214,128,.30)}
-
-  /* Sombra de contacto: sin ella el disco flota sobre la nada y el 3D no
-     termina de cerrar. Va en la zona, fuera de la escena, sin perspectiva. */
-  .zp-sombra{position:absolute;left:50%;bottom:2px;width:64%;height:16px;
-     transform:translateX(-50%);border-radius:50%;pointer-events:none;
-     background:radial-gradient(ellipse at center,rgba(0,0,0,.72),rgba(0,0,0,0) 72%);
-     filter:blur(6px);animation:zp-sombra 11s ease-in-out infinite}
-  @keyframes zp-sombra{
-    0%,100%{transform:translateX(-50%) scaleX(1) ;opacity:.85}
-    50%    {transform:translateX(-50%) scaleX(.92);opacity:.70}
-  }
-
-  /* Etiqueta y orificio: van 1px por delante de la cara para que el
-     preserve-3d no los reordene detras del disco. */
-  .zp-label{position:absolute;inset:31%;border-radius:50%;display:grid;
-     align-items:end;justify-items:center;text-align:center;
-     padding:0 8% 15%;overflow:hidden;transform:translateZ(1px);
-     background:radial-gradient(circle at 50% 42%,#1a1a20,#0b0b0f 74%);
-     box-shadow:inset 0 0 0 1px rgba(255,214,128,.34),0 0 16px rgba(0,0,0,.6)}
-  /* Dos lineas como maximo y recortado en JS: el texto de una etiqueta vive
-     dentro de un CIRCULO, no de la caja cuadrada que lo contiene. */
-  .zp-label span{font-family:var(--font-m);font-size:8px;letter-spacing:.30em;
-     text-transform:uppercase;color:rgba(255,214,128,.85);line-height:1.4;
-     white-space:nowrap;overflow:hidden;max-width:100%}
-  .zp-hoyo{position:absolute;inset:46.5%;border-radius:50%;background:var(--ink);
-     transform:translateZ(2px);
-     box-shadow:inset 0 0 0 1px rgba(255,214,128,.28),0 0 6px rgba(0,0,0,.8)}
-
-  @keyframes zp-girar{to{transform:rotate(360deg)}}
+  /* 03-10-2026 · La definición del disco 3D se mudó a assets/disco.js, que la
+     inyecta una sola vez. La usaban index.html y ahora también /ruleta; tenerla
+     en dos sitios garantizaba que el próximo arreglo se hiciera en uno solo
+     (M-7). Acá quedan únicamente los ajustes de tamaño propios de esta página,
+     más abajo en las media queries. */
 
   .zp-panel{min-width:0}
   .zp-eyebrow{font-family:var(--font-m);font-size:10px;letter-spacing:.28em;text-transform:uppercase;
@@ -1187,6 +1101,7 @@
         crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
 <script src="assets/boot.js"></script>
+<script src="assets/disco.js"></script>
 <script src="assets/app.js"></script>
 <script src="assets/senal.js"></script>
 <script src="assets/carrusel.js"></script>
