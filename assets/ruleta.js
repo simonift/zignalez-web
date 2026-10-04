@@ -385,10 +385,11 @@
         return;
       }
       evento('otp_enviado');
-      /* Alta en la lista. 23505 = ya estaba: no es error para el visitante. */
-      sb.from('subscribers').insert({ email: correo }).then(function(ins){
-        if(ins && ins.error && ins.error.code !== '23505') console.warn('subscribers insert:', ins.error);
-      });
+      /* 04-10-2026 · fix-15. Aquí había un insert a subscribers con solo el
+         correo. Era redundante: handle_new_user() (fix-01) da de alta la fila
+         confirmada cuando se abre el enlace. Lo único que agregaba era una
+         fila SIN confirmar por cada correo tipeado, que es justo la superficie
+         que un bot usa para ensuciar la lista. El alta queda en el trigger. */
       $('elegidoTitulo').textContent = limpiar(elegido);
       evento('eleccion_enviada');
       paso('paso-correo');

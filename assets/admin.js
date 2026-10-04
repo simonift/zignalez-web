@@ -1153,7 +1153,10 @@
 
   /* ---------------- subscribers ---------------- */
   function loadSubscriberCount() {
-    sb.from('subscribers').select('*', { count: 'exact', head: true }).then(function (res) {
+    /* 04-10-2026 · fix-15. Solo confirmados. La política dice "sin esa
+       confirmación no te enviamos nada": una fila sin confirmar en el conteo
+       infla el número, y en el CSV termina en un envío sin consentimiento. */
+    sb.from('subscribers').select('*', { count: 'exact', head: true }).eq('confirmed', true).then(function (res) {
       if (res.error) { $('stat-subs').textContent = '—'; return; }
       $('stat-subs').textContent = String(res.count === null || res.count === undefined ? 0 : res.count);
     });
@@ -1172,7 +1175,7 @@
   $('btn-csv').addEventListener('click', function () {
     var btn = $('btn-csv');
     busy(btn, true, 'Exportando…');
-    sb.from('subscribers').select('*').then(function (res) {
+    sb.from('subscribers').select('*').eq('confirmed', true).then(function (res) {  /* fix-15: solo confirmados */
       busy(btn, false);
       if (res.error) {
         setStatus(listStatus, errMsg(res.error, 'No se pudo exportar.'), 'err');

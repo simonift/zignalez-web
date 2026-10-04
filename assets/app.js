@@ -218,7 +218,11 @@
       note.textContent='Algo falló de mi lado. Recarga la página y vuelve a intentar.';
       return;
     }
-    var emailVal = form.email.value.trim();
+    /* 04-10-2026 · fix-15. Supabase Auth guarda el correo en minúsculas; el
+       insert del WhatsApp no lo hacía. "Simon@Gmail.com" quedaba en una fila
+       con WhatsApp y la confirmación creaba otra, "simon@gmail.com", sin él:
+       el ON CONFLICT (email) del trigger no las juntaba. */
+    var emailVal = form.email.value.trim().toLowerCase();
     var wspVal = form.whatsapp ? form.whatsapp.value.trim() : '';
     if(!emailVal || !document.getElementById('consent').checked){
       note.className='form-note warn'; note.textContent='Falta tu correo y marcar el cuadrito de abajo.'; return;
