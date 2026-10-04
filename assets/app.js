@@ -23,8 +23,8 @@
   ];
   // TikToks reales de @zignalez (extraídos sept 2026). Se pueden reordenar por vistas cuando cargues las métricas.
   var TIKTOKS = [
-    {u:"https://www.tiktok.com/@zignalez/video/7675938769161293074", t:"Sola llega, sola se va \u00b7 #Hayabusa"},
     {u:"https://www.tiktok.com/@zignalez/video/7677398562413546770", t:"LUCE BIEN \u00b7 con Fox y Acheh"},
+    {u:"https://www.tiktok.com/@zignalez/video/7675938769161293074", t:"Sola llega, sola se va \u00b7 #Hayabusa"},
     {u:"https://www.tiktok.com/@zignalez/video/7679510103124462856", t:"El beat de Flackito"},
     {u:"https://www.tiktok.com/@zignalez/video/7578195536180727058", t:"ORBIT\u00c1NDOTE \u00b7 preview"},
     {u:"https://www.tiktok.com/@zignalez/video/7344853825775275269", t:"ALTA GAMA \u00b7 con Migue Ramos"},
@@ -35,7 +35,9 @@
   var IG_IMAGES = [];
 
   /* ====== VIDEOS ====== */
-  var vgrid = document.getElementById('vgrid');
+  /* 03-10-2026 · HdU-43: el contenedor pasó de grilla (#vriel) a riel (#cfVideos).
+     Las tarjetas no cambian: sirven a los dos. */
+  var vriel = document.getElementById('cfVideos');
   var openVideo = null;
   function closeVideo(card){ if(!card) return; var f=card.querySelector('.vframe'); if(f){ var fr=f.querySelector('iframe'); if(fr) fr.remove(); } card.classList.remove('open'); if(openVideo===card) openVideo=null; }
   var estrenoForzado = /[?&]estreno=post\b/.test(location.search);
@@ -87,12 +89,31 @@
       card.classList.add('open'); openVideo=card;
     });
     card.querySelector('.vclose').addEventListener('click', function(e){ e.stopPropagation(); closeVideo(card); });
-    if(alFrente && vgrid.firstChild) vgrid.insertBefore(card, vgrid.firstChild); else vgrid.appendChild(card);
+    if(alFrente && vriel.firstChild) vriel.insertBefore(card, vriel.firstChild); else vriel.appendChild(card);
+    /* El riel se engancha cuando ya hay tarjetas; algunas entran por temporizador. */
+    if(window.ZCR) window.ZCR.montar();
   }
 
   /* ====== TikTok ====== */
   var tkMount = document.getElementById('tk-mount');
   var openTk=null;
+  /* 03-10-2026 · HdU-45 · Portada local opcional: assets/tiktok/<id>.jpg.
+     Si el archivo existe se usa como portada; si no, queda la tarjeta de marca
+     de siempre. Detecta por carga, no por lista: agregar el archivo basta.
+     NO se fija ninguna URL del CDN de TikTok: vienen firmadas y caducan, y una
+     tarjeta rota es peor que una sin foto. */
+  function portadaTk(cell, id){
+    if(!id) return;
+    var im = new Image();
+    im.onload = function(){
+      var c = cell.querySelector('.tkc-cover'); if(!c) return;
+      var tag = '<img class="tkc-img" src="assets/tiktok/'+id+'.jpg" alt="" loading="lazy" decoding="async">';
+      cell._poster = tag + cell._poster;      /* para que closeTk la restaure */
+      c.insertAdjacentHTML('afterbegin', tag);
+      cell.classList.add('has-img');
+    };
+    im.src = 'assets/tiktok/' + id + '.jpg';
+  }
   function bindPlay(cell){ var pb=cell.querySelector('.tkc-play'); if(pb) pb.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); playTk(cell); }); }
   function closeTk(cell){ if(!cell) return; var c=cell.querySelector('.tkc-cover'); if(c && cell._poster!=null){ c.innerHTML=cell._poster; bindPlay(cell); } cell.classList.remove('playing'); if(openTk===cell) openTk=null; }
   function playTk(cell){
@@ -116,6 +137,7 @@
       cell._poster=poster;
       cell.innerHTML='<div class="tkc-cover">'+poster+'</div>';
       bindPlay(cell);
+      portadaTk(cell, id);
       rail.appendChild(cell);
     });
     tkMount.appendChild(rail);

@@ -72,16 +72,7 @@
     });
   });
 
-  // Carrusel de la seccion de musica (sin relacion con Spotify).
-  var track = document.getElementById('cfMusica');
-  function paso(d){
-    var c = track && track.querySelector('.release'); if(!c) return;
-    track.scrollBy({ left: d * (c.getBoundingClientRect().width + 16), behavior:'smooth' });
-  }
-  var wrp = track ? track.closest('.cf-wrap') : null;
-  if(wrp){
-    var pv = wrp.querySelector('.cf-prev'), nx = wrp.querySelector('.cf-next');
-    if(pv) pv.addEventListener('click', function(){ paso(-1); });
-    if(nx) nx.addEventListener('click', function(){ paso(1); });
-  }
+  /* 03-10-2026 · El carrusel de esta seccion lo mueve assets/carrusel-rail.js,
+     que engancha toda .cf-wrap del documento. Antes vivia aqui, atado a
+     #cfMusica; al agregar Videos habria quedado duplicado (HdU-42, M-7). */
 })();

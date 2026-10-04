@@ -239,6 +239,29 @@
 
   /* GRILLA DE VIDEOS (portada YouTube maxres) */
   .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:20px}
+  /* 03-10-2026 · Riel de Videos (HdU-43). .vgrid queda por si alguna vista vuelve
+     a usarla; las tarjetas sirven a las dos sin cambios. */
+  #videos .cf-wrap{position:relative}
+  #videos .cf-track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;
+    padding:4px 2px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  #videos .cf-track::-webkit-scrollbar{display:none}
+  #videos .cf-track > .vcard{flex:0 0 300px;scroll-snap-align:start}
+  #videos .cf-arrow{position:absolute;top:34%;transform:translateY(-50%);z-index:5;width:40px;height:40px;
+    border-radius:50%;border:1px solid var(--line-2);background:rgba(10,10,11,.7);color:var(--chrome-hi);
+    font-size:18px;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  #videos .cf-arrow:hover{background:var(--uv);border-color:var(--uv)}
+  #videos .cf-arrow[disabled]{opacity:.3;cursor:default}
+  #videos .cf-arrow[hidden]{display:none}
+  #videos .cf-prev{left:-6px}#videos .cf-next{right:-6px}
+  @media (max-width:640px){ #videos .cf-track > .vcard{flex:0 0 78%} }
+  /* Portada local opcional de TikTok (HdU-45). Sin imagen, la tarjeta de marca
+     de siempre; con imagen, la misma tarjeta con la captura detrás de un velo
+     para que el título siga legible sobre cualquier frame. */
+  #tiktok .tkc-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  #tiktok .tkc.has-img .tkc-cover::after{content:"";position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg,rgba(10,10,11,.25) 0%,rgba(10,10,11,.1) 45%,rgba(10,10,11,.82) 100%)}
+  #tiktok .tkc.has-img .tkc-badge,#tiktok .tkc.has-img .tkc-play,
+  #tiktok .tkc.has-img .tkc-title,#tiktok .tkc.has-img .tkc-handle{position:relative;z-index:2}
   .vcard{position:relative;background:var(--ink-3);border:1px solid var(--line);border-radius:8px;overflow:hidden;transition:border-color .18s ease,transform .18s ease}
   .vcard:hover{border-color:var(--uv);transform:translateY(-3px)}
   .vthumb{position:relative;aspect-ratio:16/9;background:linear-gradient(155deg,#221a33,#0d0d12 70%);cursor:pointer;border:0;padding:0;width:100%;display:block}
@@ -1002,7 +1025,15 @@
         <h2>Videos</h2>
         <a class="follow-cta yt" href="https://www.youtube.com/@Zignalez?sub_confirmation=1" target="_blank" rel="noopener"><span class="fic" aria-hidden="true">▶</span> Suscríbete en YouTube <span class="farr">↗</span></a>
       </div>
-      <div class="vgrid" id="vgrid"></div>
+      <!-- 03-10-2026 · HdU-43: Videos pasa de grilla a carrusel. En móvil (77%
+           del tráfico) una grilla obliga a scroll vertical largo; el riel deja ver
+           que hay más con media tarjeta asomando. Mismo patrón que #musica, y las
+           flechas las mueve assets/carrusel-rail.js. -->
+      <div class="cf-wrap">
+        <button class="cf-arrow cf-prev" type="button" aria-label="Videos anteriores">‹</button>
+        <div class="cf-track" id="cfVideos"></div>
+        <button class="cf-arrow cf-next" type="button" aria-label="Videos siguientes">›</button>
+      </div>
     </div>
   </section>
 
@@ -1025,7 +1056,9 @@
   <!-- 02-10-2026 · APAGADA. Las tarjetas usan un degradado CSS como portada
        (.tkc-cover), sin imagen: se leen como seccion rota. Vuelve sola al
        quitar el hidden, cuando cada entrada de TIKTOKS tenga su caratula. -->
-  <section id="tiktok" hidden>
+  <!-- 03-10-2026 · HdU-44: llevaba semanas con hidden. El código de las
+       tarjetas existía y funcionaba; nadie lo veía. -->
+  <section id="tiktok">
     <div class="wrap">
       <div class="sec-head">
         <h2>En TikTok</h2>
@@ -1158,6 +1191,7 @@
 <script src="assets/senal.js"></script>
 <script src="assets/carrusel.js"></script>
 <script src="assets/estreno.js"></script>
+<script src="assets/carrusel-rail.js"></script>
 <script src="assets/spotify.js"></script>
 <script src="assets/apps-nativas.js"></script>
 

@@ -1,0 +1,19 @@
+Portadas de TikTok (HdU-45, 03-10-2026)
+========================================
+
+Pon aquí una captura del primer frame de cada TikTok, con el nombre:
+
+    <id-del-video>.jpg
+
+El id es el número final de la URL. Por ejemplo, para
+https://www.tiktok.com/@zignalez/video/7677398562413546770
+el archivo es   7677398562413546770.jpg
+
+Las tarjetas detectan el archivo solas: si está, lo usan de portada; si no,
+queda la tarjeta de marca. No hay lista que actualizar.
+
+Tamaño: 220 px de ancho basta para la tarjeta; 440 px si quieres nitidez en
+pantallas retina. Pásalas por docs/scripts/transcodificar.sh como el resto.
+
+No se descargan desde el CDN de TikTok a propósito: esas URL vienen firmadas y
+caducan, y una tarjeta rota es peor que una sin foto.
