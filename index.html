@@ -858,12 +858,14 @@
            completa. Sin autoplay. Al terminar, el CTA a la lista aparece aquí,
            no 6.000 px más abajo: Clarity muestra que el 87% no pasa del 10%. -->
       <div class="hero-preview" id="heroPreview" hidden></div>
-      <!-- 03-10-2026 · Ruleta de inéditos (ADR-007, fix-13). NO es un banner
-           encima de la página: `CLAUDE.md` prohíbe el pop-up al entrar, y
-           además Clarity (25-09) muestra que el 84,6% no pasa del 5% de la
-           página. Por eso la entrada vive en el hero, que es el único espacio
-           que de verdad se ve. El módulo está en /ruleta; si no hay ningún
-           extracto publicado, esa página lo dice en vez de girar en vacío. -->
+      <!-- 03-10-2026 · Ruleta de inéditos (ADR-007, fix-13). Entrada fija en
+           el hero. Desde el 03-10 además hay una tarjeta emergente
+           (assets/pop-ruleta.js) que espera 6 s o el primer scroll: así no
+           tapa el estreno de LUCE BIEN al entrar. Las dos conviven a
+           propósito — la tarjeta se ve una sola vez por persona y la franja
+           queda para quien ya la cerró. El módulo está en /ruleta; si no hay
+           ningún extracto publicado, esa página lo dice en vez de girar en
+           vacío. -->
       <a class="hero-ruleta" href="/ruleta" data-cta="ruleta-hero">
         <span class="hr-ojo">Inéditos</span>
         <span class="hr-txt">
@@ -1109,6 +1111,7 @@
 <script src="assets/carrusel-rail.js"></script>
 <script src="assets/spotify.js"></script>
 <script src="assets/apps-nativas.js"></script>
+<script src="assets/pop-ruleta.js"></script>
 
 <!-- ══════════════════════════════════════════════════════════════════
      Microsoft Clarity · proyecto yjfaswea7d
