@@ -85,11 +85,15 @@ h1.lead,h2.lead{font:800 clamp(23px,6.4vw,29px)/1.08 var(--font-d); letter-spaci
              0 0 46px -8px color-mix(in oklab,var(--uv) 55%,transparent);
   transition:transform 4.2s cubic-bezier(.12,.72,.14,1);
 }
-.rueda.gira-lento{animation:deriva 30s linear infinite}
-@keyframes deriva{to{transform:rotate(360deg)}}
+/* 03-10-2026 · Se quitó la deriva en reposo: la rueda gira sus etiquetas con
+   ella, y con el giro continuo nunca quedaban derechas para leerse. El brillo
+   UV y el cubo "GIRA" ya dicen que es interactiva. */
 .rueda b{
   position:absolute; top:50%; left:50%; transform-origin:0 0; white-space:nowrap;
-  font:400 11px/1 var(--font-m); letter-spacing:.1em; color:var(--fg-2);
+  font:400 10px/1 var(--font-m); letter-spacing:.06em; color:var(--fg-2);
+  text-shadow:0 1px 4px rgba(10,10,11,.9);
+  /* misma curva y duración que la rueda: las etiquetas la acompañan sin saltos */
+  transition:transform 4.2s cubic-bezier(.12,.72,.14,1);
 }
 .cubo{
   position:absolute; width:58px; height:58px; border-radius:50%; display:grid; place-items:center;
@@ -161,7 +165,7 @@ footer a{display:inline-flex; align-items:center; min-height:48px; padding:0 16p
          font:400 10px/1 var(--font-m); letter-spacing:.16em; text-transform:uppercase;
          color:var(--fg-3); text-decoration:none}
 footer a:hover{color:var(--uv)}
-@media (prefers-reduced-motion:reduce){*{transition:none !important} .rueda.gira-lento{animation:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
 </style>
 </head>
 <body>
@@ -180,7 +184,7 @@ footer a:hover{color:var(--uv)}
 
     <div class="rueda-caja">
       <span class="aguja" aria-hidden="true"></span>
-      <div class="rueda gira-lento" id="rueda" role="img" aria-label="Ruleta de temas inéditos"></div>
+      <div class="rueda" id="rueda" role="img" aria-label="Ruleta de temas inéditos"></div>
       <span class="cubo" aria-hidden="true">GIRA</span>
     </div>
 

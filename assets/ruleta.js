@@ -24,6 +24,8 @@
   var PENDIENTE = 'zig_eleccion_pendiente';
 
   var temas = [], girando = false, salido = null;
+  var RADIO = 66;            /* distancia de la etiqueta al centro, en px */
+  var MAX_ETIQUETA = 11;     /* caracteres antes de recortar; se ajusta al nº de temas */
 
   function paso(id){
     ['paso-rueda','paso-tema','paso-elegir','paso-correo'].forEach(function(p){
@@ -57,6 +59,8 @@
       ? 'Hay un tema inédito esperando. La ruleta te deja oír el gancho, sin registrarte.'
       : temas.length + ' maquetas inéditas. La ruleta elige una y te deja oír el gancho. Sin registrarte, sin dar nada.';
 
+    /* Con más porciones hay menos cuerda por etiqueta: se recorta antes. */
+    MAX_ETIQUETA = temas.length <= 4 ? 11 : (temas.length <= 6 ? 9 : 7);
     dibujarRueda();
     dibujarFichas();
     $('bGirar').disabled = false;
@@ -76,25 +80,24 @@
     return s.replace(/^\s*zignalez\s*[-–—:·]\s*/i, '') || (t.titulo || '');
   }
 
-  var _codigos = null;
-  function codigo(t){
-    if(!_codigos){
-      _codigos = {}; var usados = {};
-      temas.forEach(function(x, i){
-        var base = limpiar(x).normalize('NFD')
-          .replace(/[̀-ͯ]/g, '')
-          .replace(/\([^)]*\)/g, ' ')
-          .replace(/[^A-Za-zÑñ]/g, '')
-          .toUpperCase().slice(0, 4);
-        if(!base) base = 'T' + (i + 1);
-        var c = base, n = 2;
-        while(usados[c]){ c = base.slice(0, 3) + n; n++; }   /* choque: HAYA, HAY2… */
-        usados[c] = true;
-        _codigos[x.track_id] = c;
-      });
-    }
-    return _codigos[t.track_id] || '???';
+  /* 03-10-2026 · Verificado en la página en vivo: el código de 4 letras no dice
+     qué tema es ("HAYA", "ELTE"), y encima salía tangencial, así que CARA y ELTE
+     se leían al revés. Ahora la rueda muestra el nombre corto y derecho.
+     corto(): quita el featuring y el paréntesis del productor, que no caben, y
+     recorta en el límite de palabra. No inventa: solo acorta. */
+  function corto(t){
+    var s = limpiar(t)
+      .replace(/\([^)]*\)/g, ' ')
+      .replace(/\s+(ft|feat|con)\.?\s.*$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if(s.length <= MAX_ETIQUETA) return s;
+    var corte = s.slice(0, MAX_ETIQUETA);
+    var esp = corte.lastIndexOf(' ');
+    return (esp > 4 ? corte.slice(0, esp) : corte).trim() + '\u2026';
   }
+
+  var etiquetas = [];
 
   function dibujarRueda(){
     var rueda = $('rueda'), n = temas.length, seg = 360 / n;
@@ -105,12 +108,24 @@
     rueda.style.background = 'conic-gradient(' + trozos + ')';
 
     rueda.innerHTML = '';
-    temas.forEach(function(t, i){
+    etiquetas = temas.map(function(t){
       var b = document.createElement('b');
-      b.textContent = codigo(t);
-      var ang = (i*seg + seg/2) - 90;
-      b.style.transform = 'rotate(' + ang + 'deg) translate(70px) rotate(90deg) translate(-50%,-50%)';
+      b.textContent = corto(t);
       rueda.appendChild(b);
+      return b;
+    });
+    colocarEtiquetas(0);
+  }
+
+  /* Las etiquetas orbitan con su porción pero NO ruedan con ella: se les aplica
+     la rotación inversa de la rueda, así quedan derechas en todo momento, también
+     cuando el giro se detiene en un ángulo cualquiera. La transición es la misma
+     que la de la rueda (CSS), por eso acompañan el movimiento sin saltos. */
+  function colocarEtiquetas(giroRueda){
+    var n = temas.length, seg = 360 / n;
+    etiquetas.forEach(function(b, i){
+      var ang = (i*seg + seg/2) - 90;
+      b.style.transform = 'rotate(' + ang + 'deg) translate(' + RADIO + 'px) rotate(' + (-ang - giroRueda) + 'deg) translate(-50%,-50%)';
     });
   }
 
@@ -120,12 +135,14 @@
     girando = true;
     var b = this; b.disabled = true;
     var rueda = $('rueda');
-    rueda.classList.remove('gira-lento');
+
 
     var i = Math.floor(Math.random() * temas.length);
     var seg = 360 / temas.length;
     vueltas += 5;
-    rueda.style.transform = 'rotate(' + (vueltas*360 - (i*seg + seg/2)) + 'deg)';
+    var giro = vueltas*360 - (i*seg + seg/2);
+    rueda.style.transform = 'rotate(' + giro + 'deg)';
+    colocarEtiquetas(giro);
     evento('giro');
 
     setTimeout(function(){
@@ -222,7 +239,7 @@
     temas.forEach(function(t){
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'tema'; b.setAttribute('aria-pressed','false');
-      var em = document.createElement('em'); em.textContent = codigo(t);
+      var em = document.createElement('em'); em.textContent = corto(t);
       b.appendChild(em); b.appendChild(document.createTextNode(limpiar(t)));
       b.addEventListener('click', function(){
         elegido = t;
@@ -308,7 +325,7 @@
   $('bElegir2').addEventListener('click', function(){ aviso(''); evento('eleccion_abierta'); paso('paso-elegir'); });
   $('bOtra').addEventListener('click', function(){ pararAudio(); pintarOnda(-1); paso('paso-rueda'); });
   $('bVolver').addEventListener('click', function(){
-    $('rueda').classList.add('gira-lento'); $('rueda').style.transform = ''; vueltas = 0;
+    $('rueda').style.transform = ''; vueltas = 0; colocarEtiquetas(0);
     paso('paso-rueda');
   });
 })();
