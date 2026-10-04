@@ -474,6 +474,11 @@ audio{width:100%;display:block}
     <!-- DICCIONARIO: rimas, jerga y dobles sentidos para escribir. Material de
          trabajo del artista, no contenido para el fan. Lo pinta
          assets/admin-diccionario.js con el mismo evento zg-admin-ready. -->
+    <!-- ESCUCHAS: contador AGREGADO por tema (fix-14). Sin user_id: la
+         política declara uso agregado. Lo pinta assets/admin-contador.js
+         con el mismo evento zg-admin-ready. -->
+    <div id="zg-contador"></div>
+
     <div id="zg-diccionario"></div>
 
     <div class="playerbar" id="playerbar">
@@ -493,6 +498,7 @@ audio{width:100%;display:block}
         referrerpolicy="no-referrer"></script>
 <script src="assets/admin.js"></script>
 <script type="module" src="assets/admin-produccion.js"></script>
+<script type="module" src="assets/admin-contador.js"></script>
 <script type="module" src="assets/admin-diccionario.js"></script>
 </body>
 </html>
