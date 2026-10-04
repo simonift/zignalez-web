@@ -53,9 +53,13 @@
     try{ window.scrollTo({top:0, behavior:'instant'}); }catch(e){ window.scrollTo(0,0); }
   }
 
-  function guardar(k, v){ try{ sessionStorage.setItem(k, v); }catch(e){} }
-  function leer(k){ try{ return sessionStorage.getItem(k); }catch(e){ return null; } }
-  function borrar(k){ try{ sessionStorage.removeItem(k); }catch(e){} }
+  /* 03-10-2026 · localStorage, no sessionStorage. El enlace mágico del correo
+     abre una PESTAÑA NUEVA —casi siempre desde la app de correo— y
+     sessionStorage no cruza de contexto: la elección se perdía en el camino y
+     el visitante volvía sin su tema. Reportado y reproducido. */
+  function guardar(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+  function leer(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function borrar(k){ try{ localStorage.removeItem(k); }catch(e){} }
 
   /* ── 1 · Cargar los temas sorteables ──────────────────────────────── */
   if(!sb){
@@ -372,7 +376,10 @@
       var t = temas.filter(function(x){ return x.track_id === pend; })[0];
       borrar(PENDIENTE);
       evento('optin_confirmado');
+      /* El tema elegido se abre siempre: lo pagó con su correo. mostrarTema lo
+         marca como oído, así que el candado sigue valiendo para los demás. */
       if(t){ salido = t; mostrarTema(t); }
+      else { evento('eleccion_sin_tema'); }   /* el tema dejó de estar disponible */
 
       sb.rpc('registrar_eleccion', { p_track_id: pend }).then(function(r){
         if(r && r.error){
