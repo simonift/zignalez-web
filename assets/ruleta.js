@@ -194,6 +194,12 @@
   }
 
   function mostrarTema(t){
+    /* 03-10-2026 · La escucha se gasta AQUÍ, al revelarse el tema, no al
+       terminar el extracto. Antes se marcaba en el evento 'ended': quien no
+       dejaba correr los 33 s podía seguir girando indefinidamente — reportado
+       y reproducido. El regalo es el resultado del giro; oírlo entero o no es
+       asunto de quien gira. */
+    marcarOida(t.track_id);
     if(!disco && window.ZDisco){
       disco = window.ZDisco.crear(corto(t));
       $('discoMonta').appendChild(disco.zona);
