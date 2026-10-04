@@ -42,6 +42,27 @@
   }
   function bloqueado(){ return oidas().length >= LIMITE; }
 
+  /* 03-10-2026 · Temas que YA salieron y siguen en la rueda.
+     Por qué están: el extracto es bueno y el giro es tráfico; sacarlos de la
+     rueda sería desperdiciar la única atención que tenemos. Lo que NO se hace
+     es venderlos como inéditos: se dice que ya salieron, se manda al enlace
+     y el giro NO gasta la escucha de regalo — cobrarle a alguien su único
+     turno por un tema que puede oír gratis en Spotify es un mal trato.
+
+     El dato vive aquí y no en la base a propósito: `releases.platforms` guarda
+     nombres de plataforma, no URLs, y no hay columna de enlace. Meter una
+     migración solo para esto, con fix-13 todavía sin aplicar, es acumular
+     deuda. Cuando haya una segunda canción publicada, esto se convierte en
+     columna. Hoy es una línea.
+     FALTA: columna `releases.smart_link` (o equivalente) + exponerla en
+     preview_publico(). Mientras no exista, agregar aquí a mano cada estreno. */
+  var PUBLICADOS = {
+    '780cc3ba-9476-4f18-8f82-20ae7bdfdbf7': {   /* LUCE BIEN · salió 01-10-2026 */
+      url: 'https://orcd.co/lucebienzignalezachefox?utm_source=zignalez.cl&utm_medium=ruleta&utm_campaign=lucebien'
+    }
+  };
+  function publicado(t){ return t ? (PUBLICADOS[t.track_id] || null) : null; }
+
   var temas = [], girando = false, salido = null;
   var RADIO = 66;            /* distancia de la etiqueta al centro, en px */
   var MAX_ETIQUETA = 11;     /* caracteres antes de recortar; se ajusta al nº de temas */
@@ -203,7 +224,9 @@
        dejaba correr los 33 s podía seguir girando indefinidamente — reportado
        y reproducido. El regalo es el resultado del giro; oírlo entero o no es
        asunto de quien gira. */
-    marcarOida(t.track_id);
+    var pub = publicado(t);
+    /* Un tema ya publicado no gasta el turno: no es el premio que se prometió. */
+    if(!pub) marcarOida(t.track_id);
     if(!disco && window.ZDisco){
       disco = window.ZDisco.crear(corto(t));
       $('discoMonta').appendChild(disco.zona);
@@ -217,7 +240,15 @@
     $('tCred').hidden = true;
     $('tTotal').textContent = fmt(t.preview_seconds || 30);
     $('tAhora').textContent = '0:00';
-    $('tEstado').textContent = 'RECIÉN PUBLICADA';
+    $('tEstado').textContent = pub ? 'YA ESTÁ EN LAS PLATAFORMAS' : 'NO ESTÁ EN NINGUNA PLATAFORMA';
+    var bs = $('tSalio'), ns = $('tSalioNota');
+    if(bs){ bs.hidden = !pub; if(pub) bs.href = pub.url; }
+    if(ns) ns.hidden = !pub;
+    var gn = $('tGancho'); if(gn) gn.hidden = !!pub;   /* no aplica a un tema que ya salió */
+    /* Si ya salió, lo que corresponde ofrecer es otro giro, no el formulario. */
+    $('bElegir2').hidden = !!pub;
+    $('bOtra').hidden = false;
+    evento(pub ? 'ruleta_tema_publicado' : 'ruleta_tema_inedito');
     pararAudio(); pintarOnda(-1);
     paso('paso-tema');
   }
@@ -281,19 +312,23 @@
     caja.innerHTML = '';
     temas.forEach(function(t){
       var oida = ya.indexOf(t.track_id) >= 0;
-      var d = document.createElement('div');
-      d.className = 'cand' + (oida ? ' oida' : '');
+      var pub  = publicado(t);
+      /* Un tema publicado no se pinta con candado: mentiría. Va abierto y
+         enlazado, que además es el único de la lista que puede convertir aquí. */
+      var d = document.createElement(pub ? 'a' : 'div');
+      if(pub){ d.href = pub.url; d.target = '_blank'; d.rel = 'noopener'; }
+      d.className = 'cand' + (oida ? ' oida' : '') + (pub ? ' abierta' : '');
       var n = document.createElement('div'); n.className = 'n'; n.textContent = corto(t);
       var sb = document.createElement('div'); sb.className = 's';
-      sb.textContent = oida ? 'Ya la oíste' : 'Cerrada';
+      sb.textContent = pub ? 'Ya salió · escúchala ↗' : (oida ? 'Ya la oíste' : 'Cerrada');
       var ic = document.createElement('span'); ic.className = 'ic';
-      ic.innerHTML = oida
+      ic.innerHTML = (oida || pub)
         ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
         : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>';
       d.appendChild(n); d.appendChild(sb); d.appendChild(ic);
       caja.appendChild(d);
     });
-    var ya1 = temas.filter(function(t){ return ya.indexOf(t.track_id) >= 0; })[0];
+    var ya1 = temas.filter(function(t){ return ya.indexOf(t.track_id) >= 0 && !publicado(t); })[0];
     $('bloqueoSub').textContent = ya1
       ? 'Ya oíste ' + corto(ya1) + '. Deja tu correo, eliges cuál sigue, y además te enteras cuando salgan.'
       : 'Deja tu correo, eliges cuál quieres oír, y además te enteras cuando salgan.';
