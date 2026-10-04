@@ -70,5 +70,12 @@
     };
   }
 
+  /* 03-10-2026 · El CSS se inyecta al CARGAR el módulo, no al crear un disco.
+     Verificado en producción: index.html no llama a crear() —app.js construye
+     su propio DOM con las mismas clases— así que el disco de miembros quedó sin
+     estilos. Una hoja de componente pertenece al documento desde que el
+     componente se carga, no desde que alguien lo usa. */
+  estilos();
+
   window.ZDisco = { crear: crear, estilos: estilos };
 })();

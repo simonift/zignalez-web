@@ -118,6 +118,10 @@ h1.lead,h2.lead{font:800 clamp(23px,6.4vw,29px)/1.08 var(--font-d); letter-spaci
 /* Tamaño del disco en esta página. La definición del componente vive en
    assets/disco.js; acá solo se dice cuán grande va. */
 .ficha .zp-disco{--d:min(46vw,190px)}
+/* A 190px la etiqueta es un círculo de ~72px: el texto a 8px con .30em de
+   espaciado se salía y lo cortaba el orificio. Se ajusta solo en esta página;
+   el disco de miembros, que es más grande, conserva su medida. */
+.ficha .zp-label span{font-size:7px;letter-spacing:.14em}
 @media (max-width:420px){ .ficha .zp-disco{--d:min(52vw,170px)} }
 @media (prefers-reduced-motion:reduce){ .ficha .zp-disco{--d:min(38vw,140px)} }
 
